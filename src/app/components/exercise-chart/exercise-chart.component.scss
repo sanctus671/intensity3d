@@ -1,0 +1,138 @@
+.exercise-chart {
+  &__controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    &__metrics {
+      flex: 2;
+    }
+
+    &__accumulation {
+      flex: 1;
+    }
+  }
+
+  &__timeframes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    &__button {
+      &--active {
+        background-color: rgba(212, 71, 53, 0.1);
+        color: #d44735;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__chart-container {
+    position: relative;
+    min-height: 400px;
+    margin-bottom: 24px;
+
+    &__loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 400px;
+    }
+
+    &__chart {
+      width: 100%;
+      height: 400px;
+    }
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &__card {
+      // Card styles
+    }
+
+    &__metric {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      &__item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      &__icon {
+        color: #d44735;
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+
+      &__details {
+        flex: 1;
+
+        h5 {
+          margin: 0 0 4px 0;
+          font-size: 24px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+
+        h6 {
+          margin: 0 0 4px 0;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-secondary);
+        }
+
+        p {
+          margin: 0;
+          font-size: 12px;
+          color: var(--text-secondary);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .exercise-chart {
+    &__controls {
+      flex-direction: column;
+
+      &__metrics,
+      &__accumulation {
+        flex: 1;
+        width: 100%;
+      }
+    }
+
+    &__stats {
+      &__metric {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .exercise-chart {
+    &__timeframes {
+      &__button {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+    }
+
+    &__chart-container {
+      &__chart {
+        height: 300px;
+      }
+    }
+  }
+}

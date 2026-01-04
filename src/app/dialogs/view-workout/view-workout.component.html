@@ -1,0 +1,13 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ workout.name }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="view-workout">
+    <h4>{{ 'Day' | translate }} {{ workout.day }}</h4>
+    <p>{{ 'Contains' | translate }} {{ workout.exercises.length }} {{ 'exercises' | translate }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Dismiss' | translate }}</button>
+</mat-dialog-actions>

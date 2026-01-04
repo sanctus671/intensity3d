@@ -1,0 +1,61 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.workout-pool{
+    .workout-pool__loading{
+        margin-top:60px;
+        margin-bottom:60px;
+        mat-spinner{
+            margin:0 auto;     
+        }                
+    }    
+    
+    .workout-pool__program__name.mat-subheader{
+        background-color: var(--primary-color);
+        color: var(--mat-sys-on-primary);    
+        margin-top:5px;  
+        cursor:pointer;
+        
+        button{
+            display: inline-block;
+            margin-left: auto;            
+        }
+    } 
+    
+    .workout-pool__program__workouts{
+        padding: 0px 20px;
+        
+        .workouts__actions{
+            text-align: center;
+            margin-top: 20px;    
+            button{
+                margin:0px 3px;
+            }
+        }
+        
+        > h5{
+            margin: 0px;
+            font-size: 16px;
+            margin-top: 25px;
+            margin-bottom: 10px;            
+        }
+    }
+    
+    .workouts__workouts-list{
+        button{
+            margin: 0px 5px;
+            font-size: 12px;
+            line-height: 30px;
+            padding: 0px 12px;
+            height: 32px; 
+            width:140px;
+        }        
+    }
+}

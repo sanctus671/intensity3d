@@ -1,0 +1,44 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.add-program-list{
+    .add-program-list__search{
+        width:100%;
+    }
+    
+    .add-program-list__nav{
+        a{
+            cursor:pointer;
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+    }
+    
+    .program-list{
+        .program-list__add-program{
+            text-align:center;
+            margin-top:10px;
+            margin-bottom:10px;
+            
+            button{
+                margin-top:5px;
+            }
+        }
+    }
+    
+    mat-list-item{
+        mat-icon{
+            order: 10;
+            flex: 1;
+            text-align: right;
+            opacity:0.2;            
+        }  
+    }
+}

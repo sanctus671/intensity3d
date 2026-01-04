@@ -1,0 +1,72 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Manage' | translate }} {{ program.name }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="manage-program">
+    @if (loading) {
+        <div class="manage-program__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+
+    @for (cycle of programWorkouts; track cycle.addid; let i = $index) {
+        <mat-list class="manage-program__program">
+            <h3 matSubheader (click)="cycle.show = !cycle.show" class="manage-program__program__name">
+                {{ 'Added' | translate }} {{ formatDate(cycle.workouts[0].assigneddate) }} ({{ cycle.workouts.length }} {{ 'workouts' | translate }})
+                
+                @if (cycle.addid) {
+                    <button mat-icon-button (click)="removeProgram($event, cycle.addid, i)" [attr.aria-label]="'Remove' | translate">
+                        <mat-icon>delete_outline</mat-icon>
+                    </button>
+                }
+            </h3>
+            
+            @if (cycle.show) {
+                <div class="manage-program__program__workouts workouts">  
+                    <div class="workouts__actions">
+                        <button mat-flat-button color="primary" (click)="removeProgram($event, cycle.addid, i)">
+                            {{ 'Remove Program' | translate }}
+                        </button> 
+                        <button mat-stroked-button color="primary" (click)="updateMaxes(cycle.addid, i)">
+                            {{ 'Update Maxes' | translate }}
+                        </button>
+                    </div>
+
+                    <h5>{{ 'Workouts' | translate }}</h5>
+
+                    @for (workout of cycle.workouts; track workout.assigneddate) {
+                        <mat-accordion displayMode="flat" [multi]="true" class="workouts__workout">
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{ formatDate(workout.assigneddate) }} ({{ workout.workout }})
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>   
+                                
+                                <mat-nav-list class="workouts__workout__exercises">
+                                    @for (exercise of workout.sets; track exercise.id; let i2 = $index) {
+                                        <mat-list-item (click)="openSet(workout.sets, exercise, i2)">
+                                            <h2 matLine>{{ exercise.name }}</h2>
+                                            <p matLine>
+                                                {{ exercise.weight }}{{ exercise.unit }}@if (exercise.reps && exercise.reps > 0) {<span>, {{ exercise.reps }} {{ 'rep' | translate }}@if (exercise.reps !== '1') {<span>s</span>}</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}
+                                            </p>
+                                            <mat-icon matListIcon>chevron_right</mat-icon>
+                                        </mat-list-item>
+                                    }
+                                </mat-nav-list>
+                            </mat-expansion-panel>                              
+                        </mat-accordion>
+                    }
+                </div>
+            }
+        </mat-list>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button (click)="dismiss()">{{ 'Close' | translate }}</button>
+    <a mat-button [routerLink]="['/programs/' + program.id, {name:program.name}]" target="_blank">
+        {{ 'View Program' | translate }}
+    </a>
+</mat-dialog-actions>

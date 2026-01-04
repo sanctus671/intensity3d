@@ -1,0 +1,54 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Select Exercise' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="change-exercise">
+    <mat-form-field class="change-exercise__search">
+        <input matInput type="text" [placeholder]="'Search exercises' | translate" [(ngModel)]="properties.search">
+        @if (properties.search) {
+            <button mat-button matSuffix mat-icon-button [attr.aria-label]="'Clear' | translate" (click)="properties.search = ''">
+                <mat-icon>close</mat-icon>
+            </button>
+        }
+    </mat-form-field>
+    
+    <mat-tab-group class="change-exercise__nav">
+        <mat-tab [label]="'Exercises' | translate">
+            <mat-nav-list>
+                @for (recentExercise of recentExercises; track recentExercise.exerciseid || recentExercise.id) {
+                    <mat-list-item (click)="selectExercise(recentExercise)">
+                        {{ recentExercise.name }}
+                        <mat-icon matListIcon>chevron_right</mat-icon>
+                    </mat-list-item>
+                }
+            </mat-nav-list>             
+        </mat-tab>
+        
+        <mat-tab [label]="'Muscle Groups' | translate">            
+            <mat-nav-list>
+                @for (musclegroup of musclegroups; track musclegroup) {
+                    <mat-list-item (click)="selectMusclegroup(musclegroup)">
+                        {{ musclegroup }}
+                        <mat-icon matListIcon>chevron_right</mat-icon>
+                    </mat-list-item>
+                }
+            </mat-nav-list>             
+        </mat-tab>        
+
+        <mat-tab [label]="'Exercise Types' | translate">            
+            <mat-nav-list>
+                @for (exerciseType of exerciseTypes; track exerciseType) {
+                    <mat-list-item (click)="selectExerciseType(exerciseType)">
+                        {{ exerciseType }}
+                        <mat-icon matListIcon>chevron_right</mat-icon>
+                    </mat-list-item>
+                }
+            </mat-nav-list>                
+        </mat-tab>             
+    </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+</mat-dialog-actions>

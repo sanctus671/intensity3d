@@ -1,0 +1,120 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Goal Settings' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="goal-settings">
+    <mat-form-field>
+        <mat-label>{{ 'Primary Goal' | translate }}</mat-label>
+        <mat-select [(ngModel)]="account.goals.primary" name="primary-goal" (ngModelChange)="updateSettings()">
+            <mat-option value="volume">{{ 'Volume' | translate }}</mat-option>
+            <mat-option value="reps">{{ 'Reps' | translate }}</mat-option>
+            <mat-option value="weight">{{ 'Weight' | translate }}</mat-option>
+            <mat-option value="none">{{ 'None' | translate }}</mat-option>
+        </mat-select>
+    </mat-form-field>  
+
+    @if (account.goals.primary !== 'none') {
+        <div class="goal-settings__goal-options">
+            <mat-form-field>
+               <mat-label>{{ 'Target' | translate }}</mat-label>
+               <mat-select [(ngModel)]="account.goals.target" (ngModelChange)="updateSettings()">
+                   <mat-option value="alltime">{{ 'All time best' | translate }}</mat-option>
+                   <mat-option value="custom">{{ 'Custom' | translate }}</mat-option>
+                   <mat-option value="customexercise">{{ 'Exercise specific targets' | translate }}</mat-option>
+                   <mat-option value="none">{{ 'None' | translate }}</mat-option>
+               </mat-select>
+            </mat-form-field>         
+
+            @if (account.goals.target === 'custom') {
+                <mat-form-field>
+                    <mat-label>
+                        {{ 'Custom Target' | translate }} 
+                        @if (account.goals.primary === 'volume' || account.goals.primary === 'weight') {
+                            <span>({{ account.units }})</span>
+                        }
+                    </mat-label>
+                    <input matInput type="number" [(ngModel)]="account.goals.custom_target">
+                </mat-form-field>
+            }
+
+            @if (account.goals.target === 'customexercise') {
+                <div class="goal-settings__goal-options__exercise-targets exercise-targets">
+                    @for (target of account.goals.exercise_targets; track target.id; let i = $index) {
+                        <div class="exercise-targets__exercise-target">
+                            <div class="exercise-targets__exercise-target__target-exercise" (click)="openSelectExercise(target)">
+                                @if (!target.exerciseid) {
+                                    <span>{{ 'Select Exercise' | translate }}</span>
+                                } @else {
+                                    <span>{{ target.name }}</span>
+                                }
+                            </div>  
+
+                            <mat-form-field>
+                                <mat-label>{{ 'Target' | translate }}</mat-label>
+                                <input matInput type="number" [(ngModel)]="target.target" (ngModelChange)="updateTarget(target)">
+                            </mat-form-field> 
+
+                            <mat-icon (click)="deleteTarget(i, target)" color="primary">delete_outline</mat-icon> 
+                        </div>
+                    }
+
+                    <button mat-button (click)="createTarget()" color="primary">
+                        {{ 'Add Target' | translate }}
+                    </button>
+                </div>
+            }
+
+            <mat-form-field>
+               <mat-label>{{ 'Goal Timeframe' | translate }}</mat-label>
+               <mat-select [(ngModel)]="account.goals.timeframe" (ngModelChange)="updateSettings()">
+                   <mat-option value="workout">{{ 'Per workout' | translate }}</mat-option>
+                   <mat-option value="week">{{ 'Per week' | translate }}</mat-option>
+                   <mat-option value="month">{{ 'Per month' | translate }}</mat-option>
+                   <mat-option value="custom">{{ 'Specific number of days' | translate }}</mat-option>
+               </mat-select>
+            </mat-form-field>   
+
+            <div class="goal-settings__timeframe-options">
+                @if (account.goals.timeframe === 'custom') {
+                    <mat-form-field>
+                        <mat-label>{{ 'Timeframe (days)' | translate }}</mat-label>
+                        <input matInput type="number" [(ngModel)]="account.goals.custom_timeframe" (ngModelChange)="updateSettings()">
+                    </mat-form-field> 
+
+                    <mat-form-field>
+                       <mat-label>{{ 'Day To Count From' | translate }}</mat-label>
+                       <mat-select [(ngModel)]="account.goals.day" (ngModelChange)="setTimeframeDay()">
+                           <mat-option value="monday">{{ 'Monday' | translate }}</mat-option>
+                           <mat-option value="tuesday">{{ 'Tuesday' | translate }}</mat-option>
+                           <mat-option value="wednesday">{{ 'Wednesday' | translate }}</mat-option>
+                           <mat-option value="thursday">{{ 'Thursday' | translate }}</mat-option>
+                           <mat-option value="friday">{{ 'Friday' | translate }}</mat-option>
+                           <mat-option value="saturday">{{ 'Saturday' | translate }}</mat-option>
+                           <mat-option value="sunday">{{ 'Sunday' | translate }}</mat-option>
+                       </mat-select>
+                    </mat-form-field>
+                }
+            </div>
+
+            <mat-form-field>
+               <mat-label>{{ 'Group By' | translate }}</mat-label>
+               <mat-select [(ngModel)]="account.goals.grouping" (ngModelChange)="updateSettings()">
+                   <mat-option value="exercise">{{ 'Exercise' | translate }}</mat-option>
+                   <mat-option value="exercisetype">{{ 'Exercise type (e.g. squat)' | translate }}</mat-option>
+                   <mat-option value="musclegroup">{{ 'Musclegroup (e.g. biceps)' | translate }}</mat-option>               
+                   <mat-option value="session">{{ 'Session' | translate }}</mat-option>
+               </mat-select>
+            </mat-form-field> 
+                  
+            <button mat-flat-button (click)="openGoalResetsModal()" color="primary">
+                {{ 'Create Reset Points' | translate }}
+            </button>
+        </div>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+    <button mat-button (click)="add()" color="primary">{{ 'Save' | translate }}</button>
+</mat-dialog-actions>

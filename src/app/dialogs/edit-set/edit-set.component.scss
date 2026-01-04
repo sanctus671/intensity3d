@@ -1,0 +1,107 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+    
+    .delete-set{
+        display: inline-block;
+        position: absolute;
+        top: 20px;
+        right: 80px;
+        line-height: 32px;       
+        cursor:pointer;
+        font-size: 14px;
+        font-weight: 500;   
+        color: var(--primary-color);
+    }
+}
+
+.edit-set{
+    
+    .edit-set__set-record{
+        font-size: 12px;
+        text-align: center;
+        background-color: var(--primary-color);
+        border-radius: 4px;
+        color: var(--mat-sys-on-primary);
+        padding: 10px 5px;
+        margin-bottom: 15px;     
+        
+        mat-icon{
+            font-size: 13px;
+            width: 13px;
+            height: 13px;
+            margin-right: 3px;
+            vertical-align: top;
+        }    
+    }
+    
+    mat-form-field{
+        width:100%;
+    }
+    
+    .edit-set__mass-edit{
+        margin-bottom: 18px;
+        display: block;
+    }
+    
+    .edit-set__extra-action{
+        button{
+            font-size: 12px;
+            padding: 0 10px;
+            line-height: 30px;
+            float: right;
+            margin-left: 5px;
+        }
+    }
+    
+    .edit-set__rpe{
+        margin-top:6px;
+        mat-slider{
+            width:100%;
+        }
+        
+        p{
+            margin:0px;
+        }
+        
+        .mat-badge-content{
+            font-size: 10px;
+            top: 0px;
+            right: 0px !important;
+        }
+    }
+    
+    .edit-set__more-options{
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: block;
+        
+        mat-expansion-panel{
+            box-shadow: none;
+            border: 1px solid var(--divider-color);
+        }
+
+        .mat-expansion-indicator{
+            height: 8px;
+            margin-top: -3px;
+            &:after{
+                vertical-align: top;
+            }
+        }
+        
+        div.mat-expansion-panel-content {
+            height: 0px;
+        }    
+        
+        mat-expansion-panel.mat-expanded{
+            div.mat-expansion-panel-content {
+                height: auto;
+            }            
+        }
+    }
+}

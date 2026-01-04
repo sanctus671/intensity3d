@@ -1,0 +1,144 @@
+<mat-toolbar color="primary" class="main-toolbar">
+  
+  <mat-icon class="main-toolbar__menu-toggle" (click)="toggleMenu()">menu</mat-icon>
+  
+  <span class="main-toolbar__logo" [routerLink]="['/diary']">
+    <img [src]="themeService.isDark() ? 'assets/logo-white-alt.png' : 'assets/logo.png'" alt="Intensity Logo" />
+  </span>
+  
+  
+  <div class="main-toolbar__diary-nav diary-nav">
+    <button mat-stroked-button (click)="setToday()" class="diary-nav__today" [matTooltip]="getTodayFormatted()" [matTooltipShowDelay]="500">{{ 'Today' | translate }}</button>    
+    <div class="diary-nav__arrows">
+      <button mat-icon-button class="diary-nav__arrows__left" (click)="changeWeek('left')" matTooltip="Previous week" [matTooltipShowDelay]="500"><mat-icon>chevron_left</mat-icon></button> 
+      <button mat-icon-button class="diary-nav__arrows__right" (click)="changeWeek('right')" matTooltip="Next week" [matTooltipShowDelay]="500"><mat-icon>chevron_right</mat-icon></button> 
+    </div>
+    <div class="diary-nav__active-date" [routerLink]="['/diary']">{{ getSelectedMonth() }}</div>
+  </div>
+  
+  
+  <span class="main-toolbar__spacer"></span>
+
+  
+  
+  <a mat-button class="main-toolbar__programs" [routerLink]="['/programs']">
+    {{ 'Browse Programs' | translate }}
+  </a>
+  
+  <button mat-button [matMenuTriggerFor]="menu" disableRipple="true" class="main-toolbar__avatar">
+    <span [style.background-image]="'url(' + account().dp + ')'"></span>
+  </button>
+        
+  
+  <mat-menu #menu="matMenu" yPosition="below" [overlapTrigger]="false" class="main-toolbar__dropdown">
+    <button mat-menu-item [routerLink]="['/profile']" [routerLinkActive]="['active']">
+      <mat-icon>person</mat-icon>
+      <span>{{ 'Profile' | translate }}</span>
+    </button>      
+    <button mat-menu-item [routerLink]="['/settings']" [routerLinkActive]="['active']">
+      <mat-icon>settings</mat-icon>
+      <span>{{ 'Settings' | translate }}</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>lock</mat-icon>
+      <span>{{ 'Logout' | translate }}</span>
+    </button>
+  </mat-menu> 
+
+  
+</mat-toolbar>
+
+<mat-sidenav-container class="content-container">
+  
+  
+  <mat-sidenav class="content-container__sidemenu mat-elevation-z1" [opened]="sidenavOpened()" (click)="toggleMenu()" (openedChange)="menuChanged($event)" autoFocus="false">
+
+    <mat-nav-list>
+      @if (!account().premium) {
+        <a mat-list-item [routerLink]="['/premium']" [routerLinkActive]="['active']" class="content-container__sidemenu__premium">
+          <mat-icon matListIcon>star</mat-icon>
+          {{ 'Explore Premium' | translate }}
+        </a> 
+      }
+    </mat-nav-list>   
+
+    
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/diary']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>book</mat-icon>
+        {{ 'Diary' | translate }}
+      </a> 
+    </mat-nav-list>       
+    
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/records']" [routerLinkActive]="['active']">
+<!--         <mat-icon matListIcon svgIcon="trophy"></mat-icon> -->
+        {{ 'Records' | translate }}
+      </a> 
+    </mat-nav-list>  
+
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/stats']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>trending_up</mat-icon>
+        {{ 'Stats' | translate }}
+      </a> 
+    </mat-nav-list>  
+
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/leaderboard']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>sort</mat-icon>
+        {{ 'Leaderboard' | translate }}
+      </a> 
+    </mat-nav-list>  
+
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/friends']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>group</mat-icon>
+        {{ 'Friends' | translate }}
+      </a> 
+    </mat-nav-list>          
+
+
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/messages']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>message</mat-icon>
+        {{ 'Messages' | translate }}
+      </a> 
+    </mat-nav-list>   
+    
+    
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/programs']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>calendar_today</mat-icon>
+        {{ 'Programs' | translate }}
+      </a> 
+    </mat-nav-list>   
+    
+    
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/bodyweight']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>accessibility</mat-icon>
+        {{ 'Bodyweight' | translate }}
+      </a> 
+    </mat-nav-list>          
+
+
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="['/settings']" [routerLinkActive]="['active']">
+        <mat-icon matListIcon>settings</mat-icon>
+        {{ 'Settings' | translate }}
+      </a> 
+    </mat-nav-list>           
+    
+    
+  </mat-sidenav>
+  
+  
+  <mat-sidenav-content class="content-container__content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+  
+  
+  
+</mat-sidenav-container>

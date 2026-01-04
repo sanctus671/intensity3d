@@ -1,0 +1,43 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.import{
+    
+    
+    mat-form-field{
+        width:100%;
+    }
+    
+    .import__upload{
+        margin: 0px;
+        margin-bottom: 5px;        
+    }
+    
+    .import__filename{
+        margin-left:5px;
+    }
+    
+    .import__import-explaination{
+        font-size:14px;
+        
+        span{
+            display: block;
+            font-weight: 700;
+            margin-top: 10px;    
+        }        
+        
+    }
+    
+}

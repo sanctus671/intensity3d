@@ -1,0 +1,82 @@
+<app-login-container>
+    <h3>{{ 'Login' | translate }}</h3>
+    <p>{{ 'Sign in to access your workout data.' | translate }}</p>
+
+    <div class="login-form__social-login social-login">
+        <button 
+            class="social-login__facebook" 
+            mat-flat-button 
+            color="primary" 
+            [disabled]="fbLoading() || loading() || appleLoading()" 
+            (click)="fbLogin()">
+            <mat-icon svgIcon="facebook"></mat-icon>
+            {{ 'Login with Facebook' | translate }}
+            @if (fbLoading() && !loading() && !appleLoading()) {
+                <mat-spinner class="button-spinner" diameter="14" mode="indeterminate" color="primary"></mat-spinner>
+            }
+        </button>
+
+        <button 
+            class="social-login__apple" 
+            mat-flat-button 
+            color="primary" 
+            [disabled]="appleLoading() || loading() || fbLoading()" 
+            (click)="appleLogin()">
+            <mat-icon svgIcon="apple"></mat-icon>
+            {{ 'Login with Apple' | translate }}
+            @if (appleLoading() && !loading() && !fbLoading()) {
+                <mat-spinner class="button-spinner" diameter="14" mode="indeterminate" color="primary"></mat-spinner>
+            }
+        </button>
+    </div>
+
+    <form #form="ngForm" (ngSubmit)="login(form.value)">
+        <mat-form-field appearance="outline">
+            <mat-label>{{ 'Email' | translate }}</mat-label>
+            <input 
+                matInput 
+                type="email" 
+                name="email" 
+                ngModel 
+                required 
+                email>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>{{ 'Password' | translate }}</mat-label>
+            <input 
+                matInput 
+                type="password" 
+                name="password" 
+                ngModel 
+                required>
+        </mat-form-field>
+
+        @if (errors().length > 0) {
+            <p class="errors">
+                @for (error of errors(); track error) {
+                    <span>{{ error }}</span>
+                }
+            </p>
+        }
+
+        <div class="login-form__actions">
+            <button 
+                mat-flat-button 
+                color="primary" 
+                [disabled]="loading() || fbLoading()">
+                {{ 'Login' | translate }}
+                @if (loading() && !fbLoading()) {
+                    <mat-spinner class="button-spinner" diameter="14" mode="indeterminate" color="primary"></mat-spinner>
+                }
+            </button>
+
+            <a routerLink="/forgot-password">{{ 'Forgot Password?' | translate }}</a>
+        </div>
+
+        <div class="login-form__secondary-actions">
+            <a routerLink="/register">{{ 'Create an account' | translate }}</a>
+        </div>
+    </form>
+</app-login-container>
+

@@ -1,0 +1,61 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Pooled Workouts' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="workout-pool">
+    @if (loading) {
+        <div class="workout-pool__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+
+    @if (!loading) { 
+        @for (program of programs; track program) {
+            <mat-list class="workout-pool__program">
+                <h3 matSubheader class="workout-pool__program__name">
+                    {{ programNames[program] }}
+
+                    <button mat-icon-button (click)="deleteWorkoutPool(workoutPool[program][0].addid)" [attr.aria-label]="'Remove' | translate">
+                        <mat-icon>delete_outline</mat-icon>
+                    </button>
+                </h3>
+
+                <div class="workout-pool__program__workouts workouts">  
+                    <div class="workouts__actions">
+                        <button mat-flat-button color="primary" (click)="deleteWorkoutPool(workoutPool[program][0].addid)">
+                            {{ 'Remove Program' | translate }}
+                        </button> 
+                        <button mat-stroked-button color="primary" (click)="updateMaxes(workoutPool[program][0])">
+                            {{ 'Update Maxes' | translate }}
+                        </button>
+                    </div>
+
+                    <h5>{{ 'Workouts' | translate }}</h5>
+
+                    <mat-nav-list class="workouts__workouts-list">
+                        @for (workout of workoutPool[program]; track workout.id) {
+                            <mat-list-item (click)="viewWorkout(workout)">
+                                <h2 matLine>{{ workout.workout_name }}</h2>
+                                @if (!workout.added || workout.added === '0' || workout.tapped) {
+                                    <button mat-stroked-button color="primary" (click)="addWorkout($event, workout)">
+                                        {{ 'Add Workout' | translate }}
+                                    </button>
+                                }
+                                @if ((workout.added === '1' || workout.added === 1) && !workout.tapped) {
+                                    <button mat-stroked-button color="primary" disabled>
+                                        {{ 'Added' | translate }}
+                                    </button>
+                                }
+                            </mat-list-item>
+                        }
+                    </mat-nav-list>   
+                </div>
+            </mat-list>
+        }
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button (click)="dismiss()">{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

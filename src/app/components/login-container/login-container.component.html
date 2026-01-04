@@ -1,0 +1,24 @@
+<div class="login">
+    <div>
+        <div class="login__logo">
+            <img src="assets/logo-white.png" alt="Intensity Logo"/>
+        </div>
+        <mat-card class="login__login-form login-form">
+            <ng-content></ng-content>
+        </mat-card>
+
+        <div class="login__legal">
+            <a href="https://www.intensityapp.com/privacy-policy/" target="_blank" rel="noopener">
+                <span>{{ 'Privacy policy' | translate }}</span>
+            </a>
+            <a href="https://www.intensityapp.com/terms-of-use/" target="_blank" rel="noopener">
+                <span>{{ 'Terms of use' | translate }}</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="login__support">
+        {{ 'Having trouble logging in?' | translate }} 
+        <a href="https://www.intensityapp.com/contact-us" target="_blank" rel="noopener">{{ 'Contact us' | translate }}</a>
+    </div>
+</div>

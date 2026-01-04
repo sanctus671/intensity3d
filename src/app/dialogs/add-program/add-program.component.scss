@@ -1,0 +1,103 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.add-program{
+    mat-form-field{
+        width:100%;
+    }
+    
+    a{
+        cursor:pointer;
+    }
+    
+    .add-program__timeline{
+        font-size: 14px;
+        line-height: 18px;
+        margin-bottom: 25px;
+        margin-top: 0px;
+    }
+    
+    .mat-accordion{  
+        margin-bottom: 10px;
+        display: block;
+        mat-expansion-panel{
+            box-shadow: none;
+            border: 1px solid var(--divider-color);
+        }
+        
+        &.add_program__maxes.add_program__maxes--maxes-required mat-expansion-panel{
+            border: 1px solid var(--primary-color);
+        }
+        
+        &.add_program__maxes.add_program__maxes--maxes-required mat-expansion-panel-header{
+            background-color: var(--primary-color);
+            
+            .mat-expansion-panel-header-title{
+                color: var(--mat-sys-on-primary);
+            }
+            
+            .mat-expansion-indicator::after{
+                color: var(--mat-sys-on-primary);
+            }
+        }
+        
+        &.add_program__maxes.add_program__maxes--maxes-required  .mat-expansion-panel-header:not([aria-disabled=true]):hover{
+            background-color: var(--primary-color);
+        }
+        
+        &.add_program__maxes .mat-expansion-panel-body{
+            margin-top:10px;
+        }
+
+        .mat-expansion-indicator{
+            height: 8px;
+            margin-top: -3px;
+            &:after{
+                vertical-align: top;
+            }
+        }
+
+        div.mat-expansion-panel-content {
+            height: 0px;
+        }    
+
+        mat-expansion-panel.mat-expanded{
+            div.mat-expansion-panel-content {
+                height: auto;
+            }            
+        } 
+        
+        h5{
+            border-bottom: 1px solid var(--divider-color);
+            font-size: 14px;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        
+        .add_program__options__advanced__exercise-progression-amounts-toggle{
+            display: block;
+            margin-top: -5px;
+            margin-bottom: 10px;            
+        }
+    }
+    
+    .add_program__maxes__calculator, .add_program__options__advanced__exercise-progression-amounts{
+        padding: 10px 15px;
+        background-color: var(--surface-color);
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+        margin-top: 5px;
+
+        p{
+            margin: 0px;
+            margin-bottom: 5px;
+        }
+    }
+}

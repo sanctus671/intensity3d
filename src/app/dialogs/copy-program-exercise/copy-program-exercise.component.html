@@ -1,0 +1,19 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Copy' | translate }} {{ workout.name }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="change-units">
+    <p>{{ 'Select the workouts you want to copy to' | translate }}</p>
+    
+    @for (workout of workouts; track workout.index) {
+        <mat-checkbox [(ngModel)]="workout.value" labelPosition="before" color="primary">
+            {{ workout.name }}
+        </mat-checkbox>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="copy()" color="primary">{{ 'Copy' | translate }}</button>
+</mat-dialog-actions>

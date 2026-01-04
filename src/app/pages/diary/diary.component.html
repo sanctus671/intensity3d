@@ -1,0 +1,242 @@
+<div class="diary">
+    <div class="diary__sidebar">
+        <div class="diary__sidebar__calendar">
+            <mat-calendar 
+                [selected]="selectedDateCalendar" 
+                (selectedChange)="onCalendarSelect($event)" 
+                [dateClass]="dateClass()" 
+                [minDate]="minDate">
+            </mat-calendar>
+        </div>
+
+        @if (quickAddExercises && quickAddExercises.length > 0) {
+            <div class="diary__sidebar__section diary__sidebar__quick-add">
+                <mat-nav-list dense>
+                    <h3 mat-subheader>{{ 'Quick Add Exercise' | translate }}</h3>
+                    @for (exercise of quickAddExercises; track exercise.exerciseid || exercise.id) {
+                        <mat-list-item (click)="quickAddExercise(exercise)">
+                            {{ exercise.name }}
+                            
+                            
+                            <div matListItemMeta>
+                                <mat-icon mat-list-icon>add</mat-icon>
+                              </div>  
+                        </mat-list-item>
+                    }
+                </mat-nav-list>            
+            </div>
+        }
+
+        @if (workoutDates && workoutDates.length > 0) {
+            <div class="diary__sidebar__section diary__sidebar__latest-workouts">
+                <mat-nav-list dense>
+                    <h3 mat-subheader>{{ 'Latest Workouts' | translate }}</h3>
+                    @for (workoutDate of workoutDates | slice:0:10; track workoutDate; let i = $index) {
+                        <mat-list-item (click)="copyWorkout(workoutDate)">
+                            {{ formatDate(workoutDate) }}
+                            
+                            <div matListItemMeta>
+                                <mat-icon mat-list-icon>file_copy</mat-icon>
+                              </div>                            
+                        </mat-list-item>
+                    }
+                </mat-nav-list>  
+            </div>
+        }
+    </div>
+    
+    <div class="diary__diary-content">
+        <div class="diary__diary-content__day-nav day-nav">
+            @for (day of weekdays; track day.moment) {
+                <div 
+                    class="day-nav__day" 
+                    [class.day-nav__day--active]="day.active" 
+                    [class.day-nav__day--has-workout]="day.hasWorkout" 
+                    [class.day-nav__day--is-today]="day.isToday"
+                    (click)="selectDate(day.moment)">
+                    <h6>{{ day.dayName }}</h6>
+                    <h3>{{ day.day }}</h3>
+                </div>
+            }
+        </div>
+
+        <div class="diary__diary-content__diary-workout diary-workout">
+            @for (activeProgram of activePrograms; track activeProgram.id) {
+                <div class="diary-workout__active-program">
+                    <span>{{ 'Active' | translate }}: {{ activeProgram.name }}</span>
+                    <button mat-button (click)="manageProgram(activeProgram)">
+                        {{ 'Manage Program' | translate }}
+                    </button>
+                </div>
+            }
+
+            @if (workoutPool && workoutPool.length > 0) {
+                <div class="diary-workout__workout-pool workout-pool">
+                    <div class="workout-pool__program-name">
+                        <span>{{ 'Pooled' | translate }}: {{ workoutPool[0].program_name }}</span>
+                        <button 
+                            mat-button 
+                            class="workout-pool__view-workout-pool" 
+                            (click)="viewWorkoutPool(workoutPool[0])">
+                            {{ 'View all workouts' | translate }}
+                        </button>
+                    </div>
+                    <div class="workout-pool__workout-name" (click)="viewPooledWorkout(workoutPool[0])">
+                        <span class="workout-pool__workout-name__name">{{ workoutPool[0].workout_name }}</span>
+                        <button mat-button (click)="addPooledWorkout($event, workoutPool[0])">
+                            {{ 'Add Workout' | translate }}
+                        </button> 
+                    </div>
+                </div>
+            }
+
+            @if (loading) {
+                <div class="diary-workout__loading">
+                    <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            }
+
+            @if (!loading && workouts[selectedDateString].length < 1) {
+                <div class="diary-workout__empty">
+                    <mat-icon>book</mat-icon>
+                    <h2>{{ 'Diary Empty' | translate }}</h2>
+                </div>
+            }
+
+            @if (!loading && workouts[selectedDateString].length > 0) {
+                <div 
+                    class="diary-workout__workout workout" 
+                    cdkDropList 
+                    (cdkDropListDropped)="dropExercise($event)">
+                    @for (exercise of workouts[selectedDateString]; track exercise.exerciseid; let ei = $index) {
+                        <div class="workout__exercise" cdkDrag>
+                            <div class="workout__exercise__info">
+                                <div class="workout__exercise__name" cdkDragHandle>
+                                    {{ exercise.name }}
+                                </div>
+                                
+                                <div class="workout__exercise__actions">
+                                    <div class="workout__exercise__actions__primary">
+                                        <button 
+                                            mat-button 
+                                            (click)="openGoals(exercise)"
+                                            [attr.aria-label]="'Goals' | translate">
+                                            <mat-icon>event_available</mat-icon> 
+                                            {{ 'Goals' | translate }}
+                                        </button>
+                                        <button 
+                                            mat-button 
+                                            (click)="openRecords(exercise)"
+                                            [attr.aria-label]="'Records' | translate">
+                                            <mat-icon svgIcon="trophy"></mat-icon> 
+                                            {{ 'Records' | translate }}
+                                        </button>
+                                        <button 
+                                            mat-button 
+                                            (click)="openHistory(exercise)"
+                                            [attr.aria-label]="'History' | translate">
+                                            <mat-icon>replay</mat-icon> 
+                                            {{ 'History' | translate }}
+                                        </button>
+                                        <button 
+                                            mat-button 
+                                            (click)="openStats(exercise)"
+                                            [attr.aria-label]="'Stats' | translate">
+                                            <mat-icon>trending_up</mat-icon> 
+                                            {{ 'Stats' | translate }}
+                                        </button>
+                                    </div>
+                                    <div class="workout__exercise__actions__secondary">
+                                        <button 
+                                            mat-icon-button 
+                                            (click)="copyExercise(exercise)"
+                                            [attr.aria-label]="'Copy exercise' | translate">
+                                            <mat-icon>file_copy</mat-icon>
+                                        </button>
+                                        <button 
+                                            mat-icon-button 
+                                            (click)="shareExercise(exercise)"
+                                            [attr.aria-label]="'Share exercise' | translate">
+                                            <mat-icon>share</mat-icon>
+                                        </button>
+                                        <button 
+                                            mat-icon-button 
+                                            class="workout__exercise__actions__secondary__delete"
+                                            (click)="removeExercise(exercise, ei)"
+                                            [attr.aria-label]="'Remove exercise' | translate">
+                                            <mat-icon>delete_outline</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div 
+                                class="workout__exercise__sets" 
+                                cdkDropList 
+                                cdkDropListOrientation="horizontal" 
+                                (cdkDropListDropped)="dropSet($event, exercise)">
+                                @for (set of exercise.sets; track set.id; let i = $index) {
+                                    <div 
+                                        class="workout__exercise__sets__set set" 
+                                        [class.set--set-incomplete]="!set.completed || set.completed === '0'"
+                                        [class.set--has-notes]="set.notes || set.video"
+                                        [class.set--is-record]="set.is_overall_record"
+                                        (click)="editSet(set, exercise, i)" 
+                                        cdkDrag>
+                                        <mat-icon (click)="toggleSet($event, set, exercise)">check_circle</mat-icon>
+                                        <span class="set__details">{{ set.reps }} x {{ set.weight }}{{ set.unit }}</span>
+                                    </div>
+                                }
+                                
+                                <button 
+                                    mat-button 
+                                    color="primary" 
+                                    class="workout__exercise__sets__add"
+                                    [class.workout__exercise__sets__add--sets-added]="exercise.sets.length > 0"
+                                    (click)="addSets(exercise)">
+                                    <mat-icon>add_circle</mat-icon> 
+                                    {{ 'Add Sets' | translate }}
+                                </button>
+                            </div>
+                            
+                            <div class="workout__exercise__bar-progress-container">
+                                <div 
+                                    class="workout__exercise__bar-progress" 
+                                    [class.calibrating]="exercise.calibrating"
+                                    [style.width.%]="(exercise.goals.progress / exercise.goals.goal) * 100">
+                                </div> 
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (!loading) {
+                <div class="diary-workout__actions">
+                    <button 
+                        mat-flat-button 
+                        color="primary" 
+                        (click)="addExercise()">
+                        {{ 'Add Exercise' | translate }}
+                    </button>
+                    <button 
+                        mat-stroked-button 
+                        color="primary" 
+                        (click)="addProgram()">
+                        {{ 'Add Program' | translate }}
+                    </button>
+                    @if (workoutDates && workoutDates.length > 0) {
+                        <button 
+                            mat-stroked-button 
+                            (click)="copyWorkout('')">
+                            {{ 'Copy Workout' | translate }}
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+

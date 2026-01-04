@@ -1,0 +1,174 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Confirm Details' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="add-program">
+    <mat-form-field class="add-program__date">
+        <mat-label>{{ 'Start Date' | translate }}</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="startDate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field> 
+    
+    <p class="add-program__timeline">
+        {{ 'The program will start on' | translate }} <strong>{{ formatDate(startDate) }}</strong> 
+        {{ 'and end on' | translate }} <strong>{{ getEndDate() }}</strong>
+    </p>
+    
+    <mat-accordion displayMode="flat" [multi]="true" class="add_program__maxes" [class.add_program__maxes--maxes-required]="maxCount < exercises.length">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ maxCount }}/{{ exercises.length }} {{ 'Max' | translate }}@if (exercises.length !== 1) {<span>es</span>}&nbsp;{{ 'Entered' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            
+            @for (exercise of exercises; track exercise) {
+                <mat-form-field class="add_program__maxes__exercise">
+                    <mat-label>{{ maxes[exercise].name }}</mat-label>
+                    <input 
+                        matInput 
+                        type="number" 
+                        [(ngModel)]="maxes[exercise].max" 
+                        (ngModelChange)="calculateMaxes()">
+                </mat-form-field>
+            }
+            
+            <a (click)="showCalculator = !showCalculator">{{ '1RM Calculator' | translate }}</a>
+            
+            @if (showCalculator) {
+                <div class="add_program__maxes__calculator">
+                    <mat-form-field>
+                        <mat-label>{{ 'Reps' | translate }}</mat-label>
+                        <input matInput name="reps" type="number" [(ngModel)]="calculator.reps">
+                    </mat-form-field>            
+                    <mat-form-field>
+                        <mat-label>{{ 'Weight' | translate }}</mat-label>
+                        <input matInput name="weight" type="number" [(ngModel)]="calculator.weight">
+                    </mat-form-field> 
+                    
+                    <p>{{ 'Estimated Max' | translate }}: {{ getMax() | number:'1.0-2' }}{{ account.units }}</p>          
+                </div>
+            }
+        </mat-expansion-panel>
+    </mat-accordion>    
+    
+    <mat-accordion displayMode="flat" [multi]="true" class="add_program__options">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ 'More Options' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+           
+            <mat-form-field>
+                <mat-label>{{ 'How should weights be rounded?' | translate }}</mat-label>
+                <mat-select [(ngModel)]="options.rounding">
+                  <mat-option value="">{{ 'No Rounding' | translate }}</mat-option>
+                  <mat-option value="kg">{{ 'Nearest 2.5' | translate }}</mat-option>
+                  <mat-option value="lbs">{{ 'Nearest 5' | translate }}</mat-option>
+                  <mat-option value="custom">{{ 'Custom' | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field>    
+            
+            @if (options.rounding === 'custom') {
+                <mat-form-field>
+                    <mat-label>{{ 'Round to the nearest multiple of' | translate }}</mat-label>
+                    <input matInput type="number" [(ngModel)]="options.roundingcustom">
+                </mat-form-field>
+            }
+            
+            <mat-form-field>
+                <mat-label>{{ 'Should sets automatically be marked as completed?' | translate }}</mat-label>
+                <mat-select [(ngModel)]="options.autocomplete">
+                  <mat-option value="1">{{ 'Yes' | translate }}</mat-option>
+                  <mat-option value="0">{{ 'No' | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field>             
+            
+            <mat-form-field>
+                <mat-label>{{ 'Pool workouts' | translate }}</mat-label>
+                <mat-select [(ngModel)]="options.pool">
+                  <mat-option value="1">{{ 'Yes' | translate }}</mat-option>
+                  <mat-option value="0">{{ 'No' | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field>                
+            
+            <a [matTooltip]="'If you can\'t commit to the exact program schedule, you can instead add the workouts to a pool which you can select from as you do them. This means you can choose the days the workouts are placed in your diary.' | translate">
+                {{ 'What\'s this?' | translate }}
+            </a>
+            
+            <h5>{{ 'Advanced Options (optional)' | translate }}</h5>
+
+            <div class="add_program__options__advanced"> 
+                <mat-form-field>
+                    <mat-label>{{ 'How many times should this program repeat?' | translate }}</mat-label>
+                    <input matInput type="number" [(ngModel)]="options.progressioncycles">
+                </mat-form-field>               
+
+               <mat-form-field>
+                    <mat-label>{{ 'Progression Type' | translate }}</mat-label>
+                    <mat-select [(ngModel)]="options.progressiontype">
+                      <mat-option value="">{{ 'None' | translate }}</mat-option>
+                      <mat-option value="weight">{{ 'Weight' | translate }}</mat-option>
+                      <mat-option value="percentage">{{ 'Percentage' | translate }}</mat-option>
+                    </mat-select>
+                </mat-form-field>               
+
+                @if (options.progressiontype) {
+                    <div>
+                        <mat-form-field>
+                            <mat-label>
+                                {{ 'Progression Amount' | translate }}
+                                @if (options.progressiontype === 'weight') {
+                                    <span> ({{ account.units }})</span>
+                                }
+                                @if (options.progressiontype === 'percentage') {
+                                    <span> (%)</span>
+                                }
+                            </mat-label>
+                            <input matInput type="number" [(ngModel)]="options.progressionamount">
+                        </mat-form-field>  
+
+                        <a class="add_program__options__advanced__exercise-progression-amounts-toggle" (click)="showMoreProgEx = !showMoreProgEx">
+                            {{ 'Specify amounts per exercise' | translate }}
+                        </a>
+                        
+                        @if (showMoreProgEx) {
+                            <div class="add_program__options__advanced__exercise-progression-amounts">
+                                @for (exercise of exercises; track exercise) {
+                                    <mat-form-field>
+                                        <mat-label>{{ maxes[exercise].name }}</mat-label>
+                                        <input matInput type="number" [(ngModel)]="options.progressionexercises[exercise]">
+                                    </mat-form-field>
+                                }
+                            </div>
+                        }
+
+                        <mat-form-field>
+                            <mat-label>{{ 'Progression Frequency' | translate }}</mat-label>
+                            <mat-select [(ngModel)]="options.frequencySelect" (ngModelChange)="updateFrequency()">
+                              <mat-option value="every">{{ 'Increase after every workout' | translate }}</mat-option>
+                              <mat-option value="everyother">{{ 'Increase after every other workout' | translate }}</mat-option>
+                              <mat-option value="custom">{{ 'Increase after a custom amount of workouts' | translate }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>                  
+
+                        @if (options.frequencySelect === 'custom') {
+                            <mat-form-field>
+                                <mat-label>{{ 'Custom Frequency' | translate }}</mat-label>
+                                <input matInput type="number" [(ngModel)]="options.progressiontimeframe">
+                            </mat-form-field>
+                        }
+                    </div>
+                }
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion> 
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="add()" color="primary">{{ 'Add To Diary' | translate }}</button>
+</mat-dialog-actions>

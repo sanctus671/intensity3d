@@ -1,0 +1,25 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ exercise.name }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="view-set">
+    <p>
+        {{ set.reps }} {{ 'rep' | translate }}@if (set.reps !== '1') {<span>s</span>}, 
+        {{ set.weight }}{{ set.unit }}, 
+        {{ set.percentage }}%, 
+        {{ set.rpe }}RPE
+    </p>
+    
+    @if (set.notes) {
+        <p>{{ set.notes }}</p>
+    }
+
+    @if (set.video) {
+        <p><a [href]="set.video" target="_blank">{{ 'View video' | translate }}</a></p>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+</mat-dialog-actions>

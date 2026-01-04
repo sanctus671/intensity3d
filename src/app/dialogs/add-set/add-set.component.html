@@ -1,0 +1,26 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Add Sets' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="add-set">
+    <mat-form-field>
+        <mat-label>{{ 'Reps' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="set.reps">
+    </mat-form-field>
+    
+    <mat-form-field>
+        <mat-label>{{ 'Weight' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="set.weight">
+    </mat-form-field> 
+    
+    <mat-form-field>
+        <mat-label>{{ 'Number of sets' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="set.multiple">
+    </mat-form-field>     
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button mat-button (click)="add()" color="primary">{{ 'Add' | translate }}</button>
+</mat-dialog-actions>

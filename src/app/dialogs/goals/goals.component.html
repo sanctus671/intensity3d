@@ -1,0 +1,42 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Goals' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="goals">
+    @if (account.goals.primary !== 'none') {
+        <div class="goals__progress-bar">
+            <round-progress     
+                [current]="exercise.goals.progress"
+                [max]="exercise.goals.goal"
+                [color]="barColour"
+                [background]="'#eaeaea'"
+                [radius]="115"
+                [stroke]="15">
+            </round-progress>
+
+            <div class="goals__progress-bar__inner">
+                <span class="background"></span>
+                <div class="text">
+                    {{ exercise.goals.progress }}@if (account.goals.primary !== 'reps') {<span class="unit">{{ exercise.unit ? exercise.unit : account.units }}</span>}
+                </div>
+            </div>
+        </div>
+    }
+    
+    <div class="goals__details">
+        @if (exercise.calibrating) {
+            <span>
+                {{ 'This is the first time you have tracked this exercise. Intensity needs to gather more data to be able to push you to reach your goals.' | translate }}
+            </span>
+        }
+        
+        @if (!exercise.calibrating) {
+            <span [innerHTML]="getGoalDetails()"></span>
+        }
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

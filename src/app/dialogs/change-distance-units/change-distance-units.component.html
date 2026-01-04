@@ -1,0 +1,17 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Change Distance Units' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="change-distance-units">
+    <p>{{ 'Choose how to handle your existing data' | translate }}</p>
+    
+    <mat-checkbox [(ngModel)]="options.applytoall" labelPosition="before" color="primary">
+        {{ 'Update Existing Sets' | translate }}
+    </mat-checkbox>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="change()" color="primary">{{ 'Change' | translate }}</button>
+</mat-dialog-actions>

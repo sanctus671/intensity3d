@@ -1,0 +1,23 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.add-set{
+    
+    mat-form-field{
+        width:100%;
+    }
+    
+  
+}

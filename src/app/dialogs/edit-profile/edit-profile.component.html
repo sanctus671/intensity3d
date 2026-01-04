@@ -1,0 +1,51 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Edit Profile' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="edit-profile">
+    <mat-form-field>
+        <mat-label>{{ 'Display Name' | translate }}</mat-label>
+        <input matInput type="text" [(ngModel)]="profile.display">
+    </mat-form-field>
+    
+    <mat-form-field>
+        <mat-label>{{ 'Email' | translate }}</mat-label>
+        <input matInput type="text" [(ngModel)]="profile.email">
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>{{ 'Age' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="profile.age">
+    </mat-form-field>
+    
+    <mat-form-field>
+        <mat-label>{{ 'Gender' | translate }}</mat-label>
+        <mat-select [(ngModel)]="profile.gender">
+            <mat-option value="Male">{{ 'Male' | translate }}</mat-option>
+            <mat-option value="Female">{{ 'Female' | translate }}</mat-option>
+            <mat-option value="Other">{{ 'Other' | translate }}</mat-option>
+            <mat-option value="Alien">{{ 'Alien' | translate }}</mat-option>
+        </mat-select>
+    </mat-form-field>   
+    
+    <mat-form-field>
+        <mat-label>{{ 'About Me' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="profile.about" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
+    </mat-form-field>     
+    
+    <mat-form-field>
+        <mat-label>{{ 'Purpose' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="profile.why" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
+    </mat-form-field> 
+    
+    <mat-form-field>
+        <mat-label>{{ 'Goals' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="profile.goals" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
+    </mat-form-field>     
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button mat-button (click)="save()" color="primary">{{ 'Save' | translate }}</button>
+</mat-dialog-actions>

@@ -1,0 +1,64 @@
+<app-login-container>
+    <h3>{{ 'Register' | translate }}</h3>
+    <p>{{ 'Create an account to keep your data safe.' | translate }}</p>
+
+    <form #form="ngForm" (ngSubmit)="register(form.value)">
+        <mat-form-field appearance="outline">
+            <mat-label>{{ 'Email' | translate }}</mat-label>
+            <input 
+                matInput 
+                type="email" 
+                name="email" 
+                ngModel 
+                required 
+                email>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>{{ 'Password' | translate }}</mat-label>
+            <input 
+                matInput 
+                type="password" 
+                name="password" 
+                ngModel 
+                required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>{{ 'Confirm Password' | translate }}</mat-label>
+            <input 
+                matInput 
+                type="password" 
+                name="confirm_password" 
+                ngModel 
+                required>
+        </mat-form-field>
+
+        @if (errors().length > 0) {
+            <p class="errors">
+                @for (error of errors(); track error) {
+                    <span>{{ error }}</span>
+                }
+            </p>
+        }
+
+        <div class="login-form__actions">
+            <button 
+                mat-flat-button 
+                color="primary" 
+                [disabled]="loading()">
+                {{ 'Register' | translate }}
+                @if (loading()) {
+                    <mat-spinner class="button-spinner" diameter="14" mode="indeterminate" color="primary"></mat-spinner>
+                }
+            </button>
+
+            <a (click)="registerAnonymous()" class="link-button">{{ 'Skip Registration' | translate }}</a>
+        </div>
+
+        <div class="login-form__secondary-actions">
+            <a routerLink="/login">{{ 'Login to your account' | translate }}</a>
+        </div>
+    </form>
+</app-login-container>
+

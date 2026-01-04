@@ -1,0 +1,83 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Add Exercise' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="add-exercise">
+    <mat-form-field class="add-exercise__search">
+        <input 
+            matInput 
+            type="text" 
+            [placeholder]="'Search exercises' | translate" 
+            [(ngModel)]="properties.search" 
+            (ngModelChange)="refreshSelection()">
+        @if (properties.search) {
+            <button 
+                mat-button 
+                matSuffix 
+                mat-icon-button 
+                [attr.aria-label]="'Clear' | translate" 
+                (click)="clearSearch()">
+                <mat-icon>close</mat-icon>
+            </button>
+        }
+    </mat-form-field>
+    
+    <mat-tab-group class="add-exercise__nav" [selectedIndex]="properties.selectedTab">
+        <mat-tab [label]="'Recommended' | translate">
+            <mat-selection-list [(ngModel)]="selectedExercisesRecommended">
+                @for (recommendedExercise of recommendedExercises | exerciseSearch:properties.search; track recommendedExercise.id) {
+                    <mat-list-option 
+                        [value]="recommendedExercise.id" 
+                        (click)="onSelectionChanged(recommendedExercise.id, selectedExercisesRecommended)">
+                        {{ recommendedExercise.name }}
+                    </mat-list-option>
+                }
+            </mat-selection-list>            
+        </mat-tab>
+        
+        <mat-tab [label]="('Recent' | translate) + (recentExercises.length > 0 ? ' (' + recentExercises.length + ')' : '')">
+            <mat-selection-list [(ngModel)]="selectedExercisesRecent">
+                @for (recentExercise of recentExercises | exerciseSearch:properties.search; track recentExercise.exerciseid) {
+                    <mat-list-option 
+                        [value]="recentExercise.exerciseid" 
+                        (click)="onSelectionChanged(recentExercise.exerciseid, selectedExercisesRecent)">
+                        {{ recentExercise.name }}
+                    </mat-list-option>
+                }
+            </mat-selection-list>             
+        </mat-tab>
+        
+        <mat-tab [label]="('All Exercises' | translate) + (exercises.length > 0 ? ' (' + numberWithCommas(exercises.length) + ')' : '')">
+            <mat-selection-list [(ngModel)]="selectedExercisesAll" class="exercise-list">
+                @for (exercise of exercises | exerciseSearch:properties.search | slice:0:properties.exerciseLimit; track exercise.id; let i = $index) {
+                    <mat-list-option 
+                        [value]="exercise.id" 
+                        (click)="onSelectionChanged(exercise.id, selectedExercisesAll)">
+                        {{ exercise.name }}
+                    </mat-list-option>
+                }
+
+                @if (canLoadMoreExercises()) {
+                    <a mat-list-item (click)="loadMoreExercises()">
+                        {{ 'Load More Exercises' | translate }}
+                    </a>
+                }
+                
+                @if (properties.search) {
+                    <div mat-list-item class="exercise-list__add-exercise">
+                        {{ 'Can\'t find' | translate }} {{ properties.search }}?<br> 
+                        <button mat-flat-button color="primary" (click)="createExercise(properties.search)">
+                            {{ 'Create It' | translate }}
+                        </button>
+                    </div>
+                }
+            </mat-selection-list>
+        </mat-tab>
+    </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button mat-button (click)="add()" color="primary">{{ 'Add' | translate }}</button>
+</mat-dialog-actions>

@@ -1,0 +1,60 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.goal-settings{
+
+    
+    mat-form-field{
+        width:100%;
+
+    }
+    
+    
+    .exercise-targets{
+        padding: 0px 20px;
+        margin-bottom:10px;
+        .exercise-targets__exercise-target{
+            display: flex;
+            flex-direction: row;
+            
+            .exercise-targets__exercise-target__target-exercise{
+                line-height: 55px;
+                padding-right: 15px;
+                cursor: pointer;
+                white-space: nowrap;
+                width: 140px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            mat-icon{
+                line-height: 55px;
+                padding-left: 15px;
+                cursor: pointer;                
+            }
+            
+        }
+        
+        button{
+            margin: 0 auto;
+            display: block;            
+        }
+        
+        
+    }
+    
+    
+    
+}

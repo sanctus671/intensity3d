@@ -1,0 +1,64 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.notes{
+    
+    .notes__loading{
+        text-align:Center;
+        margin-top:0px;
+        margin-bottom:5px;
+        mat-spinner{
+            margin:0 auto;
+        }
+    }    
+    
+    
+    
+    .notes__notes-list{
+
+        padding-top:0px;
+
+        
+        p{
+            opacity:0.8;
+        }
+        
+        a.mat-flat-button{
+            font-size: 12px;
+            padding: 0 10px;
+            line-height: 30px;
+            min-width: 78px;
+        }        
+
+        
+        a.notes__load-more{
+            cursor:pointer;
+            text-decoration: underline;
+            color:#d44735;
+            
+            &.notes-loading{
+                pointer-events:none;
+                opacity:0.4;
+            }
+
+            
+            mat-spinner{
+                margin-left:5px;
+            }
+        }        
+        
+    }
+}
+

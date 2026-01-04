@@ -1,0 +1,21 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Edit Workout' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="add-set">
+    <mat-form-field>
+        <mat-label>{{ 'Workout Name' | translate }}</mat-label>
+        <input matInput type="text" [(ngModel)]="workout.name">
+    </mat-form-field>   
+    
+    <mat-form-field>
+        <mat-label>{{ 'Workout Day' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="workout.day">
+    </mat-form-field>     
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="update()" color="primary">{{ 'Update' | translate }}</button>
+</mat-dialog-actions>

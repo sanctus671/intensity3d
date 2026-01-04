@@ -1,0 +1,15 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.copy{
+    mat-form-field{
+        width:100%;
+    }
+}

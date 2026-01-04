@@ -1,0 +1,61 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Import Data' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="import">
+    <mat-form-field>
+        <mat-label>{{ 'Import From' | translate }}</mat-label>
+        <mat-select [(ngModel)]="import.type" name="import-from">
+            <mat-option value="fitnotes">FitNotes</mat-option>
+            <mat-option value="strong">Strong</mat-option>
+            <mat-option value="stronglifts">Stronglifts 5x5</mat-option>
+            <mat-option value="fitocracy">Fitocracy</mat-option>
+            <mat-option value="intensity">Intensity</mat-option>
+            <mat-option value="custom">Custom</mat-option>
+        </mat-select>
+    </mat-form-field>   
+    
+    <p class="import__upload">CSV File</p>
+    
+    <button mat-flat-button matSuffix color="primary" (click)="uploadFile()">
+        {{ 'Choose File' | translate }}
+    </button>
+    <span class="import__filename">{{ import.filename }}</span>
+    <input id="csvFile" name="csvFile" hidden required type="file" accept=".csv" (change)="selectFile($event)">    
+    
+    @if (import.type) {
+        <p class="import__import-explaination">
+            {{ 'Make sure your file is in CSV format with the following columns in the correct order' | translate }}:
+            @if (import.type === 'fitnotes') {
+                <span>date (in yyyy-mm-dd format), exercise, (not imported), weight, reps, distance, distance unit, time</span>
+            }
+            @if (import.type === 'strong') {
+                <span>Note: columns must be seperated by a semicolon rather than a comma. Columns: date (in yyyy-mm-dd hh:mm:ss format), (not imported), exercise, set, weight, unit, reps, distance, distance unit, time, notes</span>
+            }
+            @if (import.type === 'stronglifts') {
+                <span>date (in mm/dd/yyyy format), notes, (not imported), bodyweight, repeated per exercise: exercise, weight (kg), weight(lbs), reps x 5</span>
+            }
+            @if (import.type === 'fitocracy') {
+                <span>exercise, date (in yyyy-mm-dd format), (not imported), weight, (not imported), reps, (not imported), unit</span>
+            }
+            @if (import.type === 'intensity') {
+                <span>date (in yyyy-mm-dd format), exercise, exercise id, reps, set, weight, rpe, percentage, set type, rest, unit, distance, distance unit, time, completed (0 = no, 1 = yes), notes</span>
+            }
+            @if (import.type === 'custom') {
+                <span>date (in dd/mm/yyyy format), exercise, reps, set, weight, rpe, percentage, completed (0 = no, 1 = yes), notes</span>
+            }
+        </p>
+
+        <p class="import__import-explaination">
+            {{ 'If the columns above do not match your exported file or if your import fails in any way' | translate }}, <a href="mailto:support@intensityapp.com">{{ 'let us know' | translate }}</a>.        
+        </p>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+    <button mat-button (click)="importData()" color="primary" [disabled]="!import.file">
+        {{ 'Import' | translate }}
+    </button>
+</mat-dialog-actions>

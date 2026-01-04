@@ -1,0 +1,96 @@
+@use '@angular/material' as mat;
+@use './styles/themes/light-theme' as light;
+@use './styles/themes/dark-theme' as dark;
+
+// Include the common styles for Angular Material
+@include mat.core();
+
+// Apply the light theme by default
+.light-theme {
+  @include mat.all-component-themes(light.$intensity-light-theme);
+  
+  // Custom light theme variables
+  --primary-color: #d44735;
+  --accent-color: #757575;
+  --background-color: #fafafa;
+  --surface-color: #ffffff;
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.60);
+  --divider-color: rgba(0, 0, 0, 0.12);
+  
+  // Override Material 3 button colors to use exact primary color
+  --mat-button-filled-container-color: #d44735;
+  --mat-button-filled-label-text-color: #ffffff;
+  --mat-button-text-label-text-color: #d44735;
+  --mat-button-outlined-label-text-color:  #d44735;
+  --mat-datepicker-calendar-date-today-selected-state-outline-color: #d44735;
+  --mat-datepicker-calendar-date-selected-state-background-color: #d44735;
+  --mat-progress-spinner-active-indicator-color: #d44735;
+  --mat-checkbox-selected-icon-color: #d44735;
+  --mat-checkbox-selected-icon-color: #d44735;
+  --mat-tab-active-indicator-color: #d44735;
+  --mat-tab-active-focus-indicator-color: #d44735;
+  
+  --mat-button-filled-hover-state-layer-color: rgba(212, 71, 53, 0.08);
+  --mat-button-filled-pressed-state-layer-color: rgba(212, 71, 53, 0.12);
+  --mat-sys-primary: #d44735;
+  --mat-sys-on-primary: #ffffff;
+  --mat-toolbar-container-background-color: #ffffff;
+  --mat-sidenav-content-background-color: #ffffff;
+  --mat-sidenav-container-background-color: #ffffff;
+  --mat-menu-container-color: #fff8f6;
+}
+
+// Apply the dark theme
+.dark-theme {
+  @include mat.all-component-themes(dark.$intensity-dark-theme);
+  
+  // Custom dark theme variables
+  --primary-color: #d44735;
+  --accent-color: #757575;
+  --background-color: #303030;
+  --surface-color: #424242;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-secondary: rgba(255, 255, 255, 0.60);
+  --divider-color: rgba(255, 255, 255, 0.12);
+  
+  // Override Material 3 button colors to use exact primary color
+  --mat-button-filled-container-color: #d44735;
+  --mat-button-filled-label-text-color: #ffffff;
+  --mat-button-text-label-text-color: #d44735;
+  --mat-button-outlined-label-text-color:  #d44735;
+  --mat-datepicker-calendar-date-today-selected-state-outline-color: #d44735;
+  --mat-datepicker-calendar-date-selected-state-background-color: #d44735;
+  --mat-button-filled-hover-state-layer-color: rgba(212, 71, 53, 0.08);
+  --mat-button-filled-pressed-state-layer-color: rgba(212, 71, 53, 0.12);
+  --mat-sys-primary: #d44735;
+  --mat-sys-on-primary: #ffffff;
+}
+
+// Global styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Apply light theme by default
+body {
+  @extend .light-theme;
+}
+
+// Override with dark theme when class is applied
+body.dark-theme {
+  @extend .dark-theme;
+}

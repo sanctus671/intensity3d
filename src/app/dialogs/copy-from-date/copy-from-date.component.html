@@ -1,0 +1,55 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>
+        {{ 'Copy' | translate }} {{ details.isPreselected ? formatDate(details.date) : ('Workout' | translate) }}
+    </h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="copy">
+    @if (!details.isPreselected) {
+        <mat-form-field>
+            <mat-label>{{ 'Copy from date' | translate }}</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="details.date" (dateChange)="updateDate($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+    }
+    
+    @if (loading) {
+        <div class="copy__loading">
+            <mat-spinner diameter="15" mode="indeterminate" color="primary"></mat-spinner>  
+        </div>
+    }
+    
+    @if (!loading && workout.length > 0) {
+        <div class="copy__workout">
+            @for (exercise of workout; track exercise.exerciseid) {
+                <div class="copy__workout__exercise exercise">
+                    <div class="exercise__main-info">
+                        <span class="exercise__name">{{ exercise.name }}</span>
+                        <span class="exercise__details">
+                            {{ getAverageReps(exercise.sets) | number: '1.0-0' }} {{ 'reps' | translate }} / 
+                            {{ getAverageWeight(exercise.sets) | number: '1.0-0' }}{{ getUnits(exercise.sets) }} / 
+                            {{ exercise.sets.length }} {{ 'sets' | translate }}
+                        </span>
+                    </div>
+                    
+                    @if (details.exerciseid) {
+                        <div class="exercise__sets">
+                            @for (set of exercise.sets; track set.id) {
+                                <div class="exercise__sets__set">
+                                    {{ set['reps'] + " reps, " + set['weight'] + account.units + ", " + set['percentage'] + "%, " + set['rpe'] + "RPE" }}
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button mat-button (click)="copy()" color="primary">{{ 'Copy' | translate }}</button>
+</mat-dialog-actions>

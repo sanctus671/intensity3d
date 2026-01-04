@@ -1,0 +1,47 @@
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.update-maxes{
+    
+    padding-bottom:20px;
+    
+    .update-maxes__loading{
+        margin-top:60px;
+        margin-bottom:60px;
+        mat-spinner{
+            margin:0 auto;     
+        }                
+    }  
+
+
+    a{
+        cursor:pointer;
+    }
+    
+    mat-form-field{
+        width:100%;
+    }
+    
+    .update-maxes__maxes__calculator{
+        padding: 10px 15px;
+        background-color: #e6e6e6;
+        border-radius: 4px;
+        margin-top: 10px;
+
+        p{
+            margin: 0px;
+            margin-bottom: 5px;
+        }
+    }    
+    
+    
+}

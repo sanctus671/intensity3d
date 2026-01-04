@@ -1,0 +1,34 @@
+@use 'ngx-sharebuttons/themes/default' as share;
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.share{
+    mat-form-field{
+        width:100%;
+    }
+    
+    .share__text{
+        pointer-events:none;
+        
+        textarea{
+            opacity:0.6;
+        }
+    }
+    
+    .share__share-buttons{
+        margin-top: 30px;
+        margin-bottom: 10px;
+        p{
+            margin: 0px;
+            margin-bottom: 10px;
+        }
+    }
+}

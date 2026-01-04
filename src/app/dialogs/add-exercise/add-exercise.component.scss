@@ -1,0 +1,36 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.add-exercise{
+    
+    .add-exercise__search{
+        width:100%;
+    }
+    
+    .add-exercise__nav{
+        a{
+            cursor:pointer;
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+    }
+    
+    .exercise-list{
+        .exercise-list__add-exercise{
+            text-align:center;
+            margin-top:10px;
+            margin-bottom:10px;
+            
+            button{
+                margin-top:5px;
+            }
+        }
+    }
+}

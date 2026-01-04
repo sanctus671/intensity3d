@@ -1,0 +1,25 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Stats' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="stats">
+    <app-exercise-chart 
+        [exercise]="exercise" 
+        [user]="account">
+    </app-exercise-chart>
+    
+    @if (stats.notes > 0 || stats.videos > 0) {
+        <div class="stats__notes-stats" (click)="openNotes()">
+            <mat-icon>book</mat-icon>
+            <div class="stats__notes-stats__inner">
+                <h4>{{ stats.notes }} {{ 'notes' | translate }} & {{ stats.videos }} {{ 'videos' | translate }}</h4>
+                <p>{{ 'Tracked against sets in your diary' | translate }}</p>
+            </div>
+        </div>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

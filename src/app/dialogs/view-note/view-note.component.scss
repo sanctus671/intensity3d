@@ -1,0 +1,22 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.view-note{
+    .view-note__content{
+        opacity: 0.8;
+        margin-top: 10px;  
+        margin-bottom:5px;
+    }
+}
+

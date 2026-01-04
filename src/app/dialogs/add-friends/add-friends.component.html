@@ -1,0 +1,50 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Add Friends' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="add-friends">
+    <mat-form-field class="add-friends__search">
+        <input matInput type="text" [placeholder]="'Search users' | translate" [(ngModel)]="properties.search" (ngModelChange)="searchUsers()">
+        @if (properties.search) {
+            <button mat-button matSuffix mat-icon-button [attr.aria-label]="'Clear' | translate" (click)="clearSearch()">
+                <mat-icon>close</mat-icon>
+            </button>
+        }
+    </mat-form-field>
+
+    @if (properties.loading && !properties.search) {
+        <div class="add-friends__loading">
+            <mat-spinner diameter="25" mode="indeterminate" color="primary"></mat-spinner>  
+        </div>
+    }
+
+    @if (!properties.search) {
+        <mat-nav-list class="add-friends__user-list">
+            @for (user of suggestedUsers; track user.userid) {
+                <mat-list-item (click)="addUser(user)">
+                    <img matListAvatar [src]="getDp(user.dp)">
+                    {{ user.display ? user.display : user.username }}
+                </mat-list-item>
+            }
+        </mat-nav-list>
+    }
+        
+    @if (properties.search) {
+        <mat-nav-list class="add-friends__user-list">
+            @for (user of users; track user.userid) {
+                <mat-list-item (click)="addUser(user)" [class.user-added]="user.added">
+                    <img matListAvatar [src]="getDp(user.dp)">
+                    {{ user.display ? user.display : user.username }}
+                    @if (user.added) {
+                        <span>{{ 'Added' | translate }}</span>
+                    }
+                </mat-list-item>
+            }
+        </mat-nav-list>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

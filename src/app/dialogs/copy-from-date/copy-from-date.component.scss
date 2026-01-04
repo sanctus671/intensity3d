@@ -1,0 +1,63 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.copy{
+    mat-form-field{
+        width:100%;
+    }
+    
+    .copy__loading{
+        text-align:center;
+        margin-top:0px;
+        margin-bottom:5px;
+        mat-spinner{
+            margin:0 auto;
+        }
+    }
+    
+    .copy__workout{
+        padding: 16px 24px;
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 16px;
+        margin-bottom:10px;
+        
+        .copy__workout__exercise{
+            .exercise__main-info{
+                display:flex;
+                flex-direction:row;            
+                span{
+                    white-space: nowrap;
+                    overflow:hidden;
+                    text-overflow:ellipsis;                
+                }
+
+                .exercise__name{
+                    margin-right:3px;
+                }
+                .exercise__details{
+                    flex:1;
+                    opacity:0.6;
+                    text-align:right;
+                }
+            }
+            
+            .exercise__sets{
+                text-align: left;
+                display: block;
+                width: 100%;
+                border-top: 1px solid var(--divider-color);
+                margin-top: 5px;
+                padding-top: 5px;
+            }
+        }
+    }
+}

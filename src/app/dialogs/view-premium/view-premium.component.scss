@@ -1,0 +1,31 @@
+
+
+.premium-dialog .mat-dialog-container{
+    padding:0px;
+    overflow-x:hidden;
+    
+    .dialog-title{
+        position:relative;
+        mat-icon{
+            cursor:pointer;
+            position:absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2;
+            color:white;
+        }
+    }    
+    
+    
+    
+    .mat-dialog-content{
+        padding: 0px;
+        overflow-x:hidden;
+            /*margin: 0px;*/
+        
+        .premium .premium__content{
+                max-width: 500px;
+        }
+        
+    }
+}

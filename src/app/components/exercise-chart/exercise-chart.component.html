@@ -1,0 +1,100 @@
+<div class="exercise-chart">
+  <div class="exercise-chart__controls">
+    <mat-form-field appearance="outline" class="exercise-chart__controls__metrics">
+      <mat-label>Metrics</mat-label>
+      <mat-select [(ngModel)]="selectedMetrics" multiple (selectionChange)="onMetricsChange()">
+        @for (metric of metrics; track metric) {
+          <mat-option [value]="metric">{{ formatMetricName(metric) }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="exercise-chart__controls__accumulation">
+      <mat-label>Accumulation</mat-label>
+      <mat-select [(ngModel)]="accumulation" (selectionChange)="changeAccumulation($event.value)">
+        @for (acc of accumulations; track acc) {
+          <mat-option [value]="acc">{{ formatMetricName(acc) }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="exercise-chart__timeframes">
+    @for (tf of timeframes; track tf.value) {
+      <button 
+        mat-button 
+        class="exercise-chart__timeframes__button"
+        [class.exercise-chart__timeframes__button--active]="timeframe() === tf.value"
+        (click)="changeTimeframe(tf.value)">
+        {{ tf.label }}
+      </button>
+    }
+  </div>
+
+  <div class="exercise-chart__chart-container">
+    @if (loading()) {
+      <div class="exercise-chart__chart-container__loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      <div 
+        echarts 
+        [options]="chartOptions()" 
+        class="exercise-chart__chart-container__chart"
+        (chartInit)="onChartInit($event)">
+      </div>
+    }
+  </div>
+
+  <div class="exercise-chart__stats">
+    @for (metric of selectedMetrics(); track metric) {
+      @if (extraStats()[metric]) {
+        <mat-card class="exercise-chart__stats__card">
+          <mat-card-content>
+            <div class="exercise-chart__stats__metric">
+              <div class="exercise-chart__stats__metric__item">
+                <mat-icon class="exercise-chart__stats__metric__icon">trending_up</mat-icon>
+                <div class="exercise-chart__stats__metric__details">
+                  <h5>{{ extraStats()[metric].best.data }}{{ getMetricUnits(metric) }}</h5>
+                  <h6>Maximum {{ formatMetricName(metric) }}</h6>
+                  @if (extraStats()[metric].best.date) {
+                    <p>Tracked on {{ extraStats()[metric].best.date }}</p>
+                  }
+                </div>
+              </div>
+
+              <div class="exercise-chart__stats__metric__item">
+                <mat-icon class="exercise-chart__stats__metric__icon">trending_down</mat-icon>
+                <div class="exercise-chart__stats__metric__details">
+                  <h5>{{ extraStats()[metric].worst.data }}{{ getMetricUnits(metric) }}</h5>
+                  <h6>Minimum {{ formatMetricName(metric) }}</h6>
+                  @if (extraStats()[metric].worst.date) {
+                    <p>Tracked on {{ extraStats()[metric].worst.date }}</p>
+                  }
+                </div>
+              </div>
+
+              <div class="exercise-chart__stats__metric__item">
+                <mat-icon class="exercise-chart__stats__metric__icon">show_chart</mat-icon>
+                <div class="exercise-chart__stats__metric__details">
+                  <h5>{{ extraStats()[metric].average.data }}{{ getMetricUnits(metric) }}</h5>
+                  <h6>Average {{ formatMetricName(metric) }}</h6>
+                  <p>The average for this period</p>
+                </div>
+              </div>
+
+              <div class="exercise-chart__stats__metric__item">
+                <mat-icon class="exercise-chart__stats__metric__icon">functions</mat-icon>
+                <div class="exercise-chart__stats__metric__details">
+                  <h5>{{ extraStats()[metric].sum.data }}{{ getMetricUnits(metric) }}</h5>
+                  <h6>Total {{ formatMetricName(metric) }}</h6>
+                  <p>The sum of data in this period</p>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,52 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.add-friends{
+    
+    .add-friends__search{
+        width:100%;
+    }
+    
+    .add-friends__loading{
+        text-align:Center;
+        margin-top:20px;
+        margin-bottom:20px;
+        mat-spinner{
+            margin:0 auto;
+        }
+    }    
+
+    .add-friends__user-list{
+        
+        .user-added{
+            pointer-events: none;
+            opacity: 0.6;    
+            
+            span{
+                color: #d44735;
+                position: absolute;
+                right: 0px;
+                background-color: white;
+            }
+            
+        }
+        
+        .mat-list-avatar{
+            margin-right:10px;
+        }
+        
+    }
+    
+}

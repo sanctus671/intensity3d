@@ -1,0 +1,36 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>
+        @if (bodyweight.isAdd) {
+            <span>{{ 'Add' | translate }}</span>
+        } @else {
+            <span>{{ 'Edit' | translate }}</span>
+        }
+        {{ 'Bodyweight' | translate }}
+    </h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="add-set">
+    <mat-form-field>
+        <mat-label>{{ 'Weight' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="bodyweight.weight">
+    </mat-form-field> 
+    
+    <mat-form-field>
+        <mat-label>{{ 'Date' | translate }}</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="bodyweight.createdRaw" (dateChange)="updateDate($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>     
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="add()" color="primary">
+        @if (bodyweight.isAdd) {
+            <span>{{ 'Add' | translate }}</span>
+        } @else {
+            <span>{{ 'Update' | translate }}</span>
+        }
+    </button>
+</mat-dialog-actions>

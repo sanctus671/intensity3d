@@ -1,0 +1,69 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Select Exercise' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="select-exercise">
+    <mat-form-field class="select-exercise__search">
+        <input matInput type="text" [placeholder]="'Search exercises' | translate" [(ngModel)]="properties.search">
+        @if (properties.search) {
+            <button mat-button matSuffix mat-icon-button [attr.aria-label]="'Clear' | translate" (click)="properties.search = ''">
+                <mat-icon>close</mat-icon>
+            </button>
+        }
+    </mat-form-field>
+    
+    <mat-tab-group class="select-exercise__nav" [selectedIndex]="properties.selectedTab">
+        <mat-tab [label]="'Recommended' | translate">
+            <mat-nav-list>
+                @for (recommendedExercise of recommendedExercises | exerciseSearch:properties.search; track recommendedExercise.id) {
+                    <mat-list-item (click)="selectExercise(recommendedExercise)">
+                        {{ recommendedExercise.name }}
+                        <mat-icon matListIcon>chevron_right</mat-icon>
+                    </mat-list-item>
+                }
+            </mat-nav-list>            
+        </mat-tab>
+        
+        <mat-tab [label]="('Recent' | translate) + (recentExercises.length > 0 ? ' (' + recentExercises.length + ')' : '')">
+            <mat-nav-list>
+                @for (recentExercise of recentExercises | exerciseSearch:properties.search; track recentExercise.exerciseid) {
+                    <mat-list-item (click)="selectExercise(recentExercise)">
+                        {{ recentExercise.name }}
+                        <mat-icon matListIcon>chevron_right</mat-icon>
+                    </mat-list-item>
+                }
+            </mat-nav-list>             
+        </mat-tab>
+        
+        <mat-tab [label]="('All Exercises' | translate) + (exercises.length > 0 ? ' (' + numberWithCommas(exercises.length) + ')' : '')">
+            <mat-nav-list>
+                @for (exercise of exercises | exerciseSearch:properties.search | slice:0:properties.exerciseLimit; track exercise.id; let i = $index) {
+                    <mat-list-item (click)="selectExercise(exercise)">
+                        {{ exercise.name }}
+                        <mat-icon matListIcon>chevron_right</mat-icon>
+                    </mat-list-item>
+                }
+
+                @if (canLoadMoreExercises()) {
+                    <a mat-list-item (click)="loadMoreExercises()">
+                        {{ 'Load More Exercises' | translate }}
+                    </a>
+                }
+                
+                @if (properties.search) {
+                    <div mat-list-item class="exercise-list__add-exercise">
+                        {{ 'Can\'t find' | translate }} {{ properties.search }}?<br> 
+                        <button mat-flat-button color="primary" (click)="createExercise(properties.search)">
+                            {{ 'Create It' | translate }}
+                        </button>
+                    </div>
+                }
+            </mat-nav-list>
+        </mat-tab>
+    </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+</mat-dialog-actions>

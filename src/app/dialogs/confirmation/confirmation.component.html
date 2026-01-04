@@ -1,0 +1,13 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ title }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="confirm">
+    <p>{{ content }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="confirm()" color="primary">{{ 'Yes' | translate }}</button>
+</mat-dialog-actions>

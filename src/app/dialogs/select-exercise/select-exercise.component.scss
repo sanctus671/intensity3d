@@ -1,0 +1,29 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.select-exercise{
+    
+    .select-exercise__search{
+        width:100%;
+    }
+    
+        mat-icon{
+            order: 10;
+            flex: 1;
+            text-align: right;
+            opacity:0.2;            
+        }     
+    
+}

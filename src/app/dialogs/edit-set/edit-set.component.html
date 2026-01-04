@@ -1,0 +1,132 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Edit Set' | translate }}</h2>
+    <span class="delete-set" (click)="deleteSet()">{{ 'Delete Set' | translate }}</span>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="edit-set">
+    @if (set.is_overall_record) {
+        <div class="edit-set__set-record">
+            <mat-icon svgIcon="trophy"></mat-icon>
+            {{ 'This set is a new' | translate }} {{ set.reps }}{{ 'RM' | translate }} {{ 'record' | translate }}!
+        </div>
+    }
+    
+    <mat-form-field>
+        <mat-label>{{ 'Reps' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="set.reps">
+    </mat-form-field>
+    
+    <mat-form-field>
+        <mat-label>{{ 'Weight' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="set.weight">
+    </mat-form-field>
+
+    <mat-checkbox [(ngModel)]="set.updateAll" color="primary" class="edit-set__mass-edit">
+        {{ 'Update reps & weight for all sets' | translate }}
+    </mat-checkbox>    
+
+    <mat-form-field class="edit-set__extra-action">
+        <mat-label>{{ 'Percentage' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="set.percentage">
+        <button mat-flat-button matSuffix color="primary" (click)="calculatePercentage()">
+            {{ 'Calculate' | translate }}
+        </button>
+    </mat-form-field>
+
+    @if (!account || account.intensity_scale !== 'rir') {
+        <div class="edit-set__rpe">
+            <p [matBadge]="set.rpe" matBadgePosition="above after">RPE</p>
+            <mat-slider color="primary" max="10" min="6" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="set.rpe">
+                <input matSliderThumb>
+            </mat-slider>
+        </div>
+    }
+    
+    @if (account.intensity_scale === 'rir') {
+        <div class="edit-set__rpe">
+            <p [matBadge]="set.rir" matBadgePosition="above after">RIR</p>
+            <mat-slider color="primary" max="5" min="0" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="set.rir" (ngModelChange)="rirChanged()">
+                <input matSliderThumb>
+            </mat-slider>
+        </div>
+    }
+    
+    <mat-form-field>
+        <mat-label>{{ 'Set Type' | translate }}</mat-label>
+        <mat-select [(ngModel)]="set.type">
+            <mat-option value="">{{ 'Normal' | translate }}</mat-option>
+            <mat-option value="amrap">AMRAP</mat-option>
+            <mat-option value="w">{{ 'Warmup' | translate }}</mat-option>
+            <mat-option value="bs">{{ 'Backoff Set' | translate }}</mat-option>
+            <mat-option value="ss">{{ 'Super Set' | translate }}</mat-option>
+            <mat-option value="ds">{{ 'Drop Set' | translate }}</mat-option>
+            <mat-option value="c">{{ 'Circuit' | translate }}</mat-option>
+            <mat-option value="bw">{{ 'Bodyweight' | translate }}</mat-option>
+        </mat-select>
+    </mat-form-field>    
+
+    <mat-form-field>
+        <mat-label>{{ 'Notes' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="set.notes" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
+    </mat-form-field>  
+    
+    <mat-form-field class="edit-set__extra-action">
+        <mat-label>{{ 'Video' | translate }}</mat-label>
+        <input matInput type="text" [(ngModel)]="set.video">
+        <button mat-flat-button matSuffix color="primary" (click)="uploadVideo()">
+            {{ 'Upload' | translate }}
+        </button>
+        <input id="videoFile" name="videoFile" hidden required type="file" accept="video/*" (change)="videoFileChangeListener($event)">
+    </mat-form-field>  
+    
+    <mat-accordion displayMode="flat" [multi]="true" class="edit-set__more-options">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ 'More Options' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            
+            <mat-form-field>
+                <mat-label>{{ 'Rest Time (s)' | translate }}</mat-label>
+                <input matInput type="number" [(ngModel)]="set.rest">
+            </mat-form-field>
+            
+            <mat-form-field>
+                <mat-label>{{ 'Distance (m)' | translate }}</mat-label>
+                <input matInput type="number" [(ngModel)]="set.distance">
+            </mat-form-field>            
+            
+            <mat-form-field>
+                <mat-label>{{ 'Set Duration/Time (s)' | translate }}</mat-label>
+                <input matInput type="number" [(ngModel)]="set.time">
+            </mat-form-field> 
+            
+            <mat-form-field>
+                <mat-label>{{ 'Unit' | translate }}</mat-label>
+                <mat-select [(ngModel)]="set.unit">
+                    <mat-option value="kg">kg</mat-option>
+                    <mat-option value="lbs">lbs</mat-option>
+                </mat-select>
+            </mat-form-field>             
+
+            <mat-form-field>
+                <mat-label>{{ 'Distance Unit' | translate }}</mat-label>
+                <mat-select [(ngModel)]="set.distanceunit">
+                    <mat-option value="cm">cm</mat-option>
+                    <mat-option value="inches">{{ 'inches' | translate }}</mat-option>
+                    <mat-option value="ft">ft</mat-option>
+                    <mat-option value="m">m</mat-option>
+                    <mat-option value="km">km</mat-option>
+                    <mat-option value="miles">{{ 'miles' | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field> 
+        </mat-expansion-panel>
+    </mat-accordion>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button mat-button (click)="add()" color="primary">{{ 'Save' | translate }}</button>
+</mat-dialog-actions>

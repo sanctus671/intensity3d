@@ -1,0 +1,650 @@
+.diary{
+    display:flex;
+    flex-direction:row;
+    background-color: var(--surface-color);
+    min-height: 100vh;
+    min-height: calc(100vh - 64px);
+        
+    .diary__sidebar{
+        width:275px;
+        padding-right:25px;
+        padding-bottom:25px;
+        
+        .diary__sidebar__calendar{
+        
+        
+            .has-workout:after {
+                content: "";
+                width: 5px;
+                height: 5px;
+                background-color: var(--primary-color);
+                border-radius: 50%;
+                position: absolute;
+                bottom: 3px;
+                top:auto;
+                left: 45%;
+                left: calc(50% - 2px);
+            }   
+            
+            .mat-calendar-table-header th{
+                opacity: 0.5;
+                font-size: 0.7rem;
+            }
+
+            .mat-calendar-body-cell{
+                font-size:0.8rem;
+            }
+
+            .mat-calendar-table-header-divider{
+                display:none;
+            }
+            
+            .mat-calendar-body-today:not(.mat-calendar-body-selected){
+                border-color: var(--divider-color);
+            }
+        }
+        
+        .diary__sidebar__section{
+            margin-top:15px;
+            padding-top:10px; 
+            
+            &:first-child{
+                margin-top:10px;
+                padding-top:13px;                
+            }
+            
+            border-top: 1px solid rgba(213, 216, 222, 0.3);
+            
+            mat-nav-list{
+                padding:0px;
+                .mat-mdc-list-item, .mat-mdc-subheader{
+                    height:30px;
+                }
+                
+                .mat-mdc-subheader{
+                    color: var(--text-primary);
+                    font-size: 14px;
+                    font-weight: 500;
+                    margin-top: 0px;
+                    margin-bottom: 5px;
+                    height: auto;
+                }
+
+                .mat-mdc-list-item .mdc-list-item__primary-text{
+
+                    font-size:12px;
+                    line-height:19px;
+                }
+
+                .mat-mdc-list-item-meta{
+                    margin-left:3px;
+                    margin-right:10px;
+                }
+
+                mat-icon{
+                    text-align: right;
+                    opacity:0.2;
+                    font-size: 18px;
+                    line-height: 30px;
+                    width: 18px;
+                    height: 26px;
+                }
+            }
+        }
+        
+    }
+    
+    
+    .diary__diary-content{
+        flex:1;
+        
+        
+        .day-nav{
+            display:flex;
+            flex-direction:row;
+            width:100%;
+            border-bottom: 1px solid var(--divider-color);
+            margin:15px 0px;
+            padding-bottom:15px;
+            
+            
+            .day-nav__day{
+                flex:1;
+                text-align:center;
+                position:relative;
+                
+                h6{
+                    margin:0px;
+                    text-transform:uppercase;
+                    font-size: 11px;
+                    font-weight: 500;
+                    letter-spacing: .8px;    
+                    line-height: 18px;
+                    opacity:0.6;
+                    transition:color .2s cubic-bezier(.35,0,.25,1), opacity .2s cubic-bezier(.35,0,.25,1);
+
+                }
+                
+                h3{
+                    margin:0 auto;
+                    font-size: 25px;  
+                    line-height: 46px;
+                    letter-spacing: -1.4px;
+                    font-weight: 400;
+                    width:46px;
+                    height:46px;
+                    border-radius:50%;
+                    transition:color .2s cubic-bezier(.35,0,.25,1), background-color .2s cubic-bezier(.35,0,.25,1);
+                    position:relative;
+                }
+                
+                &:hover{
+                    cursor:pointer;
+                    
+                    h3{
+                       background-color: var(--divider-color);
+                    }
+                    
+                }   
+                
+                &--is-today{
+                    h3:after{
+                        content:"";
+                        position:absolute;
+                        width:44px;
+                        height:44px;
+                        top:0px;
+                        left:0px;
+                        border:1px solid var(--divider-color);
+                        border-radius:50%;
+                    }
+                }
+                
+                &--active{
+                    h6{
+                        color: var(--primary-color);
+                        opacity:1;
+                    }
+                    h3{
+                        color: var(--mat-sys-on-primary);
+                        background-color: var(--primary-color);
+                        
+                        &:after{
+                            display:none;
+                        }
+                    }
+                    
+                }
+                
+                &--active:hover{
+                    h3{
+                        background-color: var(--primary-color);
+                    }
+                    
+                }                 
+                
+
+                
+                &--has-workout:after {
+                    content: "";
+                    width: 5px;
+                    height: 5px;
+                    background-color: var(--primary-color);
+                    border-radius: 50%;
+                    position: absolute;
+                    bottom: 3px;
+                    left: 45%;
+                    left: calc(50% - 3px);
+                }
+                
+            }
+        }
+        
+        .diary__diary-content__diary-workout{
+            
+            
+            .diary-workout__active-program{
+                background-color: var(--primary-color);
+                max-width: 400px;
+                display: block;
+                border-radius: 4px;
+                margin: 0 auto;
+                color: var(--mat-sys-on-primary);
+                padding: 0px 20px;
+                font-size: 12px;
+                text-align: center;
+                margin-top: 5px; 
+                white-space:nowrap;
+                text-overflow:ellipsis;
+                
+                button{
+                    margin: 0px 5px;
+                    font-size: 12px;
+                    line-height: 30px;
+                    padding: 0px 12px;
+                    height: 32px; 
+                    border-color: var(--mat-sys-on-primary);
+                }
+                
+                > span{
+                    max-width: calc(100% - 150px);
+                    display: inline-block;
+                    vertical-align: top;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    line-height: 32px;                   
+                }
+                
+            }
+            
+            
+            .diary-workout__workout-pool{
+                
+                max-width: 440px;
+                display: block;
+                border-radius: 4px;
+                margin: 0 auto;
+                font-size: 12px;
+                margin-top: 5px; 
+                white-space:nowrap;
+                text-overflow:ellipsis;
+                overflow:hidden;
+                
+                .workout-pool__program-name{
+                    background-color: var(--primary-color);
+                    color: var(--mat-sys-on-primary);
+                    padding: 0px 20px;   
+                    height:32px;
+                    line-height: 32px;
+                }
+                
+                .workout-pool__workout-name{
+                    background-color: var(--surface-color);
+                    padding: 0px 20px;
+                    border: 1px solid var(--divider-color);
+                    border-radius: 4px;
+                    border-top: none;
+                    border-top-left-radius: 0px;
+                    border-top-right-radius: 0px;    
+                    height:32px;
+                    line-height: 32px;
+                    cursor:pointer;
+                }
+                
+                
+                button{
+                    float:right;
+                    font-size: 12px;
+                    line-height: 30px;
+                    padding: 0px 12px;
+                    height: 32px; 
+                    border-color: var(--mat-sys-on-primary);
+                    float: right;
+                }
+                
+                > span{
+                    max-width: calc(100% - 150px);
+                    display: inline-block;
+                    vertical-align: top;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    line-height: 32px;                   
+                }
+                
+            }            
+            
+            
+            .diary-workout__empty{
+                text-align:center;
+                padding-top:5%;
+                opacity: 0.08;
+                mat-icon{
+                    font-size:100px;
+                    width:100px;
+                    height:100px;
+                }
+                h2{
+                    margin:0px;
+                }
+                
+            }
+            
+            .diary-workout__loading{
+                padding-top:6%;
+                mat-spinner{
+                    margin:0 auto;
+                    
+                }
+            }
+            
+            .diary-workout__actions{
+                padding-top:60px;
+                padding-bottom:60px;
+                text-align:center;
+                
+                button{
+                    margin:0px 5px;
+                }
+            }
+            
+            
+            .diary-workout__workout{
+                
+                padding:0px;
+                
+                /* workout__exercise */
+             
+            }
+            
+            
+        }
+        
+        
+    }
+    
+    
+}
+
+
+/* moved out of tree for purpose of sorting drag and drop styles */
+
+.workout__exercise{
+
+    position:relative;
+    padding: 20px 20px 0px 20px;
+    background-color: var(--surface-color);
+    
+    &.cdk-drag-preview{
+        border-radius:4px;
+    }
+
+
+    .workout__exercise__info{
+
+        display:flex;
+        flex-direction:row;
+
+        .workout__exercise__name{
+            font-size:16px;
+            line-height:32px;
+            cursor:grab;
+        }
+
+        .workout__exercise__actions{
+            flex:1;
+            text-align:right;
+            height:32px;
+
+            > div{
+                display:inline-block;
+            }
+
+            .workout__exercise__actions__primary{
+              float:left;
+              margin-left:40px;
+            }
+
+            button{
+                margin: 0px 2px;
+                font-size: 13px;
+                line-height: 32px;
+                opacity:0.2;
+                height:32px;
+                color: var(--mat-app-text-color);
+
+
+
+                &:hover{
+                    opacity:1;
+                }
+
+                mat-icon{
+                    font-size: 18px;
+                    width: 18px;
+                    height: 18px;
+                    line-height: 18px;
+                }  
+
+                &.mdc-icon-button{
+                    height:32px;
+                    width:32px;
+                    padding:0px;
+
+                    mat-icon{
+                        font-size: 18px;
+                        width: 18px;
+                        height: 18px;
+                        line-height: 32px;
+                    } 
+
+                    &.workout__exercise__actions__secondary__delete{
+                        color: var(--mat-button-text-label-text-color, var(--mat-sys-primary));
+                    }
+
+                }                                
+
+
+            }
+        }
+
+
+    }
+
+
+    .workout__exercise__sets{
+
+        display:flex;
+        flex-direction:row;
+        margin-top: 5px;
+        max-width: calc(100vw - 300px);
+        overflow-y: hidden;
+        overflow-x: auto;
+        padding-bottom:10px;
+        
+        /*
+        &::-webkit-scrollbar{
+                height: 5px;
+                background-color: #CACACA; 
+         }
+        &::-webkit-scrollbar-track {
+                border: 1px solid #CACACA;
+                background-color: #CACACA;
+        }
+
+        &::-webkit-scrollbar-thumb {
+                background-color: #8D8D8D;	
+        }  
+        */
+        
+
+        /* set */
+
+
+        .workout__exercise__sets__add{
+
+
+            height:26px;
+            font-size: 14px;
+            line-height: 14px;
+            padding: 6px 6px;
+
+            &--sets-added{
+                margin-left:10px;
+            }
+
+
+            mat-icon{
+                font-size:15px;
+                width:15px;
+                height:15px;
+                float: left;
+                margin-right:5px;
+            }                            
+
+
+        }                        
+
+    }                    
+
+
+    
+    .workout__exercise__bar-progress-container{
+        padding:10px 20px 0px 20px;
+        position:relative;
+        
+        &:after{
+            content: " ";
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+            height: 2px;
+            background-color: var(--divider-color);
+            left: 0px;
+        }        
+    }
+    
+    .workout__exercise__bar-progress{
+        width: 50%;
+        position: absolute;
+        bottom: 0px;
+        height: 2px;
+        background-color: var(--primary-color);
+        left: 0px;
+        z-index: 1;
+        transition: width 200ms ease-in-out;                        
+    }
+
+
+
+}
+
+
+
+/* moved out of tree for purpose of sorting drag and drop styles */
+
+.set{
+    border: 1px solid var(--divider-color);
+    border-radius: 30px;
+    font-size: 14px;
+    line-height: 14px;
+    padding: 5px 25px;
+    margin-right:7px;
+    transition:border-color .2s cubic-bezier(.35,0,.25,1);
+    white-space: nowrap;
+    background-color: var(--surface-color);
+
+    &:hover{
+        border-color: var(--primary-color);
+        cursor:pointer;
+    }
+
+    &.set--is-record{
+        border-color: #F7D665;
+    }
+
+    &.set--has-notes{
+        border-color: var(--primary-color);
+    }
+    
+    
+    .set__details{
+        margin-left:5px;
+    }
+
+    mat-icon{
+        font-size:14px;
+        width:14px;
+        height:14px;
+        opacity:1;
+        color: var(--primary-color);
+        float: left;
+
+    }
+
+    &--set-incomplete{
+        mat-icon{
+            color: var(--text-secondary);
+            opacity: 0.4;
+        }
+    }
+
+}
+
+
+
+/* drag and drop styles */
+
+.cdk-drag-preview {
+    box-sizing: border-box;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+
+
+
+@media screen and (max-width:480px){
+    .diary{
+        display:block;
+    
+    
+        .diary__sidebar{
+            margin:0 auto;
+
+            .diary__sidebar__section{
+                display:none;
+            }
+
+        }
+
+
+        .workout__exercise{
+            .workout__exercise__info {
+            display:block;
+
+                .workout__exercise__actions{
+                    text-align:left;
+                    .workout__exercise__actions__primary{
+                        float: none;
+                        display: inline;
+                        margin-left: 0px;
+                    }
+                    .workout__exercise__actions__secondary{
+                        display:inline;
+                    }
+                }
+                
+                .workout__exercise__name{
+                    pointer-events:none;
+                }
+            }
+
+            .workout__exercise__sets{
+                display: block;
+                width: 100%;
+                max-width: 100%;      
+
+                .set, .workout__exercise__sets__add{
+                    display: inline-block;
+                        margin-top: 5px;
+                }
+
+            }
+        }
+
+        .diary__diary-content .diary__diary-content__diary-workout .diary-workout__actions button{
+            margin-bottom:5px;
+        }
+    }
+    
+}

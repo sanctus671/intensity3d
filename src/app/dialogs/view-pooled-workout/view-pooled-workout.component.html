@@ -1,0 +1,28 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ workout.name }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="view-pooled-workout">
+    @if (loading) {
+        <div class="view-pooled-workout__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+    
+    <mat-list>
+        @for (exercise of workout.exercises; track exercise.exerciseid) {
+            <mat-list-item>
+                <h2 matLine>{{ exercise.name }}</h2>
+                <p matLine>
+                    {{ exercise.sets }} {{ 'set' | translate }}@if (exercise.sets !== '1') {<span>s</span>} 
+                    {{ 'of' | translate }} {{ exercise.reps }} {{ 'rep' | translate }}@if (exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
+                </p>
+            </mat-list-item>
+        }
+    </mat-list>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Dismiss' | translate }}</button>
+</mat-dialog-actions>

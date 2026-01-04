@@ -1,0 +1,17 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ title }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="confirm">
+    <p>{{ content }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Dismiss' | translate }}</button>
+    @for (action of actions; track action.link) {
+        <a mat-button color="primary" [routerLink]="[action.link]" (click)="dismiss()">
+            {{ action.name }}
+        </a>
+    }
+</mat-dialog-actions>

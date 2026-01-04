@@ -1,0 +1,37 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Goal Resets' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="goal-resets">
+    @for (reset of resets; track reset.id; let i = $index) {
+        <div class="goal-resets__exercise-target">
+            <div class="goal-resets__target-exercise" (click)="openSelectExercise(reset)">
+                @if (!reset.exerciseid) {
+                    <span>{{ 'Select Exercise' | translate }}</span>
+                } @else {
+                    <span>{{ reset.name }}</span>
+                }
+            </div>  
+
+            <div class="goal-resets__exercise-target-date">
+                <mat-form-field>
+                    <mat-label>{{ 'Reset Date' | translate }}</mat-label>
+                    <input matInput [matDatepicker]="picker" [(ngModel)]="reset.resetdate" (dateChange)="updateReset(reset)">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>             
+            </div> 
+
+            <mat-icon (click)="deleteReset(i, reset)" color="primary">delete_outline</mat-icon> 
+        </div>
+    }
+
+    <button mat-button (click)="createReset()" color="primary">
+        {{ 'Add Reset Point' | translate }}
+    </button>    
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

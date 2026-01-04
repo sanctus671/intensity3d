@@ -1,0 +1,86 @@
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.manage-program{
+    .manage-program__loading{
+        margin-top:60px;
+        margin-bottom:60px;
+        mat-spinner{
+            margin:0 auto;     
+        }                
+    }    
+    
+    .manage-program__program__name.mat-subheader{
+        background-color: var(--primary-color);
+        color: var(--mat-sys-on-primary);    
+        margin-top:5px;  
+        cursor:pointer;
+        
+        button{
+            display: inline-block;
+            margin-left: auto;            
+        }
+    } 
+    
+    .manage-program__program__workouts{
+        padding: 0px 20px;
+        
+        .workouts__actions{
+            text-align: center;
+            margin-top: 20px;    
+            button{
+                margin:0px 3px;
+            }
+        }
+        
+        > h5{
+            margin: 0px;
+            font-size: 16px;
+            margin-top: 25px;
+            margin-bottom: 10px;            
+        }
+    }
+    
+    .workouts__workout{
+        mat-expansion-panel{
+            box-shadow: none;
+            border: 1px solid var(--divider-color);
+            margin-bottom:5px;
+        }
+
+        .mat-expansion-indicator{
+            height: 8px;
+            margin-top: -3px;
+            &:after{
+                vertical-align: top;
+            }
+        }
+
+        div.mat-expansion-panel-content {
+            height: 0px;
+        }    
+
+        mat-expansion-panel.mat-expanded{
+            div.mat-expansion-panel-content {
+                height: auto;
+            }            
+        }   
+        
+        .workouts__workout__exercises{
+            padding-top: 0px;
+            mat-icon{
+                order: 10;
+                flex: 1;
+                text-align: right;
+                opacity:0.2;            
+            }    
+        }
+    }
+}

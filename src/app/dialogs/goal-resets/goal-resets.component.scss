@@ -1,0 +1,45 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.goal-resets{
+
+        .goal-resets__exercise-target{
+            display: flex;
+            flex-direction: row;
+            
+            .goal-resets__target-exercise{
+                line-height: 55px;
+                padding-right: 15px;
+                cursor: pointer;
+                white-space: nowrap;
+                width: 140px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            mat-icon{
+                line-height: 55px;
+                padding-left: 15px;
+                cursor: pointer;                
+            }
+            
+        }
+        
+        button{
+            margin: 0 auto;
+            display: block;            
+        }
+
+}

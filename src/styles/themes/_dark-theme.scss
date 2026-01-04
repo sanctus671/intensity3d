@@ -1,0 +1,12 @@
+@use '@angular/material' as mat;
+@use './theme-base' as base;
+@use './intensity-theme/theme-colors' as intensity-theme;
+
+// Create the dark theme using M3 API with custom primary color
+$intensity-dark-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: intensity-theme.$primary-palette,
+    tertiary: intensity-theme.$tertiary-palette,
+  )
+));

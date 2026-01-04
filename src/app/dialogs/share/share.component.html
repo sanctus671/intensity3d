@@ -1,0 +1,39 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ title }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="share">
+    @if (shareType === 'workout') {
+        <mat-form-field>
+            <mat-label>{{ 'What sets do you want to share?' | translate }}</mat-label>
+            <mat-select [(ngModel)]="details.type" (ngModelChange)="generateWorkoutDescription()">
+                <mat-option value="sets">{{ 'Selected Exercise' | translate }}</mat-option>
+                <mat-option value="workout">{{ 'Entire Workout' | translate }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    }
+    
+    <mat-form-field class="share__text">
+        <mat-label>{{ 'Share text' | translate }}</mat-label>
+        <textarea id="share-text" matInput [(ngModel)]="description" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>    
+    </mat-form-field>      
+    
+    <button mat-flat-button color="primary" (click)="copyText()">
+        {{ 'Copy To Clipboard' | translate }}
+    </button>      
+    
+    <div class="share__share-buttons">
+        <p>{{ 'Share via' | translate }}:</p>
+        <share-buttons 
+        [include]="['facebook','x','linkedin','pinterest','reddit','tumblr','mix','viber','vk','telegram','messenger','whatsapp','xing','line','sms','email','print','copy']"
+            [url]="link"
+            [title]="title"
+            [description]="description">
+        </share-buttons>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

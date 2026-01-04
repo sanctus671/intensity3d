@@ -1,0 +1,84 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Edit Exercise' | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="edit-program-exercise">
+    <div class="edit-program-exercise__extra-action">
+        <span>{{ exercise.name }}</span>
+        <button mat-flat-button matSuffix color="primary" (click)="switchExercise()">
+            {{ 'Switch Exercise' | translate }}
+        </button>
+    </div>    
+    
+    <mat-form-field>
+        <mat-label>{{ 'Reps' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="exercise.reps">
+    </mat-form-field>
+    
+    <mat-form-field>
+        <mat-label>{{ 'Sets' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="exercise.sets">
+    </mat-form-field> 
+    
+    <mat-form-field>
+        <mat-label>{{ 'Weight' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="exercise.weight">
+    </mat-form-field>
+    
+    @if (exercise.weight) {
+        <p class="edit-program-exercise__weight-explanation">
+            {{ 'It is recommended to avoid setting a specific weight, and instead use a percentage (intensity). The users max for that exercise will then be used to set the weights relative to their strength levels.' | translate }}
+        </p>
+    }
+
+    <mat-form-field class="edit-program-exercise__extra-action">
+        <mat-label>{{ 'Percentage' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="exercise.percentage">
+        <button mat-flat-button matSuffix color="primary" (click)="calculatePercentage()">
+            {{ 'Calculate' | translate }}
+        </button>
+    </mat-form-field>
+
+    @if (!account || account.intensity_scale !== 'rir') {
+        <div class="edit-program-exercise__rpe">
+            <p [matBadge]="exercise.rpe" matBadgePosition="above after">RPE</p>
+            <mat-slider color="primary" max="10" min="6" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="exercise.rpe">
+                <input matSliderThumb>
+            </mat-slider>
+        </div>
+    }
+    
+    @if (account.intensity_scale === 'rir') {
+        <div class="edit-program-exercise__rpe">
+            <p [matBadge]="exercise.rir" matBadgePosition="above after">RIR</p>
+            <mat-slider color="primary" max="5" min="0" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="exercise.rir" (ngModelChange)="rirChanged()">
+                <input matSliderThumb>
+            </mat-slider>
+        </div>
+    }
+    
+    <mat-form-field>
+        <mat-label>{{ 'Set Type' | translate }}</mat-label>
+        <mat-select [(ngModel)]="exercise.type">
+            <mat-option value="">{{ 'Normal' | translate }}</mat-option>
+            <mat-option value="amrap">AMRAP</mat-option>
+            <mat-option value="w">{{ 'Warmup' | translate }}</mat-option>
+            <mat-option value="bs">{{ 'Backoff Set' | translate }}</mat-option>
+            <mat-option value="ss">{{ 'Super Set' | translate }}</mat-option>
+            <mat-option value="ds">{{ 'Drop Set' | translate }}</mat-option>
+            <mat-option value="c">{{ 'Circuit' | translate }}</mat-option>
+            <mat-option value="bw">{{ 'Bodyweight' | translate }}</mat-option>
+        </mat-select>
+    </mat-form-field>    
+
+    <mat-form-field>
+        <mat-label>{{ 'Notes' | translate }}</mat-label>
+        <textarea matInput [(ngModel)]="exercise.notes" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
+    </mat-form-field>  
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+  <button mat-button (click)="save()" color="primary">{{ 'Save' | translate }}</button>
+</mat-dialog-actions>

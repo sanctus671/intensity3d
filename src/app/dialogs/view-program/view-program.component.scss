@@ -1,0 +1,45 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:0px;
+        right:0px;
+        z-index: 2;
+    }
+}
+
+.view-program__actions{
+    text-align:center;
+    
+    button:first-child{
+        margin-left:auto;
+        margin-right:2px;
+    }
+    button:last-child{
+        margin-left:2px;
+        margin-right:auto;
+    }
+    
+}
+
+
+@media screen and (max-width:480px){
+    
+    
+    .view-program__actions{
+        display:block;
+    }
+    
+    .view-program__actions button.mat-flat-button{
+        margin-left:0px;
+        margin-right:0px;
+        margin-bottom:3px;
+    }
+    
+}
+

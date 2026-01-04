@@ -1,0 +1,62 @@
+
+
+
+
+.dialog-title{
+    position:relative;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.edit-program-exercise{
+
+    
+    
+    mat-form-field{
+        width:100%;
+    }
+
+    
+    
+    .edit-program-exercise__extra-action{
+        button{
+            font-size: 12px;
+            padding: 0 10px;
+            line-height: 30px;
+            float: right;
+            margin-left: 5px;
+        }
+        
+        span{
+            line-height:30px;
+        }
+    }
+    
+    .edit-program-exercise__rpe{
+        margin-top:6px;
+        mat-slider{
+            width:100%;
+        }
+        
+        p{
+            margin:0px;
+        }
+        
+        .mat-badge-content{
+            font-size: 10px;
+            top: 0px;
+            right: 0px !important;
+        }
+    }
+
+       
+    
+  
+}
+
+

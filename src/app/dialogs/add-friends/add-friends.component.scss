@@ -4,6 +4,7 @@
 
 .dialog-title{
     position:relative;
+    padding-right:40px;
     mat-icon{
         cursor:pointer;
         position:absolute;
@@ -29,22 +30,53 @@
     }    
 
     .add-friends__user-list{
+
+
+
+        mat-list-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            
+            &:hover {
+                background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+                
+                .dark-theme & {
+                    background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.04));
+                }
+            }
+            
+            &:focus-visible {
+                outline: 2px solid var(--mat-primary-color, #d44735);
+                outline-offset: 2px;
+            }
+
+            .mat-mdc-list-item-meta{
+                align-self:center;    
+            
+                span{
+                    color: #d44735;
+                }
+            }
+
+            .mat-mdc-list-item-avatar{
+                background-color:White;
+                border: 1px solid var(--divider-color);
+            }            
+
+            mat-icon {
+                opacity: 0.4;
+                transition: opacity 0.2s ease;
+                
+                mat-list-item:hover & {
+                    opacity: 0.7;
+                }
+            }
+        }
         
         .user-added{
             pointer-events: none;
-            opacity: 0.6;    
+            opacity: 0.6;
             
-            span{
-                color: #d44735;
-                position: absolute;
-                right: 0px;
-                background-color: white;
-            }
-            
-        }
-        
-        .mat-list-avatar{
-            margin-right:10px;
         }
         
     }

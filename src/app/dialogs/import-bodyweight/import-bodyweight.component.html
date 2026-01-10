@@ -1,0 +1,226 @@
+<h2 mat-dialog-title>{{ 'Import Bodyweight' | translate }}</h2>
+
+<mat-dialog-content class="import-bodyweight">
+  <mat-stepper [linear]="true" [selectedIndex]="currentStep()" #stepper>
+    <!-- Step 1: Upload -->
+    <mat-step [completed]="uploadedFile() !== null">
+      <ng-template matStepLabel>{{ 'Upload' | translate }}</ng-template>
+      
+      <div class="import-step">
+        <h3>{{ 'Upload File' | translate }}</h3>
+        <p>{{ 'Select your bodyweight data file to import. This must be in .CSV format.' | translate }}</p>
+        
+        <div class="file-select-container">
+          <input 
+            type="file" 
+            accept=".csv"
+            #fileInput
+            (change)="selectFile($event)"
+            style="display: none;">
+          
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="fileInput.click()"
+            [disabled]="isUploading()">
+            <mat-icon>cloud_upload</mat-icon>
+            {{ 'Choose File' | translate }}
+          </button>
+          
+          @if (selectedFile()) {
+            <div class="selected-file">
+              <mat-icon>description</mat-icon>
+              <span>{{ selectedFile()?.name }}</span>
+            </div>
+          }
+          
+          @if (isUploading()) {
+            <mat-spinner diameter="30"></mat-spinner>
+          }
+        </div>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="export-section">
+          <h4>
+            <mat-icon>cloud_download</mat-icon>
+            {{ 'Export Data' | translate }}
+          </h4>
+          <p>{{ 'Download your current bodyweight data as a CSV file.' | translate }}</p>
+          <button 
+            mat-stroked-button 
+            color="primary"
+            (click)="exportData()"
+            [disabled]="exportLoading()">
+            @if (exportLoading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <mat-icon>download</mat-icon>
+            }
+            {{ 'Download' | translate }}
+          </button>
+        </div>
+
+        @if (previousImports().length > 0) {
+          <mat-divider class="section-divider"></mat-divider>
+          
+          <div class="previous-imports">
+            <h4>{{ 'Previous imports' | translate }}</h4>
+            <mat-list>
+              @for (previousImport of previousImports(); track previousImport.addid; let i = $index) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon>history</mat-icon>
+                  <span matListItemTitle>
+                    {{ 'Imported' | translate }} {{ formatDate(previousImport.created) }}
+                  </span>
+                  <button 
+                    mat-button 
+                    color="warn"
+                    matListItemMeta
+                    (click)="removeImport(previousImport.addid, i)">
+                    <mat-icon>delete</mat-icon>
+                    {{ 'Remove' | translate }}
+                  </button>
+                </mat-list-item>
+              }
+            </mat-list>
+          </div>
+        }
+
+        <div class="step-actions">
+          <button mat-button (click)="dismiss()">
+            {{ 'Cancel' | translate }}
+          </button>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            matStepperNext
+            [disabled]="!uploadedFile()">
+            {{ 'Next' | translate }}
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- Step 2: Assign Fields -->
+    <mat-step [completed]="selectedFields().length === 2">
+      <ng-template matStepLabel>{{ 'Assign' | translate }}</ng-template>
+      
+      <div class="import-step">
+        <h3>
+          {{ importedCount() }} 
+          {{ importedCount() === 1 ? ('Record Found!' | translate) : ('Records Found!' | translate) }}
+        </h3>
+        <p>{{ 'Assign your data to the corresponding fields.' | translate }}</p>
+        
+        <div class="field-mapping-direction">
+          {{ 'Your Data' | translate }}
+          <mat-icon color="primary">arrow_forward</mat-icon>
+          Intensity
+        </div>
+
+        <div class="field-mappings">
+          @for (importedField of importedFields(); track importedField.name) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ importedField.name }}</mat-label>
+              <mat-select 
+                [(ngModel)]="importedField.mapped_value"
+                (ngModelChange)="setSelectedFields()">
+                <mat-option value="">{{ 'Not Assigned' | translate }}</mat-option>
+                @for (field of fields; track field.value) {
+                  <mat-option 
+                    [value]="field.value"
+                    [disabled]="isFieldDisabled(field.value, importedField.mapped_value)">
+                    {{ field.label }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </div>
+
+        <div class="step-actions">
+          <button mat-button matStepperPrevious>
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'Back' | translate }}
+          </button>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            matStepperNext
+            [disabled]="selectedFields().length !== 2">
+            {{ 'Next' | translate }}
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- Step 3: Import -->
+    <mat-step>
+      <ng-template matStepLabel>{{ 'Import' | translate }}</ng-template>
+      
+      <div class="import-step">
+        <h3>{{ 'Start Your Import' | translate }}</h3>
+        <p>{{ 'Use the button below to import your data. This can take several minutes.' | translate }}</p>
+        
+        <div class="import-summary">
+          <mat-card>
+            <mat-card-content>
+              <div class="summary-item">
+                <mat-icon>description</mat-icon>
+                <div>
+                  <strong>{{ 'File' | translate }}:</strong>
+                  {{ selectedFile()?.name }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>numbers</mat-icon>
+                <div>
+                  <strong>{{ 'Records' | translate }}:</strong>
+                  {{ importedCount() }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>link</mat-icon>
+                <div>
+                  <strong>{{ 'Mapped Fields' | translate }}:</strong>
+                  {{ selectedFields().length }} / {{ fields.length }}
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="import-action">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="startImport()"
+            [disabled]="isImporting()">
+            @if (isImporting()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <mat-icon>upload</mat-icon>
+            }
+            {{ 'Start Import' | translate }}
+          </button>
+        </div>
+
+        <div class="step-actions">
+          <button mat-button matStepperPrevious [disabled]="isImporting()">
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'Back' | translate }}
+          </button>
+        </div>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dismiss()" [disabled]="isUploading() || isImporting()">
+    {{ 'Close' | translate }}
+  </button>
+</mat-dialog-actions>

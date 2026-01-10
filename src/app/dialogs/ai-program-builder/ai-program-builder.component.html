@@ -1,0 +1,282 @@
+<div class="ai-program-builder">
+    <h2 mat-dialog-title>
+        {{ 'AI Program Builder' | translate }}
+        <button mat-icon-button mat-dialog-close class="ai-program-builder__close">
+            <mat-icon>close</mat-icon>
+        </button>
+    </h2>
+
+    <mat-dialog-content>
+        <p class="ai-program-builder__intro-text">
+            {{ 'Generate a personalised custom program with AI. Tailored specifically to your goals and preferences.' | translate }}
+        </p>
+
+        <!-- Mode Selection -->
+        <div class="ai-program-builder__mode-selection">
+            <mat-button-toggle-group 
+                [value]="mode()" 
+                (change)="switchMode($event.value)"
+                class="ai-program-builder__mode-toggle">
+                <mat-button-toggle value="guided">
+                    {{ 'Guided Mode' | translate }}
+                </mat-button-toggle>
+                <mat-button-toggle value="advanced">
+                    {{ 'Advanced Mode' | translate }}
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+
+        <!-- Guided Mode Form -->
+        @if (isGuidedMode()) {
+            <div class="ai-program-builder__guided-mode">
+                <div class="guided-mode__description">
+                    <h3>{{ 'Program Preferences' | translate }}</h3>
+                </div>
+
+                <div class="ai-program-builder__form">
+                    <mat-form-field appearance="outline">
+                        <mat-label>{{ 'Training Goal' | translate }}</mat-label>
+                        <mat-select 
+                            [value]="guidedOptions().goal"
+                            (selectionChange)="updateGuidedOption('goal', $event.value)">
+                            @for (goal of goals; track goal.value) {
+                                <mat-option [value]="goal.value">
+                                    {{ goal.label | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>{{ 'Experience Level' | translate }}</mat-label>
+                        <mat-select 
+                            [value]="guidedOptions().experience"
+                            (selectionChange)="updateGuidedOption('experience', $event.value)">
+                            @for (level of experienceLevels; track level.value) {
+                                <mat-option [value]="level.value">
+                                    {{ level.label | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>{{ 'Training Days per Week' | translate }}</mat-label>
+                        <mat-select 
+                            [value]="guidedOptions().trainingDays"
+                            (selectionChange)="updateGuidedOption('trainingDays', $event.value)">
+                            @for (days of trainingDaysOptions; track days) {
+                                <mat-option [value]="days">
+                                    {{ days }} {{ (days === 1 ? 'day' : 'days') | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>{{ 'Available Equipment' | translate }}</mat-label>
+                        <mat-select 
+                            [value]="guidedOptions().equipment"
+                            (selectionChange)="updateGuidedOption('equipment', $event.value)">
+                            @for (equipment of equipmentOptions; track equipment.value) {
+                                <mat-option [value]="equipment.value">
+                                    {{ equipment.label | translate }}
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    @if (needsEquipmentDescription()) {
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'Describe your equipment' | translate }}</mat-label>
+                            <textarea 
+                                matInput 
+                                [value]="guidedOptions().equipmentDescription"
+                                (input)="updateGuidedOption('equipmentDescription', $any($event.target).value)"
+                                [placeholder]="'E.g., dumbbells up to 50lbs, resistance bands, pull-up bar, yoga mat, etc.' | translate"
+                                rows="3"
+                                maxlength="500"></textarea>
+                            <mat-hint align="end">{{ guidedOptions().equipmentDescription.length }}/500</mat-hint>
+                        </mat-form-field>
+                    }
+                </div>
+
+                <!-- Extra Options Toggle -->
+                <div class="ai-program-builder__extra-options-toggle">
+                    <button mat-button (click)="toggleExtraOptions()">
+                        {{ showExtraOptions() ? ('Show Less' | translate) : ('Show More' | translate) }}
+                        <mat-icon>{{ showExtraOptions() ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </button>
+                </div>
+
+                <!-- Extra Options Form -->
+                @if (showExtraOptions()) {
+                    <div class="ai-program-builder__extra-options">
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'Focus Lift / Emphasis' | translate }}</mat-label>
+                            <mat-select 
+                                [value]="guidedOptions().extraOptions.focusLift"
+                                (selectionChange)="updateExtraOption('focusLift', $event.value)">
+                                @for (lift of focusLiftOptions; track lift.value) {
+                                    <mat-option [value]="lift.value">
+                                        {{ lift.label | translate }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'Block Length (weeks)' | translate }}</mat-label>
+                            <mat-select 
+                                [value]="guidedOptions().extraOptions.blockLength"
+                                (selectionChange)="updateExtraOption('blockLength', $event.value)">
+                                @for (weeks of blockLengthOptions; track weeks) {
+                                    <mat-option [value]="weeks">
+                                        {{ weeks }} {{ (weeks === 1 ? 'week' : 'weeks') | translate }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'Session Length' | translate }}</mat-label>
+                            <mat-select 
+                                [value]="guidedOptions().extraOptions.sessionLength"
+                                (selectionChange)="updateExtraOption('sessionLength', $event.value)">
+                                @for (length of sessionLengthOptions; track length.value) {
+                                    <mat-option [value]="length.value">
+                                        {{ length.label | translate }}
+                                    </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div class="ai-program-builder__checkbox-field">
+                            <mat-checkbox 
+                                [checked]="guidedOptions().extraOptions.hasInjuryLimitations"
+                                (change)="updateExtraOption('hasInjuryLimitations', $event.checked)">
+                                {{ 'Injury / Limitations' | translate }}
+                            </mat-checkbox>
+                        </div>
+
+                        @if (guidedOptions().extraOptions.hasInjuryLimitations) {
+                            <mat-form-field appearance="outline">
+                                <mat-label>{{ 'Describe limitations' | translate }}</mat-label>
+                                <textarea 
+                                    matInput 
+                                    [value]="guidedOptions().extraOptions.injuryLimitations"
+                                    (input)="updateExtraOption('injuryLimitations', $any($event.target).value)"
+                                    [placeholder]="'E.g., avoid overhead work, knee-friendly exercises, etc.' | translate"
+                                    rows="3"
+                                    maxlength="500"></textarea>
+                                <mat-hint align="end">{{ guidedOptions().extraOptions.injuryLimitations.length }}/500</mat-hint>
+                            </mat-form-field>
+                        }
+                    </div>
+                }
+
+                <!-- Guided Mode Summary -->
+                @if (guidedOptions().goal && guidedOptions().experience && guidedOptions().equipment) {
+                    <div class="ai-program-builder__summary">
+                        <h3>{{ 'Program Summary' | translate }}</h3>
+                        <mat-divider></mat-divider>
+                        <div class="summary-content">
+                            <p><strong>{{ 'Goal:' | translate }}</strong> {{ getGoalLabel() | translate }}</p>
+                            <p><strong>{{ 'Level:' | translate }}</strong> {{ getExperienceLabel() | translate }}</p>
+                            <p><strong>{{ 'Frequency:' | translate }}</strong> {{ guidedOptions().trainingDays }} {{ (guidedOptions().trainingDays === 1 ? 'day' : 'days') | translate }} {{ 'per week' | translate }}</p>
+                            <p><strong>{{ 'Equipment:' | translate }}</strong> {{ getEquipmentLabel() | translate }}</p>
+                            @if (guidedOptions().equipmentDescription) {
+                                <p><strong>{{ 'Equipment Details:' | translate }}</strong> {{ guidedOptions().equipmentDescription }}</p>
+                            }
+                            
+                            @if (showExtraOptions() && (guidedOptions().extraOptions.focusLift || guidedOptions().extraOptions.sessionLength)) {
+                                <mat-divider></mat-divider>
+                                <p><strong>{{ 'Focus Lift:' | translate }}</strong> {{ getFocusLiftLabel() | translate }}</p>
+                                <p><strong>{{ 'Block Length:' | translate }}</strong> {{ guidedOptions().extraOptions.blockLength }} {{ (guidedOptions().extraOptions.blockLength === 1 ? 'week' : 'weeks') | translate }}</p>
+                                <p><strong>{{ 'Session Length:' | translate }}</strong> {{ getSessionLengthLabel() | translate }}</p>
+                                @if (guidedOptions().extraOptions.hasInjuryLimitations && guidedOptions().extraOptions.injuryLimitations) {
+                                    <p><strong>{{ 'Limitations:' | translate }}</strong> {{ guidedOptions().extraOptions.injuryLimitations }}</p>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Advanced Mode Form -->
+        @if (isAdvancedMode()) {
+            <div class="ai-program-builder__advanced-mode">
+                <div class="advanced-mode__description">
+                    <h3>{{ 'Describe Your Ideal Program' | translate }}</h3>
+                    <p>{{ 'Write exactly what you want in your program. Be as specific as possible about exercises, rep ranges, training style, and any special requirements.' | translate }}</p>
+                </div>
+
+                <mat-form-field appearance="outline" class="ai-program-builder__advanced-textarea">
+                    <mat-label>{{ 'Program Description' | translate }}</mat-label>
+                    <textarea 
+                        matInput 
+                        [value]="advancedPrompt()"
+                        (input)="advancedPrompt.set($any($event.target).value)"
+                        [placeholder]="'Example: I want a 4-day upper/lower split for muscle building. Focus on compound movements with 6-12 reps. Include progressive overload and deload weeks. I have access to a full gym with barbells, dumbbells, and machines.' | translate"
+                        rows="8"
+                        maxlength="1000"></textarea>
+                    <mat-hint align="end">{{ advancedPrompt().length }}/1000</mat-hint>
+                </mat-form-field>
+
+                <!-- Advanced Mode Tips -->
+                <div class="ai-program-builder__tips">
+                    <h3>{{ 'Tips for Better Results' | translate }}</h3>
+                    
+                    <div class="ai-program-builder__tips__tip">
+                        <mat-icon color="primary">check_circle</mat-icon>
+                        <div class="ai-program-builder__tips__tip__content">
+                            <h4>{{ 'Be Specific' | translate }}</h4>
+                            <p>{{ 'Mention exact exercises, rep ranges, and training frequency' | translate }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-program-builder__tips__tip">
+                        <mat-icon color="primary">fitness_center</mat-icon>
+                        <div class="ai-program-builder__tips__tip__content">
+                            <h4>{{ 'Include Equipment' | translate }}</h4>
+                            <p>{{ 'List what equipment you have available' | translate }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-program-builder__tips__tip">
+                        <mat-icon color="primary">trending_up</mat-icon>
+                        <div class="ai-program-builder__tips__tip__content">
+                            <h4>{{ 'Mention Goals' | translate }}</h4>
+                            <p>{{ 'Specify if you want to build muscle, gain strength, or improve conditioning' | translate }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="cancel()">
+            {{ 'Cancel' | translate }}
+        </button>
+        <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="generateProgram()"
+            [disabled]="!canGenerate() || isLoading()">
+            @if (isLoading()) {
+                <mat-spinner diameter="20"></mat-spinner>
+                {{ 'Generating...' | translate }}
+            } @else {
+                @if (!user().premium) {
+                    <mat-icon>workspace_premium</mat-icon>
+                }
+                @if (user().premium) {
+                    <mat-icon>auto_awesome</mat-icon>
+                }
+                {{ 'Generate Program' | translate }}
+            }
+        </button>
+    </mat-dialog-actions>
+</div>

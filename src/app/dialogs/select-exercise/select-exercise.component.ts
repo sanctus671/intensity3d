@@ -46,9 +46,12 @@ export class SelectExerciseComponent {
     public exercises: Array<any>;
     public recentExercises: Array<any>;   
     public properties: any;
+    public showReset: boolean = false;
     
     constructor() {
         this.properties = {search:"", exerciseLimit:50, recentLoading:true, exerciseLoading:true, selectedTab:0};
+   
+        this.showReset = this.data?.showReset || false;
         
         this.recommendedExercises = this.exerciseService.getRecommendedExercises(); 
         this.recentExercises = [];
@@ -146,7 +149,11 @@ export class SelectExerciseComponent {
     
     public dismiss(): void { 
         this.dialogRef.close();
-    }            
+    }
+    
+    public clearSelection(): void {
+        this.dialogRef.close({ clear: true });
+    }
     
     public numberWithCommas(x: number): string {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

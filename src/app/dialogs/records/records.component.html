@@ -8,12 +8,12 @@
         @if (!exercise.recordsPage) {
             <mat-tab [label]="'Today' | translate">
                 <div class="records__highlight records__highlight--red-background">
-                    <mat-icon svgIcon="trophy"></mat-icon>
+                    <mat-icon fontSet="material-icons-outlined">emoji_events</mat-icon>
                     <h2>{{ localRecords.estimatedMax }}{{ account.units }}</h2>
                     <p>{{ 'Estimated session max' | translate }}</p>
                 </div>
                 
-                <div class="records__record records__record--orange-background record">
+                <div class="records__record  record">
                     <div class="record__bar-text">
                         {{ localRecords.maxReps }} {{ 'rep' | translate }}@if (localRecords.maxReps !== 1) {<div class="unit">s</div>}<span> {{ 'with' | translate }} {{ exercise.records.amrap.weight }}{{ account.units }} / {{ exercise.records.amrap.reps }} {{ 'lifetime best' | translate }}</span>
                     </div>
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <div class="records__record records__record--yellow-background record">
+                <div class="records__record record">
                     <div class="record__bar-text">
                         {{ localRecords.maxWeight }}{{ account.units }}<span> {{ exercise.records.overall.rep }} {{ 'rep max' | translate }} / {{ exercise.records.overall.max }}{{ account.units }} {{ 'lifetime best' | translate }}</span>
                     </div>
@@ -39,7 +39,7 @@
                     </div>
                 </div>
 
-                <div class="records__record records__record--darkorange-background record">
+                <div class="records__record  record">
                     <div class="record__bar-text">
                         {{ localRecords.currentVolume }}{{ account.units }} <span>{{ 'volume' | translate }} / {{ exercise.records.backoffs.best }}{{ account.units }} ({{ exercise.records.overall.rep }} {{ 'rep' | translate }}) {{ 'lifetime best' | translate }}</span>
                     </div>
@@ -57,84 +57,84 @@
         <mat-tab [label]="'Volume' | translate">
             @if (fullRecords.loading) {
                 <div class="records__loading">
-                    <mat-spinner diameter="25" mode="indeterminate" color="primary"></mat-spinner>
+                    <mat-spinner diameter="40" mode="indeterminate" color="primary"></mat-spinner>
                 </div>
             }
             
             @if (!fullRecords.loading) {
-                <div class="records__highlight records__highlight--orange-background">
-                    <mat-icon svgIcon="trophy"></mat-icon>
+                <div class="records__highlight records__highlight--red-background">
+                    <mat-icon fontSet="material-icons-outlined">emoji_events</mat-icon>
                     <h2>{{ fullRecords.backoffs[fullRecords.backoffsIndex].best }}{{ account.units }}</h2>
                     <p>{{ 'Volume for' | translate }} {{ fullRecords.backoffs[fullRecords.backoffsIndex].reps }} {{ 'rep sets' | translate }}</p>
                 </div>            
 
-                <mat-nav-list class="records__records-list">
-                    @for (item of fullRecords.backoffs; track item.assigneddate) {
-                        <a mat-list-item [routerLink]="['/diary/' + item.assigneddate]" target="_blank">
-                            <h3 matLine>{{ 'Best volume for' | translate }} {{ item.reps }} {{ 'rep sets' | translate }}: {{ item.best }}{{ account.units }}</h3>
-                            <p matLine>
-                              {{ 'Achieved on' | translate }} {{ formatDate(item.assigneddate) }}
-                            </p>                        
-                            <mat-icon matListIcon [matTooltip]="'View date in diary' | translate" matTooltipPosition="left">open_in_new</mat-icon>
-                        </a>
+                <mat-list class="records__records-list">
+                    @for (item of fullRecords.backoffs; track item.reps + '-' + item.assigneddate) {
+                        <mat-list-item (click)="openViewRecord(item, 'backoffs')" class="clickable">
+                            <h3 matListItemTitle>{{ 'Best volume for' | translate }} {{ item.reps }} {{ 'rep sets' | translate }}: {{ item.best }}{{ account.units }}</h3>
+                            <p matListItemLine>{{ 'Achieved on' | translate }} {{ formatDate(item.assigneddate) }}</p>         
+                            <div matListItemMeta>
+                                <mat-icon>chevron_right</mat-icon>
+                            </div>               
+                        </mat-list-item>
                     }
-                </mat-nav-list>
+                </mat-list>
             }
         </mat-tab>        
         
         <mat-tab [label]="'Weight' | translate">
             @if (fullRecords.loading) {
                 <div class="records__loading">
-                    <mat-spinner diameter="25" mode="indeterminate" color="primary"></mat-spinner>
+                    <mat-spinner diameter="40" mode="indeterminate" color="primary"></mat-spinner>
                 </div>
             }
             
             @if (!fullRecords.loading) {
-                <div class="records__highlight records__highlight--yellow-background">
-                    <mat-icon svgIcon="trophy"></mat-icon>
+                <div class="records__highlight records__highlight--red-background">
+                    <mat-icon fontSet="material-icons-outlined">emoji_events</mat-icon>
                     <h2>{{ fullRecords.overall[fullRecords.overallIndex].max }}{{ account.units }}</h2>
                     <p>{{ fullRecords.overall[fullRecords.overallIndex].rep }} {{ 'rep max' | translate }}</p>
                 </div>            
 
-                <mat-nav-list class="records__records-list">
-                    @for (item of fullRecords.overall; track item.assigneddate) {
-                        <a mat-list-item [routerLink]="['/diary/' + item.assigneddate]" target="_blank">
-                            <h3 matLine>{{ item.rep }}RM: {{ item.max }}{{ account.units }}</h3>
-                            <p matLine>
-                              {{ 'Achieved on' | translate }} {{ formatDate(item.assigneddate) }}
-                            </p>                        
-                            <mat-icon matListIcon>open_in_new</mat-icon>
-                        </a>
+                <mat-list class="records__records-list">
+                    @for (item of fullRecords.overall; track item.rep + '-' + item.assigneddate) {
+                        <mat-list-item (click)="openViewRecord(item, 'overall')" class="clickable">
+                            <h3 matListItemTitle>{{ item.rep }}RM: {{ item.max }}{{ account.units }}</h3>
+                            <p matListItemLine>{{ 'Achieved on' | translate }} {{ formatDate(item.assigneddate) }}</p>         
+                            <div matListItemMeta>
+                                <mat-icon>chevron_right</mat-icon>
+                            </div>               
+                        </mat-list-item>
                     }
-                </mat-nav-list>
+                </mat-list>
             }
         </mat-tab>
 
         <mat-tab [label]="'Reps' | translate">
             @if (fullRecords.loading) {
                 <div class="records__loading">
-                    <mat-spinner diameter="25" mode="indeterminate" color="primary"></mat-spinner>
+                    <mat-spinner diameter="40" mode="indeterminate" color="primary"></mat-spinner>
                 </div>
             }
             
             @if (!fullRecords.loading) {
-                <div class="records__highlight records__highlight--darkorange-background">
-                    <mat-icon svgIcon="trophy"></mat-icon>
+                <div class="records__highlight records__highlight--red-background">
+                    <mat-icon fontSet="material-icons-outlined">emoji_events</mat-icon>
                     <h2>{{ fullRecords.amrap[fullRecords.amrapIndex].reps }} {{ 'rep' | translate }}@if (fullRecords.amrap[fullRecords.amrapIndex].reps > 1) {<span>s</span>}</h2>
                     <p>{{ 'With' | translate }} {{ fullRecords.amrap[fullRecords.amrapIndex].weight }}{{ account.units }}</p>
                 </div>            
 
-                <mat-nav-list class="records__records-list">
-                    @for (item of fullRecords.amrap; track item.assigneddate) {
-                        <a mat-list-item [routerLink]="['/diary/' + item.assigneddate]" target="_blank">
-                            <h3 matLine>{{ 'Best reps with' | translate }} {{ item.weight }}{{ account.units }}: {{ item.reps }}@RPE{{ item.rpe }}</h3>
-                            <p matLine>
-                              {{ 'Achieved on' | translate }} {{ formatDate(item.assigneddate) }}
-                            </p>                        
-                            <mat-icon matListIcon>open_in_new</mat-icon>
-                        </a>
+                <mat-list class="records__records-list">
+                    @for (item of fullRecords.amrap; track item.weight + '-' + item.assigneddate) {
+                        <mat-list-item (click)="openViewRecord(item, 'amrap')" class="clickable">
+                            <h3 matListItemTitle>{{ 'Best reps with' | translate }} {{ item.weight }}{{ account.units }}: {{ item.reps }}{{ item.rpe ? ("@RPE" + item.rpe) : "" }}</h3>
+                            <p matListItemLine>{{ 'Achieved on' | translate }} {{ formatDate(item.assigneddate) }}</p>         
+                            <div matListItemMeta>
+                                <mat-icon>chevron_right</mat-icon>
+                            </div>               
+                        </mat-list-item>
                     }
-                </mat-nav-list>
+                </mat-list>
             }
         </mat-tab>
     </mat-tab-group>

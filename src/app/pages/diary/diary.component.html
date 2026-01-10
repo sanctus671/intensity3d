@@ -47,17 +47,26 @@
     
     <div class="diary__diary-content">
         <div class="diary__diary-content__day-nav day-nav">
-            @for (day of weekdays; track day.moment) {
-                <div 
-                    class="day-nav__day" 
-                    [class.day-nav__day--active]="day.active" 
-                    [class.day-nav__day--has-workout]="day.hasWorkout" 
-                    [class.day-nav__day--is-today]="day.isToday"
-                    (click)="selectDate(day.moment)">
-                    <h6>{{ day.dayName }}</h6>
-                    <h3>{{ day.day }}</h3>
-                </div>
-            }
+            <div class="day-nav__swiper-wrapper">
+                <swiper-container
+                    #swiperContainer
+                    class="day-nav__swiper"
+                    init="false">
+                    @for (day of weekdays; track day.moment.valueOf(); let i = $index) {
+                        <swiper-slide class="day-nav__slide">
+                            <div 
+                                class="day-nav__day" 
+                                [class.day-nav__day--active]="day.active" 
+                                [class.day-nav__day--has-workout]="day.hasWorkout" 
+                                [class.day-nav__day--is-today]="day.isToday"
+                                (click)="onDayClick(i)">
+                                <h6>{{ day.dayName }}</h6>
+                                <h3>{{ day.day }}</h3>
+                            </div>
+                        </swiper-slide>
+                    }
+                </swiper-container>
+            </div>
         </div>
 
         <div class="diary__diary-content__diary-workout diary-workout">
@@ -98,8 +107,9 @@
 
             @if (!loading && workouts[selectedDateString].length < 1) {
                 <div class="diary-workout__empty">
-                    <mat-icon>book</mat-icon>
+                    <mat-icon svgIcon="diary-empty"></mat-icon>
                     <h2>{{ 'Diary Empty' | translate }}</h2>
+                    <p>{{ "Add an exercise to your diary to start your workout" | translate }}</p>
                 </div>
             }
 

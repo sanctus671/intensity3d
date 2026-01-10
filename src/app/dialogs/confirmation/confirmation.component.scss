@@ -1,9 +1,14 @@
 .dialog-title{
     position:relative;
+    padding-right:40px;
     mat-icon{
         cursor:pointer;
         position:absolute;
         top:20px;
         right:20px;
     }
+}
+
+.mat-mdc-dialog-container-with-actions .mat-mdc-dialog-content.confirm{
+    padding-top:10px;
 }

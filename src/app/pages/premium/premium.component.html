@@ -1,0 +1,254 @@
+<div class="premium">
+    
+    <div class="premium__header">
+        
+        <div class="premium__header__crown-container">
+            <img ngSrc="/assets/crown.png" width="250" height="250" alt="{{ 'Premium Crown Icon' | translate }}" priority class="premium__header__crown" />
+            <div class="premium__header__shadow"></div>
+        </div>
+
+        
+        <h1>{{ 'Improve your tracking' | translate }}</h1>
+        <p>{{ 'Enhanced diary features, custom programming, and more' | translate }}</p>    
+        <div class="premium__header__actions">
+
+            <button mat-flat-button  (click)="purchasePremium()" [attr.aria-label]="'Upgrade to Premium' | translate">
+                {{ 'Upgrade to Premium' | translate }}
+            </button>
+        </div>
+        
+    </div>
+    
+    
+    <div class="premium__content">
+
+        <!-- Premium Features Section -->
+        <section class="premium__features">
+            <h2 class="premium__section-title">{{ 'Premium Features' | translate }}</h2>
+
+            <!-- Program Upgrades -->
+            <div class="premium__features__category">
+                <h3>{{ 'Program Upgrades' | translate }}</h3>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">build</mat-icon>
+                    <p [innerHTML]="'<strong>Program Builder: </strong> Create unlimited custom programs tailored to your lifting goals.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">create</mat-icon>
+                    <p [innerHTML]="'<strong>Program Customization: </strong> Modify existing programs to fit your specific needs.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">campaign</mat-icon>
+                    <p [innerHTML]="'<strong>Public Promotion: </strong> Make your program visible to other users or share via a unique URL.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">auto_awesome</mat-icon>
+                    <p [innerHTML]="'<strong>AI Programs: </strong> Generate personalised custom programs with AI.' | translate"></p>
+                </div>
+            </div>
+
+            <!-- Diary Upgrades -->
+            <div class="premium__features__category">
+                <h3>{{ 'Diary Upgrades' | translate }}</h3>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">bar_chart</mat-icon>
+                    <p [innerHTML]="'<strong>Enhanced Stats: </strong> Unlock additional stats such as record history, intensity zones and more.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">videocam</mat-icon>
+                    <p [innerHTML]="'<strong>Unlimited Videos: </strong> Upload videos of your lifts to track progress, form, and technique.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">library_books</mat-icon>
+                    <p [innerHTML]="'<strong>Create Templates: </strong> Create program templates using workouts in your diary.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">calculate</mat-icon>
+                    <p [innerHTML]="'<strong>Warmup Calculator: </strong> Easily calculate warm up sets and add them to your diary.' | translate"></p>
+                </div>
+            </div>
+
+            <!-- Support Upgrades -->
+            <div class="premium__features__category">
+                <h3>{{ 'Support Upgrades' | translate }}</h3>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">support_agent</mat-icon>
+                    <p [innerHTML]="'<strong>Priority Support: </strong> Get immediate assistance whenever you need help.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">lightbulb</mat-icon>
+                    <p [innerHTML]="'<strong>Priority Feature Requests: </strong> Share your ideas, and we will prioritize them in future updates.' | translate"></p>
+                </div>
+            </div>
+
+            <!-- Ongoing Development -->
+            <div class="premium__features__category">
+                <h3>{{ 'Ongoing Development' | translate }}</h3>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">favorite</mat-icon>
+                    <p [innerHTML]="'<strong>Support Us: </strong> Your support helps us make Intensity the best tool for strength training.' | translate"></p>
+                </div>
+                
+                <div class="premium__features__feature">
+                    <mat-icon fontSet="material-icons-outlined">attach_money</mat-icon>
+                    <p [innerHTML]="'<strong>Reinvestment: </strong> Revenue supports development, server costs, and reinvestment into the lifting community.' | translate"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="premium__testimonials">
+            <h2 class="premium__section-title">{{ 'What Our Users Say' | translate }}</h2>
+            
+            <div class="premium__testimonials__container">
+                <mat-card class="premium__testimonials__card">
+                    <div class="premium__testimonials__rating">
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                    </div>
+                    <p class="premium__testimonials__comment">"Premium has transformed my training. The program builder alone is worth the price!"</p>
+                    <p class="premium__testimonials__author">- John E.</p>
+                </mat-card>
+                
+                <mat-card class="premium__testimonials__card">
+                    <div class="premium__testimonials__rating">
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                    </div>
+                    <p class="premium__testimonials__comment">"The video upload feature helps me track my form progression. Amazing app!"</p>
+                    <p class="premium__testimonials__author">- Sarah M.</p>
+                </mat-card>
+                
+                <mat-card class="premium__testimonials__card">
+                    <div class="premium__testimonials__rating">
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                        <mat-icon>star</mat-icon>
+                    </div>
+                    <p class="premium__testimonials__comment">"The warmup calculator saves me so much time. Premium features are game-changing."</p>
+                    <p class="premium__testimonials__author">- Mike R.</p>
+                </mat-card>
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section class="premium__comparison">
+            <h2 class="premium__section-title">{{ 'Compare Plans' | translate }}</h2>
+            
+            <div class="premium__comparison__table">
+                <div class="premium__comparison__table__header">
+                    <div class="premium__comparison__table__header__feature">{{ 'Feature' | translate }}</div>
+                    <div class="premium__comparison__table__header__free">{{ 'Free' | translate }}</div>
+                    <div class="premium__comparison__table__header__premium">{{ 'Premium' | translate }}</div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Diary Tracking' | translate }}</div>
+                    <div class="premium__comparison__table__row__free">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Add Pre-built Programs' | translate }}</div>
+                    <div class="premium__comparison__table__row__free">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'In-depth Stats' | translate }}</div>
+                    <div class="premium__comparison__table__row__free">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Program Builder' | translate }}</div>
+                    <div class="premium__comparison__table__row__free"></div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Program Customization' | translate }}</div>
+                    <div class="premium__comparison__table__row__free"></div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Video Uploads' | translate }}</div>
+                    <div class="premium__comparison__table__row__free"></div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Enhanced Stats' | translate }}</div>
+                    <div class="premium__comparison__table__row__free"></div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Create Templates' | translate }}</div>
+                    <div class="premium__comparison__table__row__free"></div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="premium__comparison__table__row">
+                    <div class="premium__comparison__table__row__feature">{{ 'Warmup Calculator' | translate }}</div>
+                    <div class="premium__comparison__table__row__free"></div>
+                    <div class="premium__comparison__table__row__premium">
+                        <mat-icon>check_circle</mat-icon>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+
+    <div class="premium__footer">
+        <button mat-flat-button color="primary" (click)="purchasePremium()" [attr.aria-label]="'Upgrade to Premium' | translate">
+            {{ 'Upgrade to Premium' | translate }}
+        </button>
+    </div>
+   
+    
+</div>

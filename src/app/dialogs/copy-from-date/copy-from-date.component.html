@@ -5,7 +5,7 @@
     <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
 </div>
 
-<mat-dialog-content class="copy">
+<mat-dialog-content class="copy" [class.copy--no-date]="details.isPreselected">
     @if (!details.isPreselected) {
         <mat-form-field>
             <mat-label>{{ 'Copy from date' | translate }}</mat-label>
@@ -38,7 +38,7 @@
                         <div class="exercise__sets">
                             @for (set of exercise.sets; track set.id) {
                                 <div class="exercise__sets__set">
-                                    {{ set['reps'] + " reps, " + set['weight'] + account.units + ", " + set['percentage'] + "%, " + set['rpe'] + "RPE" }}
+                                    {{ set['reps'] + " reps, " + set['weight'] + account.units + ", " + set['percentage'] + "%" + (set['rpe'] ? (", " + set['rpe'] + "RPE") : "") }}
                                 </div>
                             }
                         </div>

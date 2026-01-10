@@ -1,0 +1,53 @@
+<div class="weight-converter">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>
+      {{ "Weight Converter" | translate }}
+    </h2>
+    <button mat-icon-button class="refresh-button" (click)="clearValues()" [matTooltip]="'Clear' | translate">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Kilograms (kg)" | translate }}</mat-label>
+      <input 
+        matInput 
+        type="number" 
+        [value]="kgValue()"
+        (input)="onKgChange($any($event.target).value)">
+      @if (kgValue() !== null) {
+        <button matSuffix mat-icon-button (click)="kgValue.set(null); lbsValue.set(null)">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Pounds (lbs)" | translate }}</mat-label>
+      <input 
+        matInput 
+        type="number" 
+        [value]="lbsValue()"
+        (input)="onLbsChange($any($event.target).value)">
+      @if (lbsValue() !== null) {
+        <button matSuffix mat-icon-button (click)="kgValue.set(null); lbsValue.set(null)">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <div class="weight-converter__info">
+      <p>{{ "Enter a value in either field to convert" | translate }}</p>
+      <p class="weight-converter__info__formula">1 kg = 2.20462 lbs</p>
+      <p class="weight-converter__info__formula">1 lbs = 0.453592 kg</p>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ "Close" | translate }}</button>
+  </mat-dialog-actions>
+</div>
+
+

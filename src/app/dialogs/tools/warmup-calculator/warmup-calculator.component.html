@@ -1,0 +1,156 @@
+<div class="warmup-calculator">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>{{ "Warmup Calculator" | translate }}</h2>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Total weight" | translate }} ({{selectedValues().units}})</mat-label>
+      <input matInput type="number" [value]="selectedValues().weight" (input)="updateWeight($any($event.target).value)">
+    </mat-form-field>
+
+    @if (selectedValues().weight && fields().warmupMethod) {
+      <h6 class="result warmup-result-title">{{ "Warmup Sets" | translate }}</h6>
+
+      <div class="result warmup-result">
+        @for (set of calculatedWarmupSets(); track trackByWarmupSet($index, set)) {
+          <div class="warmup-set-item" (click)="openWarmupPlates(set)">
+            {{set.reps ? set.reps : 0}} x {{set.weight ? set.weight : 0}}{{selectedValues().units}}
+          </div>
+        }
+      </div>
+    }
+
+    <h6 class="warmup-calculator__options-title">{{ "Calculator Options" | translate }}</h6>
+
+    <mat-accordion class="warmup-calculator__options">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ "Warmup Method" | translate }}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ "Warmup Method" | translate }}</mat-label>
+          <mat-select [value]="fields().warmupMethod" (selectionChange)="updateWarmupMethod($event.value)">
+            <mat-option value="startingstrength">Starting Strength</mat-option>
+            <mat-option value="507085">50% - 70% - 85%</mat-option>
+            <mat-option value="custom">{{ "Custom" | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (fields().warmupMethod === 'custom') {
+          <div class="warmup-calculator__custom">
+            @for (set of fields().warmupCustomSets; track $index; let i = $index) {
+              <div class="warmup-calculator__custom__set">
+                <h6>{{ "Warmup Set" | translate }} {{i + 1}}</h6>
+
+                <div class="warmup-calculator__custom__set__data">
+                  <mat-form-field appearance="outline" class="warmup-calculator__custom__set__data__reps">
+                    <mat-label>{{ "Reps" | translate }}</mat-label>
+                    <input matInput type="number" [value]="set.reps" (input)="updateCustomSetReps(i, $any($event.target).value)">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="warmup-calculator__custom__set__weight">
+                    <mat-label>{{ "Weight" | translate }}</mat-label>
+                    <mat-select [value]="set.weight" (selectionChange)="updateCustomSetWeight(i, $event.value)">
+                      <mat-option value="bar">{{ "Bar only" | translate }}</mat-option>
+                      <mat-option value="workweight">{{ "Work Weight" | translate }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  @if (set.weight === 'workweight') {
+                    <mat-form-field appearance="outline" class="warmup-calculator__custom__set__percentage">
+                      <mat-label>{{ "Percentage (%)" | translate }}</mat-label>
+                      <input matInput type="number" [value]="set.percentage" (input)="updateCustomSetPercentage(i, $any($event.target).value)">
+                    </mat-form-field>
+                  }
+
+                  <button mat-icon-button color="warn" (click)="removeWarmupSet(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            }
+
+            <button mat-stroked-button (click)="addWarmupSet()" class="warmup-calculator__add-set">
+              {{ "Add Set" | translate }}
+            </button>
+          </div>
+        }
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ "Bar & Plates" | translate }}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="warmup-calculator__bar-weights">
+          <div class="warmup-calculator__bar-weights__title">
+            <span>{{ "Select bar weight" | translate }}</span>
+            <button mat-button color="primary" (click)="openAddCustomBarWeight()">{{ "Add custom bar weight" | translate }}</button>
+          </div>
+          <div class="warmup-calculator__bar-weights__container">
+            @for (barWeight of currentBarWeights; track barWeight) {
+              <div class="warmup-calculator__bar-weights__container__bar-weight"
+                   (click)="selectBarWeight(barWeight)"
+                   [class.warmup-calculator__bar-weights__container__bar-weight--selected]="barWeight === currentBarWeight">
+                {{barWeight}}{{selectedValues().units}}
+              </div>
+            }
+          </div>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ "Collar weight" | translate }} ({{selectedValues().units}})</mat-label>
+          <input matInput type="number" [value]="collarWeight" (input)="updateCollarWeight($any($event.target).value)">
+        </mat-form-field>
+
+        <div class="warmup-calculator__plates-selection">
+          <div class="warmup-calculator__plates-selection__title">
+            <span>{{ "Select available plates" | translate }}</span>
+            <button mat-icon-button [matMenuTriggerFor]="plateOptionsMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #plateOptionsMenu="matMenu">
+              <button mat-menu-item (click)="openAddCustomPlate()">
+                <span>{{ "Add custom plate" | translate }}</span>
+              </button>
+              <button mat-menu-item (click)="openColorSettings()">
+                <span>{{ "Change plate colors" | translate }}</span>
+              </button>
+            </mat-menu>
+          </div>
+
+          <div class="warmup-calculator__plates-selection__container">
+            @for (plateOption of currentPlates; track plateOption) {
+              <div class="warmup-calculator__plates-selection__container__plate warmup-calculator__plates-selection__container__plate--{{cssPlateName(plateOption)}}"
+                   (click)="togglePlateOption(plateOption)"
+                   [class.warmup-calculator__plates-selection__container__plate--selected]="currentDefaultPlates.indexOf(plateOption) > -1">
+                {{plateOption}}{{selectedValues().units}}
+              </div>
+            }
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ "Units" | translate }}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ "Unit" | translate }}</mat-label>
+          <mat-select [value]="selectedValues().units" (selectionChange)="updateUnits($event.value)">
+            <mat-option value="kg">kg</mat-option>
+            <mat-option value="lbs">lbs</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ "Close" | translate }}</button>
+  </mat-dialog-actions>
+</div>

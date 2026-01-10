@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, inject, ViewEncapsulation, ViewChild, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,9 +9,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
-import { StripeService, StripeCardComponent } from 'ngx-stripe';
-import { StripeCardElementOptions, StripeElementsOptions } from '@stripe/stripe-js';
+import { StripeService, StripePaymentElementComponent } from 'ngx-stripe';
+import { StripePaymentElementOptions, StripeElementsOptions } from '@stripe/stripe-js';
 import { AccountService } from '../../services/account/account.service';
+import { ThemeService } from '../../services/theme/theme.service';
+
+interface Account {
+  id?: number;
+  email?: string;
+  premium?: boolean;
+}
 
 @Component({
   selector: 'app-purchase-premium',
@@ -28,80 +35,114 @@ import { AccountService } from '../../services/account/account.service';
     MatIconModule,
     MatProgressSpinnerModule,
     TranslateModule,
-    StripeCardComponent
+    StripePaymentElementComponent
   ]
 })
-export class PurchasePremiumComponent {
+export class PurchasePremiumComponent implements OnInit {
     
     public dialogRef = inject(MatDialogRef<PurchasePremiumComponent>);
     public data = inject(MAT_DIALOG_DATA);
     private stripeService = inject(StripeService);
     private accountService = inject(AccountService);
+    private themeService = inject(ThemeService);
     public snackBar = inject(MatSnackBar);
     
-    @ViewChild(StripeCardComponent, {static: false}) card!: StripeCardComponent;
+    @ViewChild(StripePaymentElementComponent, {static: false}) paymentElement!: StripePaymentElementComponent;
     
-    cardOptions: StripeCardElementOptions = {
-        style: {
-            base: {
-                iconColor: '#000000',
-                color: '#000000',
-                lineHeight: '40px',
-                fontWeight: '400',
-                fontFamily: 'Roboto, "Helvetica Neue", sans-serif',
-                fontSize: '16px',
-                '::placeholder': {
-                  color: 'rgba(0, 0, 0, 0.54)'
-              }
-            }
+    public account = signal<Account>({});
+    public loading = signal<boolean>(false);
+    
+    paymentElementOptions: StripePaymentElementOptions = {
+        layout: {
+            type: 'tabs',
+            defaultCollapsed: false,
         }
     };  
     
     elementsOptions: StripeElementsOptions = {
-        locale: 'en'
-    };     
-    
-    public account: any;
-    public loading: boolean = false;
+        locale: 'en',
+        appearance: {
+            theme: this.themeService.isDark() ? 'night' : 'stripe',
+        },
+        mode: 'payment',
+        amount: 3499, // $34.99 in cents
+        currency: 'usd',
+    };
     
     constructor() {
-        this.account = {};
-
-        this.accountService.getAccountLocal().then((account: any) => {
-            this.account = account;
+        this.loadAccount();
+        
+        // Update payment element styling when theme changes
+        effect(() => {
+            const isDark = this.themeService.isDark();
+            this.elementsOptions = {
+                locale: 'en',
+                appearance: {
+                    theme: isDark ? 'night' : 'stripe',
+                },
+                mode: 'payment',
+                amount: 3499,
+                currency: 'usd',
+            };
         });
     }
+    
+    ngOnInit(): void {
+        // Component initialization
+    }
+    
+    private async loadAccount(): Promise<void> {
+        try {
+            const account = await this.accountService.getAccountLocal();
+            if (account) {
+                this.account.set(account);
+            }
+        } catch (error) {
+            console.error('Error loading account:', error);
+        }
+    }
  
-    public purchase(form: any): void {
-        this.loading = true;
-        this.stripeService
-          .createToken(this.card.element, { name: form.cardholder })
-          .subscribe(result => {
-            if (result.token) {
-                let subscriptionData = {
-                    id: result.token.id, 
-                    email: this.account.email, 
+    public async purchase(form: any): Promise<void> {
+        this.loading.set(true);
+        
+        try {
+            const result = await this.stripeService.confirmPayment({
+                elements: this.paymentElement.elements,
+                confirmParams: {
+                    return_url: window.location.origin + '/premium?payment_success=true',
+                    payment_method_data: {
+                        billing_details: {
+                            name: form.cardholder,
+                            email: this.account().email
+                        }
+                    }
+                },
+                redirect: 'if_required'
+            }).toPromise();
+
+            if (result?.error) {
+                this.loading.set(false);
+                this.snackBar.open(result.error.message || 'There was an error with your payment.', '', {
+                    duration: 5000
+                });
+            } else if (result?.paymentIntent) {
+                // Payment succeeded
+                const billingInfo = {
+                    id: result.paymentIntent.id, 
+                    email: this.account().email, 
                     name: form.cardholder
                 };
                 
-                // Note: purchasePremium method needs to be implemented in AccountService
-                this.accountService.updateAccount(subscriptionData).then((data) => {
-                    this.loading = false;
-                    this.dialogRef.close(true);
-                }).catch(() => {
-                    this.loading = false;
-                    this.snackBar.open('There was an error making payment.', '', {
-                        duration: 5000
-                    });                     
-                })
-
-            } else if (result.error) {
-                this.loading = false;
-                this.snackBar.open('There was an error with your card.', '', {
-                    duration: 5000
-                });                 
+                await this.accountService.purchasePremium(billingInfo);
+                this.loading.set(false);
+                this.dialogRef.close(true);
             }
-          });          
+        } catch (error) {
+            this.loading.set(false);
+            this.snackBar.open('There was an error making payment.', '', {
+                duration: 5000
+            });
+        }
     }    
     
     public dismiss(): void { 

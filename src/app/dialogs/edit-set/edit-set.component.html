@@ -5,10 +5,10 @@
 </div>
 
 <mat-dialog-content class="edit-set">
-    @if (set.is_overall_record) {
-        <div class="edit-set__set-record">
+    @if (set.is_overall_record && recordSet.reps == set.reps && recordSet.weight == set.weight) {
+        <div class="edit-set__set-record" (click)="openRecordHistory()">
             <mat-icon svgIcon="trophy"></mat-icon>
-            {{ 'This set is a new' | translate }} {{ set.reps }}{{ 'RM' | translate }} {{ 'record' | translate }}!
+            {{ 'This set is a new' | translate }} {{ recordSet.reps }}{{ 'RM' | translate }} {{ 'record' | translate }}!
         </div>
     }
     
@@ -20,37 +20,53 @@
     <mat-form-field>
         <mat-label>{{ 'Weight' | translate }}</mat-label>
         <input matInput type="number" [(ngModel)]="set.weight">
+        @if (set.weight) {
+            <button mat-icon-button matSuffix 
+                    class="edit-set__plates"
+                    (click)="openPlateCalculator()" 
+                    [attr.aria-label]="'Open plate calculator' | translate"
+                    type="button">
+                <mat-icon svgIcon="plates"></mat-icon>
+            </button>
+        }
     </mat-form-field>
 
     <mat-checkbox [(ngModel)]="set.updateAll" color="primary" class="edit-set__mass-edit">
         {{ 'Update reps & weight for all sets' | translate }}
     </mat-checkbox>    
-
+    
     <mat-form-field class="edit-set__extra-action">
-        <mat-label>{{ 'Percentage' | translate }}</mat-label>
+        <mat-label>{{ 'Intensity (%)' | translate }}</mat-label>
         <input matInput type="number" [(ngModel)]="set.percentage">
-        <button mat-flat-button matSuffix color="primary" (click)="calculatePercentage()">
+        <button mat-button matSuffix color="primary" (click)="calculatePercentage()">
             {{ 'Calculate' | translate }}
         </button>
     </mat-form-field>
 
-    @if (!account || account.intensity_scale !== 'rir') {
-        <div class="edit-set__rpe">
-            <p [matBadge]="set.rpe" matBadgePosition="above after">RPE</p>
-            <mat-slider color="primary" max="10" min="6" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="set.rpe">
-                <input matSliderThumb>
-            </mat-slider>
+    <div class="edit-set__rpe">
+        <div class="edit-set__rpe__header">
+            <span class="edit-set__rpe__title" (click)="editRpe()">
+                {{account && account.intensity_scale === "rir" ? "RIR" : "RPE"}}
+                <mat-icon>edit</mat-icon>
+            </span>
         </div>
-    }
-    
-    @if (account.intensity_scale === 'rir') {
-        <div class="edit-set__rpe">
-            <p [matBadge]="set.rir" matBadgePosition="above after">RIR</p>
-            <mat-slider color="primary" max="5" min="0" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="set.rir" (ngModelChange)="rirChanged()">
-                <input matSliderThumb>
-            </mat-slider>
+
+        <div class="edit-set__rpe__selection">
+            @for (rpeOption of rpeOptions; track rpeOption) {
+                <div class="edit-set__rpe__selection__option" 
+                     [class.edit-set__rpe__selection__option--selected]="set.rpe === rpeOption"
+                     (click)="set.rpe = (set.rpe === rpeOption ? null : rpeOption)">
+                    {{account && account.intensity_scale === "rir" ? (10 - rpeOption) : rpeOption}}
+                </div>
+            }
         </div>
-    }
+
+        @if (set.rpe) {
+            <div class="edit-set__rpe__explanation">
+                {{getRpeExplanation()}}
+            </div>
+        }
+    </div>
     
     <mat-form-field>
         <mat-label>{{ 'Set Type' | translate }}</mat-label>
@@ -74,7 +90,10 @@
     <mat-form-field class="edit-set__extra-action">
         <mat-label>{{ 'Video' | translate }}</mat-label>
         <input matInput type="text" [(ngModel)]="set.video">
-        <button mat-flat-button matSuffix color="primary" (click)="uploadVideo()">
+        <button mat-button matSuffix color="primary" (click)="uploadVideo()">
+            @if (!account.premium) {
+                <mat-icon matListItemIcon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+            }            
             {{ 'Upload' | translate }}
         </button>
         <input id="videoFile" name="videoFile" hidden required type="file" accept="video/*" (change)="videoFileChangeListener($event)">

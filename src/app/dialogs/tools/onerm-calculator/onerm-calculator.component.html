@@ -1,0 +1,53 @@
+<div class="onerm-calculator">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>{{ "1 Rep Max Calculator" | translate }}</h2>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Reps" | translate }}</mat-label>
+      <input matInput type="number" [value]="reps()" (input)="reps.set($any($event.target).value ? +$any($event.target).value : null)">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Weight" | translate }}</mat-label>
+      <input matInput type="number" [value]="weight()" (input)="weight.set($any($event.target).value ? +$any($event.target).value : null)">
+    </mat-form-field>
+
+    @if (!reps() || reps()! < 16) {
+      <div class="edit-set__rpe">
+        <div class="edit-set__rpe__title" (click)="editRpe()">
+          {{user().intensity_scale === "rir" ? "RIR" : "RPE"}}
+          <mat-icon>edit</mat-icon>
+        </div>
+
+        <div class="edit-set__rpe__selection">
+          @for (rpeOption of rpeOptions; track rpeOption) {
+            <div class="edit-set__rpe__selection__option" 
+                 [class.edit-set__rpe__selection__option--selected]="rpe() === rpeOption"
+                 (click)="rpe.set(rpe() === rpeOption ? null : rpeOption)">
+              {{user().intensity_scale === "rir" ? (10 - rpeOption) : rpeOption}}
+            </div>
+          }
+        </div>
+
+        @if (rpe()) {
+          <div class="edit-set__rpe__explaination">
+            {{getRpeExplaination()}}
+          </div>
+        }
+      </div>
+    }
+
+    @if (reps() && weight()) {
+      <p class="onerm-calculator__result">
+        {{ "Estimated Max" | translate}}: <strong>{{getMax() | number:'1.0-2'}}{{user().units}}</strong>
+      </p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ "Close" | translate }}</button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,157 @@
+<div class="settings">
+    
+    
+    <h2 class="settings__title">{{ "Settings" | translate }}</h2>
+    
+    
+    <div class="settings__settings-list">
+
+        <mat-nav-list>            
+            <h3 matSubheader>{{ "Appearance" | translate }}</h3>
+            
+            <mat-list-item>
+                <mat-icon matListItemIcon>color_lens</mat-icon>
+                <div matListItemTitle>{{ "Theme" | translate }}</div>
+                <mat-form-field appearance="fill" class="settings__inline-select">
+                    <mat-select [(ngModel)]="selectedTheme" (ngModelChange)="onThemeChange()">
+                        <mat-option value="system">{{ "System default" | translate }}</mat-option>
+                        <mat-option value="light">{{ "Light" | translate }}</mat-option>
+                        <mat-option value="dark">{{ "Dark" | translate }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </mat-list-item>
+            
+            <mat-list-item>
+                <mat-icon matListItemIcon>language</mat-icon>
+                <div matListItemTitle>{{ "Language" | translate }}</div>
+                <mat-form-field appearance="fill" class="settings__inline-select">
+                    <mat-select [(ngModel)]="selectedLanguage" (ngModelChange)="onLanguageChange()">
+                        @for (lang of supportedLanguages; track lang.code) {
+                            <mat-option [value]="lang.code">{{ lang.name }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </mat-list-item>
+        </mat-nav-list>
+
+        <mat-nav-list>            
+            <h3 matSubheader>{{ "Diary Settings" | translate }}</h3>           
+            <mat-list-item (click)="openGoalSettings()">
+                <mat-icon matListItemIcon>flag</mat-icon>
+                <div matListItemTitle>{{ "Goal Settings" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </mat-list-item>
+        </mat-nav-list>
+        
+        
+        <div class="settings__form-elements">
+        
+            <mat-form-field class="settings__form-elements__units">
+                <mat-label>{{ "Default Units" | translate }}</mat-label>
+                <mat-select [ngModel]="units().units" name="units" (ngModelChange)="onUnitsChange($event)">
+                    <mat-option value="kg">kg</mat-option>
+                    <mat-option value="lbs">lbs</mat-option>
+                </mat-select>
+            </mat-form-field>         
+
+
+            <mat-form-field>
+                <mat-label>{{ "Default Distance Units" | translate }}</mat-label>
+                <mat-select [ngModel]="units().distanceunits" name="distance-units" (ngModelChange)="onDistanceUnitsChange($event)">
+                    <mat-option value="cm">cm</mat-option>
+                    <mat-option value="inches">{{ "inches" | translate }}</mat-option>
+                    <mat-option value="ft">ft</mat-option>
+                    <mat-option value="m">m</mat-option>
+                    <mat-option value="km">km</mat-option>
+                    <mat-option value="miles">{{ "miles" | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field> 
+
+
+            <mat-form-field>
+                <mat-label>{{ "Intensity Scale" | translate }}</mat-label>
+                <mat-select [ngModel]="account().intensity_scale" name="intensity-scale" (ngModelChange)="onIntensityScaleChange($event)">
+                    <mat-option value="rpe">RPE</mat-option>
+                    <mat-option value="rir">RIR</mat-option>
+                </mat-select>
+            </mat-form-field>        
+
+
+
+            <mat-checkbox [ngModel]="account().autocomplete" labelPosition="before" color="primary" (ngModelChange)="onAutocompleteChange($event)">{{ "Autocomplete Sets" | translate }}</mat-checkbox>
+            <mat-checkbox [ngModel]="account().leaderboard" labelPosition="before" color="primary" (ngModelChange)="onLeaderboardChange($event)">{{ "Show On Leaderboard" | translate }}</mat-checkbox>
+        
+
+        </div>
+        
+        <mat-nav-list>            
+            <h3 matSubheader>{{ "Data" | translate }}</h3>           
+            <mat-list-item (click)="importData()">
+                <mat-icon matListItemIcon>upload</mat-icon>
+                <div matListItemTitle>{{ "Import Data" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </mat-list-item>         
+            <mat-list-item (click)="exportData()" [class.loading]="exportLoading()">
+                <mat-icon matListItemIcon>download</mat-icon>
+                <div matListItemTitle>{{ "Export Data" | translate }}</div>
+                @if (exportLoading()) {
+                    <mat-spinner diameter="15" mode="indeterminate" color="primary"></mat-spinner>
+                } @else {
+                    <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                }
+            </mat-list-item>
+        </mat-nav-list>        
+        
+        
+        <mat-nav-list>            
+            <h3 matSubheader>{{ "Support" | translate }}</h3>           
+            <a href="https://www.facebook.com/intensityapp/" target="_blank" mat-list-item>
+                <mat-icon matListItemIcon>thumb_up</mat-icon>
+                <div matListItemTitle>{{ "Follow Us" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </a>         
+            <a href="mailto:support@intensityapp.com" target="_blank" mat-list-item>
+                <mat-icon matListItemIcon>email</mat-icon>
+                <div matListItemTitle>{{ "Contact Support" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </a>
+        </mat-nav-list>        
+        
+        
+        <mat-nav-list>            
+            <h3 matSubheader>{{ "Account Settings" | translate }}</h3>             
+            <mat-list-item (click)="changePassword()">
+                <mat-icon matListItemIcon>lock</mat-icon>
+                <div matListItemTitle>{{ "Change Password" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </mat-list-item>          
+            <mat-list-item [routerLink]="['/premium']" class="premium-link" [class.purchased]="account().premium">
+                <mat-icon matListItemIcon>star</mat-icon>
+                <div matListItemTitle>{{ "Premium" | translate }}</div>
+                @if (account().premium) {
+                    <span class="settings__premium-badge">{{ "Purchased" | translate }}</span>
+                } @else {
+                    <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                }
+            </mat-list-item>         
+            <mat-list-item (click)="deleteAccount()" class="settings__delete-account">
+                <mat-icon matListItemIcon color="warn">delete</mat-icon>
+                <div matListItemTitle class="settings__delete-text">{{ "Delete Account" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </mat-list-item>
+            <mat-list-item (click)="logout()">
+                <mat-icon matListItemIcon>logout</mat-icon>
+                <div matListItemTitle>{{ "Logout" | translate }}</div>
+                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+            </mat-list-item>
+        </mat-nav-list>           
+        
+        
+        
+    </div>
+    
+    <div class="settings__version">
+        v{{ version }}
+    </div>
+    
+</div>

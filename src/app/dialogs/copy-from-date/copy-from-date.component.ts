@@ -74,7 +74,7 @@ export class CopyFromDateComponent {
     public getWorkout(): void {
         this.loading = true;
         this.workout = [];
-        this.diaryService.getWorkouts(this.details.date).then((data) => {
+        this.diaryService.preloadWorkout(this.details.date).then((data) => {
             
             if (this.details.exerciseid){
                 this.workout = data.filter((item: any) => {return item.exerciseid === this.details.exerciseid});

@@ -1,0 +1,24 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ title }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content>
+    @if (message) {
+        <p>{{ message }}</p>
+    }
+    <mat-form-field appearance="outline" class="full-width">
+        <input 
+            matInput 
+            [(ngModel)]="inputValue" 
+            [type]="inputType"
+            [placeholder]="placeholder"
+            (keyup.enter)="confirm()"
+            autofocus>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    <button mat-button (click)="confirm()" color="primary">{{ 'OK' | translate }}</button>
+</mat-dialog-actions>

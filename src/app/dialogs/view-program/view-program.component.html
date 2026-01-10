@@ -1,21 +1,58 @@
-<div class="dialog-title">
-    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
-</div>
-
-<mat-dialog-content class="view-program">
-<!--     <app-program [id]="program.id" [name]="program.name"></app-program>   -->  
-</mat-dialog-content>
-
-<mat-dialog-actions class="view-program__actions">
-    <button mat-flat-button color="primary" (click)="addProgram()">
-        {{ 'Add To Diary' | translate }}
-    </button>     
-    @if (program.userid === account.id) {
-        <button mat-stroked-button color="primary" (click)="editProgram()">
-            {{ 'Edit Program' | translate }}
+<div class="view-program">
+    <h2 mat-dialog-title>
+        <button mat-icon-button 
+                mat-dialog-close 
+                class="view-program__close"
+                [attr.aria-label]="'Close dialog' | translate">
+            <mat-icon>close</mat-icon>
         </button>
-    }
-    <button mat-stroked-button (click)="customizeProgram()">
-        {{ 'Customize Program' | translate }}
-    </button>  
-</mat-dialog-actions>
+    </h2>
+
+    <mat-dialog-content>
+        @if (program().id) {
+            <div class="view-program__info">
+       
+                
+                <!-- Program component with hidden actions since dialog has its own -->
+                <app-program 
+                    [id]="program().id" 
+                    [name]="program().name"
+                    (programLoaded)="onProgramLoaded($event)">
+                </app-program>
+            </div>
+        } @else {
+            <div class="view-program__empty">
+                <mat-icon>info</mat-icon>
+                <p>{{ 'No program information available' | translate }}</p>
+            </div>
+        }
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-flat-button 
+                color="primary" 
+                (click)="addProgram()"
+                [attr.aria-label]="'Add To Diary' | translate">
+            <mat-icon>add</mat-icon>
+            {{ 'Add To Diary' | translate }}
+        </button>
+        
+        @if (isCreator()) {
+            <button mat-stroked-button 
+                    color="primary" 
+                    (click)="editProgram()"
+                    [attr.aria-label]="'Edit Program' | translate">
+                <mat-icon>edit</mat-icon>
+                {{ 'Edit Program' | translate }}
+            </button>
+        }
+        
+        <button mat-stroked-button 
+                (click)="customizeProgram()"
+                [attr.aria-label]="'Customize Program' | translate">
+            <mat-icon>tune</mat-icon>
+            {{ 'Customize Program' | translate }}
+        </button>
+    </mat-dialog-actions>
+
+</div>

@@ -43,9 +43,14 @@ export class ChangeExerciseComponent {
     public musclegroups: Array<any>;
     public exerciseTypes: Array<any>;
     public properties: any;
+    public showReset: boolean = false;
+    public exercisesOnly: boolean = false;
     
     constructor() {
         this.properties = {search:"", recentLoading:true};
+        console.log(this.data);
+        this.showReset = this.data?.showReset || false;
+        this.exercisesOnly = this.data?.exercisesOnly || false;
  
         this.recentExercises = [];
         this.musclegroups = ["Rectus Abdominis", "Biceps", "Deltoids", "Erector Spinae", "Gastrocnemius", "Soleus","Gluteus","Hamstrings","Latissimus Dorsi","Rhomboids","Obliques","Pectoralis","Quadriceps","Trapezius","Triceps","Forearms"];
@@ -81,5 +86,9 @@ export class ChangeExerciseComponent {
         
     public dismiss(): void { 
         this.dialogRef.close();
+    }
+    
+    public clearSelection(): void {
+        this.dialogRef.close({ clear: true });
     }
 }

@@ -1,0 +1,31 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ title() }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+<mat-dialog-content class="view-record">
+
+
+    <p class="view-record__date">{{ formatDate(set().assigneddate) }}</p>
+    <p class="view-record__details">
+        {{ "You achieved this record on" | translate }}<br>
+        {{ formatDate(set().assigneddate) }}
+    </p>
+
+    <button 
+        mat-flat-button 
+        color="primary" 
+        class="view-record__upgrade-button" 
+        (click)="openRecordHistory()">
+        @if (!user().premium) {
+            <mat-icon matListItemIcon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+        }
+        {{ "View record history" | translate }}
+    </button>
+
+</mat-dialog-content>
+
+
+<mat-dialog-actions class="view-record__footer">
+    <button mat-button (click)="dismiss()">{{ "Dismiss" | translate }}</button>
+    <button mat-button color="primary" (click)="openDate()">{{ "Go to date" | translate }}</button>
+</mat-dialog-actions>

@@ -1,0 +1,117 @@
+.leaderboard-exercise {
+  min-height: 300px;
+
+  .leaderboard__exercises__exercise__empty {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  .leaderboard__exercises__exercise {
+    padding: 0;
+    margin-bottom: 15px;
+
+    .leaderboard__exercises__exercise__column-headers {
+      margin-bottom: 5px;
+      margin-top: 10px;
+
+      .leaderboard__exercises__exercise__column-headers__header {
+        display: inline-block;
+        width: 33%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 1px;
+        opacity: 0.4;
+        color: var(--text-secondary);
+
+        &.leaderboard__exercises__exercise__column-headers__header--rank {
+          width: 20%;
+        }
+
+        &.leaderboard__exercises__exercise__column-headers__header--weight {
+          width: 35%;
+        }
+
+        &.leaderboard__exercises__exercise__column-headers__header--name {
+          padding-right: 20px;
+          width: 45%;
+        }
+      }
+    }
+
+    .leaderboard__exercises__exercise__item {
+      position: relative;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      &:focus {
+        outline: 2px solid var(--mat-sys-primary);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--divider-color);
+      }
+
+      .leaderboard__exercises__exercise__item__value {
+        display: inline-block;
+        width: 33%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--text-primary);
+
+        &.leaderboard__exercises__exercise__item__value--rank {
+          width: 20%;
+        }
+
+        &.leaderboard__exercises__exercise__item__value--weight {
+          width: 35%;
+        }
+
+        &.leaderboard__exercises__exercise__item__value--name {
+          padding-right: 20px;
+          width: 45%;
+        }
+
+        &.leaderboard__exercises__exercise__item__value--gold {
+          color: #FFD700;
+          font-weight: bold;
+        }
+
+        &.leaderboard__exercises__exercise__item__value--silver {
+          color: #C0C0C0;
+          font-weight: bold;
+        }
+
+        &.leaderboard__exercises__exercise__item__value--bronze {
+          color: #CD7F32;
+          font-weight: bold;
+        }
+      }
+
+      .chevron {
+        position: absolute;
+        right: 0;
+        top: 10px;
+        opacity: 0.5;
+        font-size: 18px;
+        color: var(--text-secondary);
+      }
+    }
+  }
+}

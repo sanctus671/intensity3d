@@ -4,81 +4,127 @@
 </div>
 
 <mat-dialog-content class="edit-program-exercise">
-    <div class="edit-program-exercise__extra-action">
-        <span>{{ exercise.name }}</span>
-        <button mat-flat-button matSuffix color="primary" (click)="switchExercise()">
+    <!-- Exercise Name and Switch Button -->
+    <div class="edit-program-exercise__exercise-name">
+        <span>{{ exercise().name | translate }}</span>
+        <button mat-stroked-button color="primary" (click)="switchExercise()">
             {{ 'Switch Exercise' | translate }}
         </button>
-    </div>    
-    
-    <mat-form-field>
-        <mat-label>{{ 'Reps' | translate }}</mat-label>
-        <input matInput type="number" [(ngModel)]="exercise.reps">
-    </mat-form-field>
-    
-    <mat-form-field>
-        <mat-label>{{ 'Sets' | translate }}</mat-label>
-        <input matInput type="number" [(ngModel)]="exercise.sets">
-    </mat-form-field> 
-    
-    <mat-form-field>
-        <mat-label>{{ 'Weight' | translate }}</mat-label>
-        <input matInput type="number" [(ngModel)]="exercise.weight">
-    </mat-form-field>
-    
-    @if (exercise.weight) {
-        <p class="edit-program-exercise__weight-explanation">
-            {{ 'It is recommended to avoid setting a specific weight, and instead use a percentage (intensity). The users max for that exercise will then be used to set the weights relative to their strength levels.' | translate }}
-        </p>
+    </div>
+
+    <!-- Reps with Rep Range Toggle -->
+    <div class="edit-program-exercise__reps-container">
+        <mat-form-field>
+            <mat-label>{{ (exercise().enable_rep_range ? 'Minimum reps' : 'Reps') | translate }}</mat-label>
+            <input matInput type="number" [(ngModel)]="exercise().reps">
+        </mat-form-field>
+        
+        <mat-slide-toggle 
+            [(ngModel)]="exercise().enable_rep_range" 
+            (change)="toggleRepRange()"
+            color="primary">
+            {{ 'Range' | translate }}
+        </mat-slide-toggle>
+    </div>
+
+    <!-- Maximum Reps (if rep range enabled) -->
+    @if (exercise().enable_rep_range) {
+        <mat-form-field>
+            <mat-label>{{ 'Maximum reps' | translate }}</mat-label>
+            <input matInput type="number" [(ngModel)]="exercise().maxreps">
+        </mat-form-field>
     }
 
+    <!-- Sets -->
+    <mat-form-field>
+        <mat-label>{{ 'Sets' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="exercise().sets">
+    </mat-form-field>
+
+    <!-- Intensity/Percentage with Calculate Button -->
     <mat-form-field class="edit-program-exercise__extra-action">
-        <mat-label>{{ 'Percentage' | translate }}</mat-label>
-        <input matInput type="number" [(ngModel)]="exercise.percentage">
-        <button mat-flat-button matSuffix color="primary" (click)="calculatePercentage()">
+        <mat-label>{{ 'Intensity (%)' | translate }}</mat-label>
+        <input matInput type="number" [(ngModel)]="exercise().percentage">
+        <button mat-button matSuffix color="primary" (click)="determinePercentage()">
             {{ 'Calculate' | translate }}
         </button>
     </mat-form-field>
 
-    @if (!account || account.intensity_scale !== 'rir') {
-        <div class="edit-program-exercise__rpe">
-            <p [matBadge]="exercise.rpe" matBadgePosition="above after">RPE</p>
-            <mat-slider color="primary" max="10" min="6" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="exercise.rpe">
-                <input matSliderThumb>
-            </mat-slider>
+    <!-- RPE Selection (like edit-set) -->
+    <div class="edit-program-exercise__rpe">
+        <div class="edit-program-exercise__rpe__header">
+            <span class="edit-program-exercise__rpe__title" (click)="editRpe()">
+                {{ account()?.intensity_scale === 'rir' ? 'RIR' : 'RPE' }}
+                <mat-icon>edit</mat-icon>
+            </span>
         </div>
-    }
-    
-    @if (account.intensity_scale === 'rir') {
-        <div class="edit-program-exercise__rpe">
-            <p [matBadge]="exercise.rir" matBadgePosition="above after">RIR</p>
-            <mat-slider color="primary" max="5" min="0" step="0.1" tickInterval="0.5" [displayWith]="formatLabel" [(ngModel)]="exercise.rir" (ngModelChange)="rirChanged()">
-                <input matSliderThumb>
-            </mat-slider>
-        </div>
-    }
-    
-    <mat-form-field>
-        <mat-label>{{ 'Set Type' | translate }}</mat-label>
-        <mat-select [(ngModel)]="exercise.type">
-            <mat-option value="">{{ 'Normal' | translate }}</mat-option>
-            <mat-option value="amrap">AMRAP</mat-option>
-            <mat-option value="w">{{ 'Warmup' | translate }}</mat-option>
-            <mat-option value="bs">{{ 'Backoff Set' | translate }}</mat-option>
-            <mat-option value="ss">{{ 'Super Set' | translate }}</mat-option>
-            <mat-option value="ds">{{ 'Drop Set' | translate }}</mat-option>
-            <mat-option value="c">{{ 'Circuit' | translate }}</mat-option>
-            <mat-option value="bw">{{ 'Bodyweight' | translate }}</mat-option>
-        </mat-select>
-    </mat-form-field>    
 
-    <mat-form-field>
-        <mat-label>{{ 'Notes' | translate }}</mat-label>
-        <textarea matInput [(ngModel)]="exercise.notes" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
-    </mat-form-field>  
+        <div class="edit-program-exercise__rpe__selection">
+            @for (rpeOption of rpeOptions; track rpeOption) {
+                <div class="edit-program-exercise__rpe__selection__option"
+                     [class.edit-program-exercise__rpe__selection__option--selected]="exercise().rpe === rpeOption"
+                     (click)="setRpe(rpeOption)">
+                    {{ account()?.intensity_scale === 'rir' ? (10 - rpeOption) : rpeOption }}
+                </div>
+            }
+        </div>
+
+        @if (exercise().rpe) {
+            <div class="edit-program-exercise__rpe__explanation">
+                {{ getRpeExplanation() }}
+            </div>
+        }
+    </div>
+
+    <!-- More Options Accordion -->
+    <mat-accordion class="edit-program-exercise__more-options">
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ 'More Options' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <!-- Weight -->
+            <mat-form-field>
+                <mat-label>{{ 'Weight' | translate }}</mat-label>
+                <input matInput type="number" [(ngModel)]="exercise().weight">
+            </mat-form-field>
+
+            @if (exercise().weight) {
+                <p class="edit-program-exercise__weight-explanation">
+                    {{ 'Try using percentage (intensity) instead of specifying a weight, which adapts to the user\'s strength levels based on their max for the exercise.' | translate }}
+                </p>
+            }
+
+            <!-- Set Type -->
+            <mat-form-field>
+                <mat-label>{{ 'Set Type' | translate }}</mat-label>
+                <mat-select [(ngModel)]="exercise().type">
+                    <mat-option value="">{{ 'Normal' | translate }}</mat-option>
+                    <mat-option value="amrap">AMRAP</mat-option>
+                    <mat-option value="w">{{ 'Warmup' | translate }}</mat-option>
+                    <mat-option value="bs">{{ 'Backoff Set' | translate }}</mat-option>
+                    <mat-option value="ss">{{ 'Super Set' | translate }}</mat-option>
+                    <mat-option value="ds">{{ 'Drop Set' | translate }}</mat-option>
+                    <mat-option value="c">{{ 'Circuit' | translate }}</mat-option>
+                    <mat-option value="bw">{{ 'Bodyweight' | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Notes -->
+            <mat-form-field>
+                <mat-label>{{ 'Notes' | translate }}</mat-label>
+                <textarea matInput 
+                          [(ngModel)]="exercise().notes" 
+                          cdkTextareaAutosize 
+                          cdkAutosizeMinRows="2"></textarea>
+            </mat-form-field>
+        </mat-expansion-panel>
+    </mat-accordion>
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
-  <button mat-button (click)="save()" color="primary">{{ 'Save' | translate }}</button>
+    <button mat-button (click)="cancel()">{{ 'Cancel' | translate }}</button>
+    <button mat-flat-button color="primary" (click)="save()">{{ 'Save' | translate }}</button>
 </mat-dialog-actions>

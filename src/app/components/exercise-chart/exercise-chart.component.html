@@ -1,100 +1,206 @@
-<div class="exercise-chart">
-  <div class="exercise-chart__controls">
-    <mat-form-field appearance="outline" class="exercise-chart__controls__metrics">
-      <mat-label>Metrics</mat-label>
-      <mat-select [(ngModel)]="selectedMetrics" multiple (selectionChange)="onMetricsChange()">
-        @for (metric of metrics; track metric) {
-          <mat-option [value]="metric">{{ formatMetricName(metric) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+<div class="exercise-chart" 
+     [class.exercise-chart--metrics-bottom]="metricsSelectPosition === 'bottom'" 
+     [class.exercise-chart--metrics-top]="metricsSelectPosition === 'top'">
 
-    <mat-form-field appearance="outline" class="exercise-chart__controls__accumulation">
-      <mat-label>Accumulation</mat-label>
-      <mat-select [(ngModel)]="accumulation" (selectionChange)="changeAccumulation($event.value)">
-        @for (acc of accumulations; track acc) {
-          <mat-option [value]="acc">{{ formatMetricName(acc) }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
+    <div class="exercise-chart__chart">
 
-  <div class="exercise-chart__timeframes">
-    @for (tf of timeframes; track tf.value) {
-      <button 
-        mat-button 
-        class="exercise-chart__timeframes__button"
-        [class.exercise-chart__timeframes__button--active]="timeframe() === tf.value"
-        (click)="changeTimeframe(tf.value)">
-        {{ tf.label }}
-      </button>
-    }
-  </div>
+        @if (metricsSelectPosition === 'top') {
+            <div class="exercise-chart__chart__metrics exercise-chart__chart__metrics--top">
+                <button mat-button (click)="openMetricsSelect()">
+                    {{displaySelectedMetrics()}}
+                    <mat-icon iconPositionEnd>edit</mat-icon>
+                </button>
 
-  <div class="exercise-chart__chart-container">
-    @if (loading()) {
-      <div class="exercise-chart__chart-container__loading">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
-    } @else {
-      <div 
-        echarts 
-        [options]="chartOptions()" 
-        class="exercise-chart__chart-container__chart"
-        (chartInit)="onChartInit($event)">
-      </div>
-    }
-  </div>
-
-  <div class="exercise-chart__stats">
-    @for (metric of selectedMetrics(); track metric) {
-      @if (extraStats()[metric]) {
-        <mat-card class="exercise-chart__stats__card">
-          <mat-card-content>
-            <div class="exercise-chart__stats__metric">
-              <div class="exercise-chart__stats__metric__item">
-                <mat-icon class="exercise-chart__stats__metric__icon">trending_up</mat-icon>
-                <div class="exercise-chart__stats__metric__details">
-                  <h5>{{ extraStats()[metric].best.data }}{{ getMetricUnits(metric) }}</h5>
-                  <h6>Maximum {{ formatMetricName(metric) }}</h6>
-                  @if (extraStats()[metric].best.date) {
-                    <p>Tracked on {{ extraStats()[metric].best.date }}</p>
-                  }
-                </div>
-              </div>
-
-              <div class="exercise-chart__stats__metric__item">
-                <mat-icon class="exercise-chart__stats__metric__icon">trending_down</mat-icon>
-                <div class="exercise-chart__stats__metric__details">
-                  <h5>{{ extraStats()[metric].worst.data }}{{ getMetricUnits(metric) }}</h5>
-                  <h6>Minimum {{ formatMetricName(metric) }}</h6>
-                  @if (extraStats()[metric].worst.date) {
-                    <p>Tracked on {{ extraStats()[metric].worst.date }}</p>
-                  }
-                </div>
-              </div>
-
-              <div class="exercise-chart__stats__metric__item">
-                <mat-icon class="exercise-chart__stats__metric__icon">show_chart</mat-icon>
-                <div class="exercise-chart__stats__metric__details">
-                  <h5>{{ extraStats()[metric].average.data }}{{ getMetricUnits(metric) }}</h5>
-                  <h6>Average {{ formatMetricName(metric) }}</h6>
-                  <p>The average for this period</p>
-                </div>
-              </div>
-
-              <div class="exercise-chart__stats__metric__item">
-                <mat-icon class="exercise-chart__stats__metric__icon">functions</mat-icon>
-                <div class="exercise-chart__stats__metric__details">
-                  <h5>{{ extraStats()[metric].sum.data }}{{ getMetricUnits(metric) }}</h5>
-                  <h6>Total {{ formatMetricName(metric) }}</h6>
-                  <p>The sum of data in this period</p>
-                </div>
-              </div>
+                <mat-select #metricsSelect 
+                            [multiple]="true" 
+                            [(ngModel)]="properties.selectedMetrics" 
+                            (selectionChange)="metricsUpdated()"
+                            class="hidden-select"
+                            panelClass="metrics-select-panel">
+                    @for (metric of metrics; track metric) {
+                        <mat-option [value]="metric">{{formatMetricName(metric)}}</mat-option>
+                    }
+                </mat-select>
             </div>
-          </mat-card-content>
-        </mat-card>
-      }
+        }
+
+        <div class="exercise-chart__chart__timeframes">
+            <button mat-button 
+                    class="exercise-chart__chart__timeframes__timeframe-button" 
+                    (click)="changeStatsTimeframe('forever')" 
+                    [color]="properties.timeframe === 'forever' ? 'primary' : ''"
+                    [class.selected]="properties.timeframe === 'forever'">
+                {{ "Lifetime" | translate }}
+            </button>
+            <button mat-button 
+                    class="exercise-chart__chart__timeframes__timeframe-button" 
+                    (click)="changeStatsTimeframe('1 Year')" 
+                    [color]="properties.timeframe === '1 Year' ? 'primary' : ''"
+                    [class.selected]="properties.timeframe === '1 Year'">
+                {{ "1 Year" | translate }}
+            </button>
+            <button mat-button 
+                    class="exercise-chart__chart__timeframes__timeframe-button" 
+                    (click)="changeStatsTimeframe('6 Months')" 
+                    [color]="properties.timeframe === '6 Months' ? 'primary' : ''"
+                    [class.selected]="properties.timeframe === '6 Months'">
+                {{ "6 Months" | translate }}
+            </button>
+            <button mat-button 
+                    class="exercise-chart__chart__timeframes__timeframe-button" 
+                    (click)="changeStatsTimeframe('1 Month')" 
+                    [color]="properties.timeframe === '1 Month' ? 'primary' : ''"
+                    [class.selected]="properties.timeframe === '1 Month'">
+                {{ "1 Month" | translate }}
+            </button>
+            <button mat-button 
+                    class="exercise-chart__chart__timeframes__timeframe-button" 
+                    (click)="changeStatsTimeframe('1 Week')" 
+                    [color]="properties.timeframe === '1 Week' ? 'primary' : ''"
+                    [class.selected]="properties.timeframe === '1 Week'">
+                {{ "1 Week" | translate }}
+            </button>
+            <button mat-icon-button 
+                    #accumulationButton
+                    (click)="openAccumulationSelect()" 
+                    color="primary" 
+                    class="exercise-chart__chart__timeframes__accumulation-button">
+                <mat-icon>settings</mat-icon>
+            </button>
+
+            <mat-select #accumulationSelect 
+                        [(ngModel)]="properties.accumulation" 
+                        (selectionChange)="changeStatsAccumulation()" 
+                        class="hidden-select"
+                        panelClass="accumulation-select-panel">
+                <mat-option value="monthly">{{ "Monthly" | translate }}</mat-option>
+                <mat-option value="weekly">{{ "Weekly" | translate }}</mat-option>
+                <mat-option value="daily">{{ "Daily" | translate }}</mat-option>
+                <mat-option value="not accumulated">{{ "Not Accumulated" | translate }}</mat-option>
+            </mat-select>
+        </div>
+
+        <div class="exercise-chart__chart__container">
+            <div echarts [options]="chartOptions" class="exercise-chart__chart__container__chart" (chartInit)="onChartInit($event)"></div>
+
+            @if (properties.initialLoad) {
+                <div class="exercise-chart__chart__container__loading">
+                    <mat-spinner color="primary" [diameter]="40"></mat-spinner>
+                </div>
+            }
+        </div>
+
+        @if (metricsSelectPosition === 'bottom') {
+            <div class="exercise-chart__chart__metrics exercise-chart__chart__metrics--bottom">
+                <button mat-button (click)="openMetricsSelect()" color="primary">
+                    {{displaySelectedMetrics()}}
+                    <mat-icon iconPositionEnd>edit</mat-icon>
+                </button>
+
+                <mat-select #metricsSelect 
+                            [multiple]="true" 
+                            [(ngModel)]="properties.selectedMetrics" 
+                            (selectionChange)="metricsUpdated()"
+                            class="hidden-select"
+                            panelClass="metrics-select-panel">
+                    @for (metric of metrics; track metric) {
+                        <mat-option [value]="metric">{{formatMetricName(metric)}}</mat-option>
+                    }
+                </mat-select>
+            </div>
+        }
+
+    </div>
+
+    @for (metric of properties.selectedMetrics; track metric) {
+        <div class="exercise-chart__metrics">
+            <div class="exercise-chart__metrics__metric">
+                <div class="exercise-chart__metrics__metric__icon">
+                    <mat-icon svgIcon="maximum"></mat-icon>
+                </div>
+                <div class="exercise-chart__metrics__metric__details">
+                    @if (extraStats[metric]) {
+                        <h5>{{extraStats[metric].best.data}}{{getMetricUnitsRaw(metric)}}</h5>
+                    } @else {
+                        <h5><span class="skeleton-text" style="width: 100px; height: 24px; display: inline-block;"></span></h5>
+                    }
+                    <h6>{{ "Maximum" | translate }} {{formatMetricName(metric)}}</h6>
+                    <p>
+                        {{extraStats[metric] && extraStats[metric].best && extraStats[metric].best.date ? 
+                        translate.instant("Tracked on") + " " + extraStats[metric].best.date + "." :
+                        translate.instant("The most you have done in this period.")}}
+                    </p>
+                </div>
+            </div>
+
+            <div class="exercise-chart__metrics__metric">
+                <div class="exercise-chart__metrics__metric__icon">
+                    <mat-icon svgIcon="minimum"></mat-icon>
+                </div>
+                <div class="exercise-chart__metrics__metric__details">
+                    @if (extraStats[metric]) {
+                        <h5>{{extraStats[metric].worst.data}}{{getMetricUnitsRaw(metric)}}</h5>
+                    } @else {
+                        <h5><span class="skeleton-text" style="width: 100px; height: 24px; display: inline-block;"></span></h5>
+                    }
+                    <h6>{{"Minimum" | translate }} {{formatMetricName(metric)}}</h6>
+                    <p>
+                        {{extraStats[metric] && extraStats[metric].worst && extraStats[metric].worst.date ? 
+                        translate.instant("Tracked on") + " " + extraStats[metric].worst.date + "." :
+                        translate.instant("The least you have done in this period.")}}
+                    </p>
+                </div>
+            </div>
+
+            <div class="exercise-chart__metrics__metric">
+                <div class="exercise-chart__metrics__metric__icon">
+                    <mat-icon svgIcon="average"></mat-icon>
+                </div>
+                <div class="exercise-chart__metrics__metric__details">
+                    @if (extraStats[metric]) {
+                        <h5>{{extraStats[metric].average.data}}{{getMetricUnitsRaw(metric)}}</h5>
+                    } @else {
+                        <h5><span class="skeleton-text" style="width: 100px; height: 24px; display: inline-block;"></span></h5>
+                    }
+                    <h6>{{"Average" | translate}} {{formatMetricName(metric)}}</h6>
+                    <p>{{ "The average for this period." | translate }}</p>
+                </div>
+            </div>
+
+            <div class="exercise-chart__metrics__metric">
+                <div class="exercise-chart__metrics__metric__icon">
+                    <mat-icon svgIcon="median"></mat-icon>
+                </div>
+                <div class="exercise-chart__metrics__metric__details">
+                    @if (extraStats[metric]) {
+                        <h5>{{extraStats[metric].median.data}}{{getMetricUnitsRaw(metric)}}</h5>
+                    } @else {
+                        <h5><span class="skeleton-text" style="width: 100px; height: 24px; display: inline-block;"></span></h5>
+                    }
+                    <h6>{{ "Median" | translate }} {{formatMetricName(metric)}}</h6>
+                    <p>
+                        {{extraStats[metric] && extraStats[metric].median && extraStats[metric].median.date ? 
+                            translate.instant("Tracked on") + " " + extraStats[metric].median.date + "." :
+                            translate.instant("The median for this period.")}}
+                    </p>
+                </div>
+            </div>
+
+            <div class="exercise-chart__metrics__metric">
+                <div class="exercise-chart__metrics__metric__icon">
+                    <mat-icon svgIcon="sum"></mat-icon>
+                </div>
+                <div class="exercise-chart__metrics__metric__details">
+                    @if (extraStats[metric]) {
+                        <h5>{{extraStats[metric].sum.data}}{{getMetricUnitsRaw(metric)}}</h5>
+                    } @else {
+                        <h5><span class="skeleton-text" style="width: 100px; height: 24px; display: inline-block;"></span></h5>
+                    }
+                    <h6>{{ "Total" | translate }} {{formatMetricName(metric)}}</h6>
+                    <p>{{ "The sum of data in this period." | translate }}</p>
+                </div>
+            </div>
+        </div>
     }
-  </div>
+
 </div>

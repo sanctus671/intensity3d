@@ -1,35 +1,86 @@
 <div class="dialog-title">
-    <h2 mat-dialog-title>{{ 'History' | translate }}</h2>
+    <h2 mat-dialog-title>{{ exercise.name ? exercise.name : ('Exercise History' | translate) }}</h2>
     <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
 </div>
 
 <mat-dialog-content class="history">
-    <mat-nav-list class="history__history-list">
-        @for (workout of exercise.history; track workout.assigneddate) {
-            <a mat-list-item (click)="copyWorkout(workout.assigneddate, workout)">
-                <h3 matLine>{{ formatDate(workout.assigneddate) }}</h3>
-                <p matLine>
-                  {{ workout.sets.length }} {{ 'set' | translate }}@if (workout.sets.length !== 1) {<span>s</span>} /
-                  {{ getAverageReps(workout.sets) | number: '1.0-0' }} {{ 'reps' | translate }} / 
-                  {{ getAverageWeight(workout.sets) | number: '1.0-0' }}{{ getUnits(workout.sets) }}
-                </p>                        
-                <mat-icon matListIcon>file_copy</mat-icon>
-            </a>
-        }
-        
+    <!-- Loading State -->
+    @if (exercise.loadingFullData) {
+        <div class="history__loading">
+            <mat-spinner color="primary" [diameter]="40"></mat-spinner>
+        </div>
+    }
+
+    <!-- Empty State -->
+    @if (!exercise.loadingFullData && (!exercise.history || exercise.history.length < 1)) {
+        <div class="history__empty">
+            <div class="history__empty__container">
+                <h3>{{ "No History" | translate }}</h3>
+                <p>{{ "You have no tracked history for this exercise." | translate }}</p>
+                <button mat-button color="primary" (click)="dismiss()">
+                    {{ "Back to Diary" | translate }}
+                </button>
+            </div>
+        </div>
+    }
+
+    <!-- History List -->
+    @if (!exercise.loadingFullData && exercise.history && exercise.history.length > 0) {
+        <div class="history__list">
+            @for (workout of exercise.history; track workout.assigneddate) {
+                <div class="history__list__item">
+                    <h6>{{ formatDate(workout.assigneddate) }}</h6>
+                    
+                    <div class="history__list__item__actions">
+                        <a mat-stroked-button [href]="'/diary/' + workout.assigneddate" target="_blank">
+                            <mat-icon>visibility</mat-icon>
+                            {{ "View" | translate }}
+                        </a>
+                        <button mat-stroked-button (click)="copyWorkout(workout.assigneddate, workout)">
+                            <mat-icon>content_copy</mat-icon>
+                            {{ "Copy" | translate }}
+                        </button>
+                        <button mat-stroked-button (click)="shareWorkout(workout)">
+                            <mat-icon>share</mat-icon>
+                            {{ "Share" | translate }}
+                        </button>
+                    </div>
+
+                    <div class="history__list__item__sets">
+                        @for (set of workout.sets; track $index) {
+                            <div 
+                                class="history__list__item__sets__set"
+                                [class.history__list__item__sets__set--has-note]="set.notes"
+                                (click)="openEditSet($event, set, workout, $index)">
+                                <mat-icon 
+                                    [class.completed]="set.completed && set.completed !== '0'"
+                                    (click)="toggleSet($event, set)">
+                                    {{ set.completed && set.completed !== '0' ? 'check_circle' : 'check_circle' }}
+                                </mat-icon>
+                                <span>{{ set.reps }} x {{ set.weight }}{{ set.unit }}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Load More Button -->
         @if (exercise.canGetMoreHistory) {
-            <a 
-                mat-list-item 
-                (click)="loadMoreHistory()" 
-                class="history__load-more"
-                [class.history-loading]="exercise.historyLoading">
-                {{ 'Load More History' | translate }}
-                @if (exercise.historyLoading) {
-                    <mat-spinner diameter="15" mode="indeterminate" color="primary"></mat-spinner>
-                }
-            </a>
+            <div class="history__load-more">
+                <button 
+                    mat-stroked-button 
+                    color="primary"
+                    (click)="loadMoreHistory()" 
+                    [disabled]="exercise.historyLoading">
+                    {{ "Load more" | translate }}
+                    @if (exercise.historyLoading) {
+                        <mat-spinner diameter="15" color="accent"></mat-spinner>
+                    }
+                </button>
+            </div>
         }
-    </mat-nav-list>
+    }
 </mat-dialog-content>
 
 <mat-dialog-actions>

@@ -1,5 +1,6 @@
 .dialog-title{
     position:relative;
+    padding-right:40px;
     mat-icon{
         cursor:pointer;
         position:absolute;
@@ -12,8 +13,8 @@
     .stats__notes-stats{
         background-color: var(--primary-color);
         color: var(--mat-sys-on-primary);
-        padding: 20px 30px;
-        border-radius: 4px;  
+        padding: 25px 30px;
+        border-radius: 12px;  
         margin:25px 0px;
         cursor:pointer;
         
@@ -31,6 +32,14 @@
             height:40px;
         }
         
+        .stats__notes-stats__arrow{
+            font-size:24px;
+            width:24px;
+            height:24px;
+            align-self: center;
+            opacity: 0.8;
+        }
+        
         .stats__notes-stats__inner{
             flex:1;
             padding-left: 20px;
@@ -38,6 +47,7 @@
             h4{
                 margin:0px;
                 font-weight:500;
+                font-size:16px;
             }
             p{
                 margin:0px;

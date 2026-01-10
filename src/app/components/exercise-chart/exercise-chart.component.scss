@@ -1,138 +1,198 @@
 .exercise-chart {
-  &__controls {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
 
-    &__metrics {
-      flex: 2;
+    .exercise-chart__chart {
+        margin-bottom: 30px;
+
+        .exercise-chart__chart__container {
+            position: relative;
+
+            .exercise-chart__chart__container__chart {
+                height: 450px;
+            }
+
+            .exercise-chart__chart__container__loading {
+                position: absolute;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+
+                mat-spinner {
+                    margin-bottom: 60px;
+                }
+            }
+        }
+
+        .exercise-chart__chart__timeframes {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+            position: relative;
+            max-width: 450px;
+
+            button.exercise-chart__chart__timeframes__timeframe-button {
+                min-height: 32px;
+                height:32px;
+                padding: 4px 12px;
+                font-size: 12px;
+                line-height: 14px;
+                border: 1px solid;
+
+                &.selected {
+                    color: white;
+                    border-color: var(--mat-sys-primary);
+                    background-color: var(--mat-sys-primary);
+                }
+            }
+
+            .exercise-chart__chart__timeframes__accumulation-button {
+                // Settings button styles
+            }
+
+            .hidden-select {
+                position: absolute;
+                right: 0;
+                top: 0;
+                opacity: 0;
+                pointer-events: none;
+                width: 40px;
+                height: 40px;
+                z-index: -1;
+            }
+        }
+
+        .exercise-chart__chart__metrics {
+            text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+
+            button {
+                font-size: 18px;
+                white-space: normal;
+                min-height: 40px;
+                line-height: 24px;
+                color: var(--mat-app-text-color);
+                mat-icon{
+                    opacity:0.3;
+                }
+            }
+
+            &.exercise-chart__chart__metrics--bottom{
+                margin-top:10px;
+                margin-bottom:20px;
+            }
+        }
     }
 
-    &__accumulation {
-      flex: 1;
-    }
-  }
-
-  &__timeframes {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-
-    &__button {
-      &--active {
-        background-color: rgba(212, 71, 53, 0.1);
-        color: #d44735;
-        font-weight: 600;
-      }
-    }
-  }
-
-  &__chart-container {
-    position: relative;
-    min-height: 400px;
-    margin-bottom: 24px;
-
-    &__loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 400px;
-    }
-
-    &__chart {
-      width: 100%;
-      height: 400px;
-    }
-  }
-
-  &__stats {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-
-    &__card {
-      // Card styles
-    }
-
-    &__metric {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-
-      &__item {
+    .exercise-chart__metrics {
+        margin-top: 20px;
+        white-space: nowrap;
+        overflow-x: auto;
         display: flex;
-        gap: 12px;
-        align-items: flex-start;
-      }
+        gap: 15px;
+        padding: 0 15px 15px;
 
-      &__icon {
-        color: #d44735;
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
-      }
+        .exercise-chart__metrics__metric {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #e1e1e0;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 280px;
+            flex-shrink: 0;
 
-      &__details {
-        flex: 1;
+            .exercise-chart__metrics__metric__icon {
+                padding-right: 24px;
 
-        h5 {
-          margin: 0 0 4px 0;
-          font-size: 24px;
-          font-weight: 600;
-          color: var(--text-primary);
+                mat-icon {
+                    color: #e1e1e0;
+                    font-size: 50px;
+                    width: 50px;
+                    height: 50px;
+                    border: 2px solid #e1e1e0;
+                    padding: 10px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+            }
+
+            .exercise-chart__metrics__metric__details {
+                flex: 1;
+
+                h5 {
+                    margin: 0;
+                    margin-bottom: 4px;
+                    font-size: 18px;
+                    font-weight: 500;
+                }
+
+                h6 {
+                    margin: 0;
+                    margin-bottom: 4px;
+                    font-size: 14px;
+                    font-weight: 500;
+                }
+
+                p {
+                    margin: 0;
+                    font-size: 13px;
+                    line-height: 18px;
+                    opacity: 0.7;
+                    max-width: 200px;
+                    white-space: normal;
+                }
+
+                .skeleton-text {
+                    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                    background-size: 200% 100%;
+                    animation: loading 1.5s infinite;
+                    border-radius: 4px;
+                }
+            }
         }
-
-        h6 {
-          margin: 0 0 4px 0;
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--text-secondary);
-        }
-
-        p {
-          margin: 0;
-          font-size: 12px;
-          color: var(--text-secondary);
-        }
-      }
     }
-  }
+
+    &.exercise-chart--metrics-bottom {
+        .exercise-chart__chart {
+            margin-bottom: 0;
+        }
+
+        .exercise-chart__metrics {
+            margin-top: 10px;
+        }
+    }
 }
 
-@media (max-width: 1024px) {
-  .exercise-chart {
-    &__controls {
-      flex-direction: column;
-
-      &__metrics,
-      &__accumulation {
-        flex: 1;
-        width: 100%;
-      }
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
     }
-
-    &__stats {
-      &__metric {
-        grid-template-columns: 1fr;
-      }
+    100% {
+        background-position: -200% 0;
     }
-  }
 }
 
-@media (max-width: 767px) {
-  .exercise-chart {
-    &__timeframes {
-      &__button {
-        font-size: 12px;
-        padding: 4px 8px;
-      }
+// Hide mat-select elements but keep them in DOM for functionality
+// Use opacity instead of visibility to allow overlay positioning to work correctly
+.exercise-chart__chart__metrics {
+    .hidden-select {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 200px;
+        height: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
     }
-
-    &__chart-container {
-      &__chart {
-        height: 300px;
-      }
-    }
-  }
 }

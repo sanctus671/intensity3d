@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RoundProgressModule } from '@edumetz16/angular-svg-round-progressbar';
 import { AccountService } from '../../services/account/account.service';
+import { ThemeService } from '../../services/theme/theme.service';
 
 @Component({
   selector: 'app-goals',
@@ -27,10 +28,16 @@ export class GoalsComponent {
     public data = inject(MAT_DIALOG_DATA);
     private accountService = inject(AccountService);
     private translate = inject(TranslateService);
+    private themeService = inject(ThemeService);
 
     public exercise: any;
     public barColour: string;
-    public account: any = {goals: {}}; 
+    public account: any = {goals: {}};
+    
+    // Background color that adapts to theme
+    public progressBackground = computed(() => 
+        this.themeService.effectiveTheme() === 'dark' ? '#424242' : '#eaeaea'
+    ); 
     
     constructor() {
         this.exercise = this.data.exercise ? this.data.exercise : {sets:[], goals:{goal:0,progress:0}};
@@ -46,9 +53,16 @@ export class GoalsComponent {
         if (this.account.goals.primary === 'none'){
             return this.translate.instant('You currently have goals turned off. You can change this in your settings.');
         } else {       
-            let progressPecentage = Math.round((this.exercise.goals.progress / this.exercise.goals.goal)*100);
-            let remaining = this.exercise.goals.goal - this.exercise.goals.progress;
-            let remainingPercentage = Math.round((remaining / this.exercise.goals.goal) * 100)
+            const progress = this.exercise.goals.progress || 0;
+            const goal = this.exercise.goals.goal || 0; // Use 1 to avoid division by zero
+            const goalDivisor = (goal > 0 ? goal : 1);
+            let progressPecentage = Math.round((progress / goalDivisor )*100);
+            let remaining = goal - progress;
+            let remainingPercentage = Math.round((remaining / goalDivisor ) * 100);
+            
+            // Ensure percentages are valid numbers
+            progressPecentage = isNaN(progressPecentage) ? 0 : progressPecentage;
+            remainingPercentage = isNaN(remainingPercentage) ? 100 : remainingPercentage;
             
             const goalDescription = this.translate.instant('Your goal is currently set as') + 
                 ' <strong>' + this.account.goals.target + '</strong> <strong>' + this.account.goals.primary + '</strong> ' + 

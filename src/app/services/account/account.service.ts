@@ -9,6 +9,11 @@ import { environment } from '../../../environments/environment';
 })
 export class AccountService {
   private accountObservable: BehaviorSubject<any>;
+  private activityCache: any = null;
+  private activityCacheTimestamp: number = 0;
+  private requestsCache: any = null;
+  private requestsCacheTimestamp: number = 0;
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   constructor(
     private request: RequestService,
@@ -88,6 +93,10 @@ export class AccountService {
     return this.request.modify('edit', 'updateaccount', accountData);
   }
 
+  purchasePremium(billingInfo: any): Promise<any> {
+    return this.request.modify('edit', 'purchasepremium', billingInfo);
+  }
+
   getSettings(): Promise<any> {
     return this.request.get('view', 'getsettings', 'settings', {});
   }
@@ -100,8 +109,26 @@ export class AccountService {
     return this.request.get('view', 'getpremiumstatus', 'premium_status', {});
   }
 
-  getUserActivity(userId: number | null, page: number = 1): Promise<any> {
-    return this.request.get('view', 'getactivity', `useractivity${userId}-${page}`, { userid: userId, page, limit: 20 });
+  async getUserActivity(userId: number | null, page: number = 1, forceRefresh: boolean = false): Promise<any> {
+    // Only cache page 1
+    if (page === 1) {
+      const now = Date.now();
+      const cacheIsValid = this.activityCache && (now - this.activityCacheTimestamp < this.CACHE_DURATION);
+      
+      if (!forceRefresh && cacheIsValid) {
+        return Promise.resolve(this.activityCache);
+      }
+    }
+
+    const data = await this.request.get('view', 'getactivity', `useractivity${userId}-${page}`, { userid: userId, page, limit: 20 });
+    
+    // Cache page 1 results
+    if (page === 1) {
+      this.activityCache = data;
+      this.activityCacheTimestamp = Date.now();
+    }
+    
+    return data;
   }
 
   updateProfile(profileData: any): Promise<any> {
@@ -154,8 +181,31 @@ export class AccountService {
     return this.request.upload('uploaddp', formData);
   }
 
-  getFriendRequests(): Promise<any> {
-    return this.request.get('view', 'getfriendrequests', 'friendrequests', {});
+  async getFriendRequests(forceRefresh: boolean = false): Promise<any> {
+    const now = Date.now();
+    const cacheIsValid = this.requestsCache && (now - this.requestsCacheTimestamp < this.CACHE_DURATION);
+    
+    if (!forceRefresh && cacheIsValid) {
+      return Promise.resolve(this.requestsCache);
+    }
+
+    const data = await this.request.get('view', 'getfriendrequests', 'friendrequests', {});
+    
+    // Update cache
+    this.requestsCache = data;
+    this.requestsCacheTimestamp = now;
+    
+    return data;
+  }
+
+  clearActivityCache(): void {
+    this.activityCache = null;
+    this.activityCacheTimestamp = 0;
+  }
+
+  clearRequestsCache(): void {
+    this.requestsCache = null;
+    this.requestsCacheTimestamp = 0;
   }
 
   async getAccountLocal(): Promise<any> {

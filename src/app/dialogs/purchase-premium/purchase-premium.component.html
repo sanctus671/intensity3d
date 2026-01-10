@@ -1,4 +1,4 @@
-<form #form="ngForm" (ngSubmit)="purchase(form.value)" class="purchase-premium" [class.purchase-premium--purchasing]="loading">  
+<form #form="ngForm" (ngSubmit)="purchase(form.value)" class="purchase-premium" [class.purchase-premium--purchasing]="loading()">  
     <div class="dialog-title">
         <h2 mat-dialog-title>{{ 'Purchase Premium' | translate }}</h2>
         <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
@@ -11,21 +11,21 @@
             <p>{{ 'Lifetime Premium' | translate }}</p>
         </div>
         
-        <h4>{{ 'Card Information' | translate }}</h4>
+        <h4>{{ 'Payment Information' | translate }}</h4>
         
         <mat-form-field>
-            <mat-label>{{ 'Card holder\'s name' | translate }}</mat-label>
+            <mat-label>{{ 'Your name' | translate }}</mat-label>
             <input matInput type="text" name="cardholder" required ngModel>
         </mat-form-field>
         
-        <ngx-stripe-card [options]="cardOptions" [elementsOptions]="elementsOptions"></ngx-stripe-card>
+        <ngx-stripe-payment [options]="paymentElementOptions" [elementsOptions]="elementsOptions"></ngx-stripe-payment>
     </mat-dialog-content>
     
     <mat-dialog-actions>
         <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
-        <button mat-button type="submit" color="primary" [disabled]="loading">
+        <button mat-flat-button type="submit" color="primary" [disabled]="loading()">
             {{ 'Purchase for $34.99 USD' | translate }}
-            @if (loading) {
+            @if (loading()) {
                 <mat-spinner class='button-spinner' diameter="14" mode="indeterminate" color="primary"></mat-spinner>
             }
         </button>

@@ -1,0 +1,31 @@
+.dialog-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h2 {
+        margin: 0;
+        flex: 1;
+    }
+    
+    mat-icon {
+        cursor: pointer;
+        user-select: none;
+    }
+}
+
+mat-dialog-content {
+    p {
+        margin-bottom: 16px;
+    }
+}
+
+.full-width {
+    width: 100%;
+}
+
+mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

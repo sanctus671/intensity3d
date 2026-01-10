@@ -1,0 +1,293 @@
+<div class="timer-dialog">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>{{ "Timer" | translate }}</h2>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    <mat-tab-group [(selectedIndex)]="activeTab" (selectedIndexChange)="onTabChange($event)">
+      
+      <!-- Stopwatch Tab -->
+      <mat-tab [label]="'Stopwatch' | translate">
+        <div class="timer__tab timer__tab--stopwatch" [class.timer__tab--started]="properties().stopwatchStarted">
+          
+          <div class="timer__tab__circle" (click)="toggleStopwatch()">
+            <div class="timer__tab__circle__container">
+              <mat-progress-spinner
+                [mode]="properties().stopwatchStarted ? 'indeterminate' : 'determinate'"
+                [value]="properties().stopwatchStarted ? 85 : 100"
+                [diameter]="200"
+                [strokeWidth]="4"
+                [color]="properties().stopwatchStarted ? 'warn' : 'primary'">
+              </mat-progress-spinner>
+            </div>
+            
+            <div class="timer__tab__circle__time">
+              {{ getStopwatchTime() }}
+            </div>
+          </div>
+
+          <div class="timer__tab__actions">
+            <button mat-flat-button color="primary" (click)="toggleStopwatch()">
+              <mat-icon>{{ properties().stopwatchStarted ? 'stop' : 'play_arrow' }}</mat-icon>
+              {{ (properties().stopwatchStarted ? "Stop" : "Start") | translate }}
+            </button>
+
+            <button mat-stroked-button color="primary" (click)="resetStopwatch()">
+              <mat-icon>refresh</mat-icon>
+              {{ "Reset" | translate }}
+            </button>
+          </div>
+
+          <div class="timer__tab__options">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ "Stopwatch Options" | translate }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <mat-checkbox 
+                [(ngModel)]="stopwatchProperties.playSound" 
+                (ngModelChange)="updateStopwatchProperties()"
+                color="primary">
+                {{ "Play sound at time" | translate }}
+              </mat-checkbox>
+
+              @if (stopwatchProperties.playSound) {
+                <div class="timer__tab__options__timer-picker">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ "Minutes" | translate }}</mat-label>
+                    <input 
+                      matInput 
+                      type="number" 
+                      min="0" 
+                      [(ngModel)]="stopwatchProperties.timeMinutes" 
+                      (ngModelChange)="updateStopwatchProperties()">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ "Seconds" | translate }}</mat-label>
+                    <input 
+                      matInput 
+                      type="number" 
+                      min="0" 
+                      [(ngModel)]="stopwatchProperties.timeSeconds" 
+                      (ngModelChange)="updateStopwatchProperties()">
+                  </mat-form-field>
+                </div>
+              }
+
+              <mat-checkbox 
+                [(ngModel)]="stopwatchProperties.restart" 
+                (ngModelChange)="updateStopwatchProperties()"
+                color="primary">
+                {{ "Reset when set completed/added" | translate }}
+              </mat-checkbox>
+            </mat-expansion-panel>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Countdown Tab -->
+      <mat-tab [label]="'Countdown' | translate">
+        <div class="timer__tab timer__tab--countdown">
+          
+          <div class="timer__tab__circle" (click)="toggleCountdownTimer()">
+            <div class="timer__tab__circle__container">
+              <mat-progress-spinner
+                mode="determinate"
+                [value]="getCountdownTimerPercentage()"
+                [diameter]="200"
+                [strokeWidth]="4"
+                [color]="properties().countdownTimerStarted ? 'warn' : 'primary'">
+              </mat-progress-spinner>
+            </div>
+            
+            <div class="timer__tab__circle__time">
+              {{ getCountdownTimerTime() }}
+            </div>
+          </div>
+
+          <div class="timer__tab__actions">
+            <button mat-flat-button color="primary" (click)="toggleCountdownTimer()">
+              <mat-icon>{{ properties().countdownTimerStarted ? 'stop' : 'play_arrow' }}</mat-icon>
+              {{ (properties().countdownTimerStarted ? "Stop" : "Start") | translate }}
+            </button>
+
+            <button mat-stroked-button color="primary" (click)="resetCountdownTimer()">
+              <mat-icon>refresh</mat-icon>
+              {{ "Reset" | translate }}
+            </button>
+          </div>
+
+          <div class="timer__tab__options">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ "Countdown Options" | translate }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="timer__tab__options__timer-picker">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "Minutes" | translate }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    min="0" 
+                    [(ngModel)]="countdownTimerProperties.timeMinutes" 
+                    (ngModelChange)="updateCountdownTimerProperties(); resetCountdownTimer()">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "Seconds" | translate }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    min="0" 
+                    [(ngModel)]="countdownTimerProperties.timeSeconds" 
+                    (ngModelChange)="updateCountdownTimerProperties(); resetCountdownTimer()">
+                </mat-form-field>
+              </div>
+
+              <mat-checkbox 
+                [(ngModel)]="countdownTimerProperties.playSound" 
+                (ngModelChange)="updateCountdownTimerProperties()"
+                color="primary">
+                {{ "Play sound at 0" | translate }}
+              </mat-checkbox>
+
+              <mat-checkbox 
+                [(ngModel)]="countdownTimerProperties.repeat" 
+                (ngModelChange)="updateCountdownTimerProperties()"
+                color="primary">
+                {{ "Should repeat" | translate }}
+              </mat-checkbox>
+
+              <mat-checkbox 
+                [(ngModel)]="countdownTimerProperties.restart" 
+                (ngModelChange)="updateCountdownTimerProperties()"
+                color="primary">
+                {{ "Reset when set completed/added" | translate }}
+              </mat-checkbox>
+            </mat-expansion-panel>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Interval Tab -->
+      <mat-tab [label]="'Interval' | translate">
+        <div class="timer__tab timer__tab--interval" [class.timer__tab--started]="properties().intervalStarted">
+          
+          <div class="timer__tab__interval-time" (click)="toggleIntervalTimer()">
+            <div class="timer__tab__interval-time__sets">
+              {{ "Set" | translate }} {{ getIntervalSets() }}/{{ intervalProperties.sets }}
+            </div>
+
+            <div class="timer__tab__interval-time__time timer__tab__interval-time__time--work" 
+                 [class.timer__tab__interval-time__time--active]="properties().intervalStarted && getIntervalPhase() === 'work'">
+              <h6>{{ "Work" | translate }}</h6>
+              <span>{{ getIntervalWorkTime() }}</span>
+            </div>
+
+            <div class="timer__tab__interval-time__time timer__tab__interval-time__time--rest" 
+                 [class.timer__tab__interval-time__time--active]="properties().intervalStarted && getIntervalPhase() === 'rest'">
+              <h6>{{ "Rest" | translate }}</h6>
+              <span>{{ getIntervalRestTime() }}</span>
+            </div>
+          </div>
+
+          <div class="timer__tab__actions">
+            <button mat-flat-button color="primary" (click)="toggleIntervalTimer()">
+              <mat-icon>{{ properties().intervalStarted ? 'stop' : 'play_arrow' }}</mat-icon>
+              {{ (properties().intervalStarted ? "Stop" : "Start") | translate }}
+            </button>
+
+            <button mat-stroked-button color="primary" (click)="resetIntervalTimer()">
+              <mat-icon>refresh</mat-icon>
+              {{ "Reset" | translate }}
+            </button>
+          </div>
+
+          <div class="timer__tab__options">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ "Interval Options" | translate }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="timer__tab__options__timer-picker">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "Work Minutes" | translate }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    min="0" 
+                    [(ngModel)]="intervalProperties.workMinutes" 
+                    (ngModelChange)="updateIntervalTimerProperties(); resetIntervalTimer()">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "Work Seconds" | translate }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    min="0" 
+                    [(ngModel)]="intervalProperties.workSeconds" 
+                    (ngModelChange)="updateIntervalTimerProperties(); resetIntervalTimer()">
+                </mat-form-field>
+              </div>
+
+              <div class="timer__tab__options__timer-picker">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "Rest Minutes" | translate }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    min="0" 
+                    [(ngModel)]="intervalProperties.restMinutes" 
+                    (ngModelChange)="updateIntervalTimerProperties(); resetIntervalTimer()">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ "Rest Seconds" | translate }}</mat-label>
+                  <input 
+                    matInput 
+                    type="number" 
+                    min="0" 
+                    [(ngModel)]="intervalProperties.restSeconds" 
+                    (ngModelChange)="updateIntervalTimerProperties(); resetIntervalTimer()">
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline">
+                <mat-label>{{ "Sets" | translate }}</mat-label>
+                <input 
+                  matInput 
+                  type="number" 
+                  min="0" 
+                  [(ngModel)]="intervalProperties.sets" 
+                  (ngModelChange)="updateIntervalTimerProperties()">
+              </mat-form-field>
+
+              <mat-checkbox 
+                [(ngModel)]="intervalProperties.playSound" 
+                (ngModelChange)="updateIntervalTimerProperties()"
+                color="primary">
+                {{ "Play sound at 0" | translate }}
+              </mat-checkbox>
+            </mat-expansion-panel>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">
+      {{ "Close" | translate }}
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -55,7 +55,7 @@ export class AddProgramListComponent {
     constructor() {
         this.properties = {search:"", programLimit:50, recentLoading:true, programLoading:true, selectedTab:0};
 
-        this.recommendedPrograms = this.programService.getPopularPrograms();
+        this.recommendedPrograms = this.programService.getRecommendedPrograms();
         this.recentPrograms = [];
         this.programs = [];
       

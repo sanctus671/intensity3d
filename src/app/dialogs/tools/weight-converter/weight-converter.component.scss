@@ -1,0 +1,53 @@
+.weight-converter {
+
+
+    .dialog-title{
+        position:relative;
+        > mat-icon{
+            cursor:pointer;
+            position:absolute;
+            top:20px;
+            right:20px;
+        }
+
+        .refresh-button{
+            position:absolute;
+            top:13px;
+            right:60px;
+
+        }
+    }
+
+    mat-form-field.full-width{
+        width:100%;
+    }
+
+
+  &__info {
+    padding: 20px;
+    text-align: center;
+    color: var(--ion-color-medium);
+
+    p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    &__formula {
+      font-size: 12px;
+      font-family: monospace;
+      color: var(--ion-color-medium-shade);
+    }
+  }
+}
+
+ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+}
+
+ion-input {
+  font-size: 16px;
+}
+
+

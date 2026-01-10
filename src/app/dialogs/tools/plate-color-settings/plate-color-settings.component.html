@@ -1,0 +1,47 @@
+<div class="plate-color-settings">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>{{ "Plate Colors" | translate }}</h2>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    <p class="plate-color-settings__description">{{ "Customize the colors of your weight plates. Changes will apply to both the plate calculator and warmup calculator." | translate }}</p>
+
+    <mat-list>
+      @for (plate of plateColors(); track trackByPlateId($index, plate); let i = $index) {
+        <mat-list-item class="plate-color-settings__item">
+          <div class="plate-color-settings__item-content">
+            <span class="plate-color-settings__label">
+              {{ units() === 'lbs' ? plate.lbsLabel : plate.kgLabel }}
+            </span>
+            <div class="plate-color-settings__color-inputs">
+              <div class="plate-color-settings__color-input">
+                <label>{{ "Plate" | translate }}</label>
+                <input type="color" [value]="plate.color" (input)="updatePlateColor(i, 'color', $any($event.target).value)" />
+              </div>
+              <div class="plate-color-settings__color-input">
+                <label>{{ "Text" | translate }}</label>
+                <input type="color" [value]="plate.textColor" (input)="updatePlateColor(i, 'textColor', $any($event.target).value)" />
+              </div>
+            </div>
+            <div class="plate-color-settings__preview" [style.background-color]="plate.color" [style.color]="plate.textColor">
+              {{ units() === 'lbs' ? plate.lbsValue : plate.kgValue }}
+            </div>
+          </div>
+        </mat-list-item>
+      }
+    </mat-list>
+
+    <div class="plate-color-settings__actions">
+      <button mat-stroked-button (click)="resetToDefaults()">
+        {{ "Reset to Defaults" | translate }}
+      </button>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ "Cancel" | translate }}</button>
+    <button mat-raised-button color="primary" (click)="save()">{{ "Save" | translate }}</button>
+  </mat-dialog-actions>
+</div>
+

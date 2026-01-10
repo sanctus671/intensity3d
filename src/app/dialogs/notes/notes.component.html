@@ -6,7 +6,7 @@
 <mat-dialog-content class="notes">
     @if (notes.notesLoading) {
         <div class="notes__loading">
-            <mat-spinner diameter="15" mode="indeterminate" color="primary"></mat-spinner>
+            <mat-spinner diameter="40" mode="indeterminate" color="primary"></mat-spinner>
         </div>
     }
     
@@ -19,12 +19,10 @@
                     @for (set of diary.sets; track set.id) {
                         @if (set.notes || set.video) {
                             <a mat-list-item (click)="openNote(set)">
-                                <h2 matLine>{{ set.name }}</h2>
-                                <h3 matLine>
-                                    {{ set.weight ? set.weight : 0 }}{{ set.unit }}, {{ set.reps }} {{ 'rep' | translate }}@if (set.reps !== '1') {<span>s</span>}@if (set.percentage && set.percentage > 0) {<span>, {{ set.percentage }}%</span>}@if (set.rpe && set.rpe > 0) {<span>, @{{ set.rpe }}RPE</span>}
-                                </h3>    
+                                <span matListItemTitle>{{ set.name }}</span>
+                                <span matListItemLine>{{ set.weight ? set.weight : 0 }}{{ set.unit }}, {{ set.reps }} {{ 'rep' | translate }}@if (set.reps !== '1') {<span>s</span>}@if (set.percentage && set.percentage > 0) {<span>, {{ set.percentage }}%</span>}@if (set.rpe && set.rpe > 0) {<span>, @{{ set.rpe }}RPE</span>}</span>    
                                 @if (set.notes) {
-                                    <p matLine>{{ set.notes }}</p>
+                                    <span matListItemLine>{{ set.notes }}</span>
                                 }
                                 @if (set.video) {
                                     <a mat-flat-button matSuffix color="primary" [href]="set.video" target="_blank" (click)="viewVideo($event)">

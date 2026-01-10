@@ -1,0 +1,384 @@
+<div class="programs">
+    
+    <div class="programs__header">
+        <h2>{{ 'Programs' | translate }}</h2>
+    </div>
+    
+    <mat-tab-group class="programs__nav" mat-align-tabs="center" [(selectedIndex)]="properties().selectedTab">
+        <mat-tab [label]="'Recommended' | translate">   
+    
+            <div class="programs__sliders">
+    
+                <div class="programs__slider" id="popular-programs">
+                    <h3>{{ 'Popular Programs' | translate }}</h3>
+                    <a (click)="seeMorePrograms('popular-programs')">{{ 'See More' | translate }}</a>
+                    
+                    <swiper-container
+                        class="programs__swiper"
+                        slides-per-view="3"
+                        space-between="15"
+                        loop="true"
+                        navigation="true">
+                        @for (program of popularPrograms(); track program.id) {
+                            <swiper-slide>
+                                <div class="programs__slider__item" (click)="viewProgram(program)">
+                                    <mat-card class="programs__slider__card" [style.background-image]="'url(' + program.image + ')'">
+                                        <div class="programs__slider__card__content">
+                                            <h5>{{program.displayName}}</h5>
+                                            <h6>{{program.subtitle}}</h6>
+                                        </div>
+                                    </mat-card>
+                                </div>
+                            </swiper-slide>
+                        }
+                    </swiper-container>
+
+                </div>
+
+
+                <div class="programs__slider" id="powerlifting-programs">
+                    <h3>{{ 'Powerlifting Programs' | translate }}</h3>
+                    <a (click)="seeMorePrograms('powerlifting-programs')">{{ 'See More' | translate }}</a>
+
+                    <swiper-container
+                        class="programs__swiper"
+                        slides-per-view="3"
+                        space-between="15"
+                        loop="true"
+                        navigation="true">
+                        @for (program of powerliftingPrograms(); track program.id) {
+                            <swiper-slide>
+                                <div class="programs__slider__item">
+                                    <mat-card class="programs__slider__card"
+                                        [style.background-image]="'url(' + program.image + ')'" 
+                                        (click)="viewProgram(program)">
+                                        <div class="programs__slider__card__content">
+                                            <h5>{{program.displayName}}</h5>
+                                            <h6>{{program.subtitle}}</h6>
+                                        </div>
+                                    </mat-card>
+                                </div>
+                            </swiper-slide>
+                        }
+                    </swiper-container>
+
+                </div>   
+
+
+                <div class="programs__slider" id="bodybuilding-programs">
+                    <h3>{{ 'Bodybuilding Programs' | translate }}</h3>
+                    <a (click)="seeMorePrograms('bodybuilding-programs')">{{ 'See More' | translate }}</a>
+
+                    <swiper-container
+                        class="programs__swiper"
+                        slides-per-view="3"
+                        space-between="15"
+                        loop="true"
+                        navigation="true">
+                        @for (program of bodybuildingPrograms(); track program.id) {
+                            <swiper-slide>
+                                <div class="programs__slider__item">
+                                    <mat-card class="programs__slider__card"
+                                        [style.background-image]="'url(' + program.image + ')'" 
+                                        (click)="viewProgram(program)">
+                                        <div class="programs__slider__card__content">
+                                            <h5>{{program.displayName}}</h5>
+                                            <h6>{{program.subtitle}}</h6>
+                                        </div>
+                                    </mat-card>
+                                </div>
+                            </swiper-slide>
+                        }
+                    </swiper-container>
+
+                </div>
+
+                <div class="programs__slider" id="powerbuilding-programs">
+                    <h3>{{ 'Powerbuilding Programs' | translate }}</h3>
+                    <a (click)="seeMorePrograms('powerbuilding-programs')">{{ 'See More' | translate }}</a>
+
+                    <swiper-container
+                        class="programs__swiper"
+                        slides-per-view="3"
+                        space-between="15"
+                        loop="true"
+                        navigation="true">
+                        @for (program of powerbuildingPrograms(); track program.id) {
+                            <swiper-slide>
+                                <div class="programs__slider__item">
+                                    <mat-card class="programs__slider__card"
+                                        [style.background-image]="'url(' + program.image + ')'" 
+                                        (click)="viewProgram(program)">
+                                        <div class="programs__slider__card__content">
+                                            <h5>{{program.displayName}}</h5>
+                                            <h6>{{program.subtitle}}</h6>
+                                        </div>
+                                    </mat-card>
+                                </div>
+                            </swiper-slide>
+                        }
+                    </swiper-container>
+
+                </div>
+
+                <div class="programs__slider" id="weightlifting-programs">
+                    <h3>{{ 'Weightlifting Programs' | translate }}</h3>
+                    <a (click)="seeMorePrograms('weightlifting-programs')">{{ 'See More' | translate }}</a>
+
+                    <swiper-container
+                        class="programs__swiper"
+                        slides-per-view="3"
+                        space-between="15"
+                        loop="true"
+                        navigation="true">
+                        @for (program of weightliftingPrograms(); track program.id) {
+                            <swiper-slide>
+                                <div class="programs__slider__item">
+                                    <mat-card class="programs__slider__card"
+                                        [style.background-image]="'url(' + program.image + ')'" 
+                                        (click)="viewProgram(program)">
+                                        <div class="programs__slider__card__content">
+                                            <h5>{{program.displayName}}</h5>
+                                            <h6>{{program.subtitle}}</h6>
+                                        </div>
+                                    </mat-card>
+                                </div>
+                            </swiper-slide>
+                        }
+                    </swiper-container>
+
+                </div>
+
+                <div class="programs__slider" id="strongman-programs">
+                    <h3>{{ 'Strongman Programs' | translate }}</h3>
+                    <a (click)="seeMorePrograms('strongman-programs')">{{ 'See More' | translate }}</a>
+
+                    <swiper-container
+                        class="programs__swiper"
+                        slides-per-view="3"
+                        space-between="15"
+                        loop="true"
+                        navigation="true">
+                        @for (program of strongmanPrograms(); track program.id) {
+                            <swiper-slide>
+                                <div class="programs__slider__item">
+                                    <mat-card class="programs__slider__card"
+                                        [style.background-image]="'url(' + program.image + ')'" 
+                                        (click)="viewProgram(program)">
+                                        <div class="programs__slider__card__content">
+                                            <h5>{{program.displayName}}</h5>
+                                            <h6>{{program.subtitle}}</h6>
+                                        </div>
+                                    </mat-card>
+                                </div>
+                            </swiper-slide>
+                        }
+                    </swiper-container>
+
+                </div>     
+                
+            </div>
+            
+            <button mat-flat-button color="primary" (click)="changeTab(3)">
+                {{ 'Browse All Programs' | translate }}
+            </button>
+            
+            <div class="programs__action-buttons">
+                <button mat-stroked-button color="primary" [routerLink]="['/programs/create']">
+                    <mat-icon>add</mat-icon>
+                    {{ 'Create Program' | translate }}
+                </button>
+                
+                <button mat-stroked-button color="primary" (click)="openAiProgramBuilder()">
+                    <mat-icon>auto_awesome</mat-icon>
+                    {{ 'Create with AI' | translate }}
+                </button>
+                
+                <button mat-stroked-button color="primary" (click)="openCreateTemplate()">
+                    <mat-icon>content_copy</mat-icon>
+                    {{ 'Create from Diary' | translate }}
+                </button>
+            </div>
+    
+        </mat-tab> 
+        
+        <mat-tab [label]="('Recently Added' | translate) + (recentPrograms().length > 0 ? ' (' + numberWithCommas(recentPrograms().length) + ')' : '')">
+
+            @if (properties().recentLoading) {
+                <div class="programs__loading">
+                    <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            }
+
+            @if (!properties().recentLoading && recentPrograms().length < 1) {
+                <div class="programs__empty">
+                    <mat-icon>calendar_today</mat-icon>
+                    <h2>{{ 'No Recent Programs' | translate }}</h2>
+                </div>
+                
+                <div class="programs__empty-actions">
+                    <button mat-flat-button color="primary" (click)="changeTab(3)">
+                        {{ 'Browse All Programs' | translate }}
+                    </button>                 
+                </div>
+            }
+
+            @if (!properties().recentLoading && recentPrograms().length > 0) {
+                <mat-form-field class="programs__search">
+                    <input matInput 
+                           type="text" 
+                           [placeholder]="'Search programs' | translate" 
+                           [ngModel]="properties().search"
+                           (ngModelChange)="updateSearch($event)"
+                           [attr.aria-label]="'Search programs' | translate">
+                    @if (properties().search) {
+                        <button mat-button matSuffix mat-icon-button [attr.aria-label]="'Clear search' | translate" (click)="clearSearch()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    }
+                </mat-form-field>
+
+                <mat-nav-list class="programs__programs-list">
+                    @for (program of filteredRecentPrograms(); track program.id || program.programid) {
+                        <mat-list-item (click)="viewProgram(program)" class="programs__programs-list__program program">
+                            <h3 matLine>{{program.name}}</h3>                      
+                            <mat-icon matListIcon>chevron_right</mat-icon>
+                        </mat-list-item>
+                    }
+                </mat-nav-list>
+            }
+
+            
+            
+            
+        </mat-tab>
+
+        <mat-tab [label]="('Created Programs' | translate) + (createdPrograms().length > 0 ? ' (' + numberWithCommas(createdPrograms().length) + ')' : '')">
+            
+            @if (properties().createdLoading) {
+                <div class="programs__loading">
+                    <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            }
+
+            @if (!properties().createdLoading && createdPrograms().length < 1) {
+                <div class="programs__empty">
+                    <mat-icon>calendar_today</mat-icon>
+                    <h2>{{ 'No Created Programs' | translate }}</h2>
+                </div>
+                
+                <div class="programs__empty-actions">
+                    <button mat-flat-button color="primary" [routerLink]="['/programs/create']">
+                        {{ 'Create A Program' | translate }}
+                    </button>                 
+                </div>
+            }
+            
+            @if (!properties().createdLoading && createdPrograms().length > 0) {
+                <mat-form-field class="programs__search">
+                    <input matInput 
+                           type="text" 
+                           [placeholder]="'Search programs' | translate" 
+                           [ngModel]="properties().search"
+                           (ngModelChange)="updateSearch($event)"
+                           [attr.aria-label]="'Search programs' | translate">
+                    @if (properties().search) {
+                        <button mat-button matSuffix mat-icon-button [attr.aria-label]="'Clear search' | translate" (click)="clearSearch()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    }
+                </mat-form-field>
+                
+                <mat-nav-list class="programs__programs-list">
+                    @for (program of filteredCreatedPrograms(); track program.id || program.programid) {
+                        <mat-list-item (click)="viewProgram(program)" class="programs__programs-list__program program">
+                            <h3 matLine>{{program.name}}</h3>
+                            <p matLine>{{formatDuration(program.duration || 0)}}</p>                        
+                            <mat-icon matListIcon>chevron_right</mat-icon>
+                        </mat-list-item>
+                    }
+                </mat-nav-list>
+            }            
+            
+            
+            
+            
+        </mat-tab>
+
+        <mat-tab [label]="('All Programs' | translate) + (programs().length > 0 ? ' (' + numberWithCommas(programs().length) + ')' : '')">
+            
+            @if (properties().programsLoading) {
+                <div class="programs__loading">
+                    <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            }
+
+            @if (!properties().programsLoading && programs().length < 1) {
+                <div class="programs__empty">
+                    <mat-icon>calendar_today</mat-icon>
+                    <h2>{{ 'No Programs' | translate }}</h2>
+                </div>
+                
+                <div class="programs__empty-actions">
+                    <button mat-flat-button color="primary" [routerLink]="['/programs/create']">
+                        {{ 'Create A Program' | translate }}
+                    </button>                 
+                </div>
+            }
+            
+            @if (!properties().programsLoading && programs().length > 0) {
+                <mat-form-field class="programs__search">
+                    <input matInput 
+                           type="text" 
+                           [placeholder]="'Search programs' | translate" 
+                           [ngModel]="properties().search"
+                           (ngModelChange)="updateSearch($event)"
+                           [attr.aria-label]="'Search programs' | translate">
+                    @if (properties().search) {
+                        <button mat-button matSuffix mat-icon-button [attr.aria-label]="'Clear search' | translate" (click)="clearSearch()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    }
+                </mat-form-field>
+
+                <mat-nav-list class="programs__programs-list">
+                    @for (program of filteredPrograms(); track program.id || program.programid; let i = $index) {
+                        <mat-list-item 
+                            (click)="viewProgram(program)"
+                            class="programs__programs-list__program program">
+                            <h3 matLine>
+                                {{program.name}} 
+                                @if (program.userid === '5') {
+                                    <mat-icon class="program__verified" [matTooltip]="'Program verified' | translate" matTooltipPosition="right">check_circle</mat-icon>
+                                }
+                            </h3>
+                            <p matLine>{{formatDuration(program.duration || 0)}}</p>                        
+                            <mat-icon matListIcon>chevron_right</mat-icon>
+                        </mat-list-item>
+                    }
+                    
+                    @if (canLoadMorePrograms()) {
+                        <a mat-list-item (click)="loadMorePrograms()">{{ 'Load More Programs' | translate }}</a>
+                    }
+                </mat-nav-list>
+            }            
+
+
+            
+        </mat-tab>
+        
+    </mat-tab-group>
+    
+    
+    <div class="programs__create-program">
+        <button mat-fab 
+                color="primary" 
+                [matTooltip]="'Create your own program' | translate" 
+                matTooltipPosition="left" 
+                [routerLink]="['/programs/create']"
+                [attr.aria-label]="'Create your own program' | translate">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
+    
+</div>

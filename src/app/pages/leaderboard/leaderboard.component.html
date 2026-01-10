@@ -1,0 +1,192 @@
+<div class="leaderboard">
+  <h2 class="leaderboard__title">{{ 'Leaderboard' | translate }}</h2>
+
+
+  <mat-tab-group 
+    class="leaderboard__tabs"
+    [selectedIndex]="selectedTab() === 'maxes' ? 0 : 1"
+    (selectedIndexChange)="onTabChange($event)">
+    <mat-tab [label]="'All Users' | translate">
+      <div class="leaderboard__exercises">
+        @for (exercise of selectedExercises(); track exercise.exerciseid; let exerciseIndex = $index) {
+          <div class="leaderboard__exercises__exercise">
+            <button 
+              class="leaderboard__exercises__exercise__remove" 
+              (click)="removeExercise(exercise, exerciseIndex)"
+              [attr.aria-label]="'Remove ' + exercise.name"
+              mat-icon-button>
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+
+            <div class="leaderboard__exercises__exercise__header">
+              <h6>{{ exercise.name | translate }}</h6>
+              <button 
+                mat-stroked-button 
+                color="primary"
+                (click)="changeReps(exercise)">
+                {{ leaderboardsReps()[exercise.exerciseid] }}RM
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+
+            @if (leaderboardsLoading()[exercise.exerciseid]) {
+              <div class="leaderboard__exercises__exercise__loading">
+                <mat-spinner diameter="40"></mat-spinner>
+              </div>
+            }
+
+            @if (!leaderboardsLoading()[exercise.exerciseid] && (!leaderboards()[exercise.exerciseid] || leaderboards()[exercise.exerciseid].length < 1)) {
+              <div class="leaderboard__exercises__exercise__empty">
+                {{ 'No rep sets tracked for this exercise' | translate:{ reps: leaderboardsReps()[exercise.exerciseid] } }}
+              </div>
+            }
+
+            @if (!leaderboardsLoading()[exercise.exerciseid] && leaderboards()[exercise.exerciseid] && leaderboards()[exercise.exerciseid].length > 0) {
+              <div>
+                <div class="leaderboard__exercises__exercise__column-headers">
+                  <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--rank">
+                    {{ 'Rank' | translate }}
+                  </div>
+                  <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--weight">
+                    {{ 'Weight' | translate }}
+                  </div>
+                  <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--name">
+                    {{ 'Name' | translate }}
+                  </div>
+                </div>
+
+                @for (item of leaderboards()[exercise.exerciseid].slice(0, 5); track item.id; let i = $index) {
+                  <div 
+                    class="leaderboard__exercises__exercise__item" 
+                    (click)="viewItem(exercise, item, i + 1)"
+                    role="button"
+                    tabindex="0"
+                    [attr.aria-label]="'View details for rank ' + (i + 1)">
+                    <div 
+                      class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--rank"
+                      [class.leaderboard__exercises__exercise__item__value--gold]="i === 0"
+                      [class.leaderboard__exercises__exercise__item__value--silver]="i === 1"
+                      [class.leaderboard__exercises__exercise__item__value--bronze]="i === 2">
+                      #{{ i + 1 }}
+                    </div>
+                    <div class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--weight">
+                      {{ item.weight }}{{ item.unit }}
+                    </div>
+                    <div class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--name">
+                      {{ formatName(item) }}
+                    </div>
+                    <mat-icon class="chevron">chevron_right</mat-icon>
+                  </div>
+                }
+
+                @if (leaderboards()[exercise.exerciseid].length > 5) {
+                  <button 
+                    mat-button 
+                    class="leaderboard__exercises__exercise__more" 
+                    (click)="openLeaderboard(exercise)">
+                    {{ 'View More' | translate }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <button 
+          mat-flat-button 
+          color="primary"
+          class="leaderboard__exercises__add" 
+          (click)="addExercise()">
+          {{ 'Add Exercise' | translate }}
+        </button>
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'Friends Only' | translate">
+      <div class="leaderboard__exercises">
+        @for (exercise of selectedExercises(); track exercise.exerciseid; let exerciseIndex = $index) {
+          <div class="leaderboard__exercises__exercise">
+            <button 
+              class="leaderboard__exercises__exercise__remove" 
+              (click)="removeExercise(exercise, exerciseIndex)"
+              [attr.aria-label]="'Remove ' + exercise.name"
+              mat-icon-button>
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+
+            <div class="leaderboard__exercises__exercise__header">
+              <h6>{{ exercise.name | translate }}</h6>
+              <button 
+                mat-stroked-button 
+                color="primary"
+                (click)="changeReps(exercise)">
+                {{ friendsLeaderboardsReps()[exercise.exerciseid] }}RM
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+
+            @if (friendsLeaderboardsLoading()[exercise.exerciseid]) {
+              <div class="leaderboard__exercises__exercise__loading">
+                <mat-spinner diameter="40"></mat-spinner>
+              </div>
+            }
+
+            @if (!friendsLeaderboardsLoading()[exercise.exerciseid] && (!friendsLeaderboards()[exercise.exerciseid] || friendsLeaderboards()[exercise.exerciseid].length < 1)) {
+              <div class="leaderboard__exercises__exercise__empty">
+                {{ 'No rep sets tracked for this exercise' | translate:{ reps: friendsLeaderboardsReps()[exercise.exerciseid] } }}
+              </div>
+            }
+
+            @if (!friendsLeaderboardsLoading()[exercise.exerciseid] && friendsLeaderboards()[exercise.exerciseid] && friendsLeaderboards()[exercise.exerciseid].length > 0) {
+              <div>
+                <div class="leaderboard__exercises__exercise__column-headers">
+                  <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--rank">
+                    {{ 'Rank' | translate }}
+                  </div>
+                  <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--weight">
+                    {{ 'Weight' | translate }}
+                  </div>
+                  <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--name">
+                    {{ 'Name' | translate }}
+                  </div>
+                </div>
+
+                @for (item of friendsLeaderboards()[exercise.exerciseid]; track item.id; let i = $index) {
+                  <div 
+                    class="leaderboard__exercises__exercise__item" 
+                    (click)="viewItem(exercise, item, i + 1)"
+                    role="button"
+                    tabindex="0"
+                    [attr.aria-label]="'View details for rank ' + (i + 1)">
+                    <div 
+                      class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--rank"
+                      [class.leaderboard__exercises__exercise__item__value--gold]="i === 0"
+                      [class.leaderboard__exercises__exercise__item__value--silver]="i === 1"
+                      [class.leaderboard__exercises__exercise__item__value--bronze]="i === 2">
+                      #{{ i + 1 }}
+                    </div>
+                    <div class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--weight">
+                      {{ item.weight }}{{ item.unit }}
+                    </div>
+                    <div class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--name">
+                      {{ formatName(item) }}
+                    </div>
+                    <mat-icon class="chevron">chevron_right</mat-icon>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <button 
+          mat-flat-button 
+          color="primary"
+          class="leaderboard__exercises__add" 
+          (click)="addExercise()">
+          {{ 'Add Exercise' | translate }}
+        </button>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

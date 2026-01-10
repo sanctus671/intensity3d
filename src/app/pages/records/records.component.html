@@ -1,0 +1,59 @@
+<div class="records-page">
+    
+    <h2 class="records-page__title">{{ 'Records' | translate }}</h2>
+
+    @if (isLoading()) {
+        <div class="records-page__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+    
+    @if (!isLoading()) {
+        <mat-form-field class="records-page__search">
+            <mat-label>{{ 'Search exercises' | translate }}</mat-label>
+            <input 
+                matInput 
+                type="text" 
+                [value]="searchTerm()" 
+                (input)="searchTerm.set($any($event.target).value)"
+                [attr.aria-label]="'Search exercises' | translate">
+            @if (searchTerm()) {
+                <button 
+                    mat-icon-button 
+                    matSuffix 
+                    [attr.aria-label]="'Clear search' | translate"
+                    (click)="clearSearch()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            }
+        </mat-form-field>
+        
+        <mat-list class="records-page__exercise-list" role="navigation" [attr.aria-label]="'Exercise records list' | translate">
+            @for (exercise of filteredExercises(); track exercise.exerciseid) {
+                <mat-list-item 
+                    (click)="selectExercise(exercise)"
+                    role="button"
+                    [attr.aria-label]="'View records for ' + exercise.name">
+                    <span matListItemTitle>{{ exercise.name }}</span>
+                    <div matListItemMeta>
+
+                        <mat-icon>chevron_right</mat-icon>
+                    </div>
+                </mat-list-item>
+            }
+            
+            @if (filteredExercises().length === 0 && searchTerm()) {
+                <div class="records-page__no-results">
+                    {{ 'No exercises found matching your search' | translate }}
+                </div>
+            }
+            
+            @if (exercises().length === 0 && !isLoading()) {
+                <div class="records-page__no-results">
+                    {{ 'No exercises tracked yet' | translate }}
+                </div>
+            }
+        </mat-list>
+    }
+    
+</div>

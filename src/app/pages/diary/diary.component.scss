@@ -1,7 +1,7 @@
 .diary{
     display:flex;
     flex-direction:row;
-    background-color: var(--surface-color);
+    background-color: var(--mat-app-background-color);
     min-height: 100vh;
     min-height: calc(100vh - 64px);
         
@@ -33,6 +33,8 @@
 
             .mat-calendar-body-cell{
                 font-size:0.8rem;
+
+            
             }
 
             .mat-calendar-table-header-divider{
@@ -46,7 +48,7 @@
         
         .diary__sidebar__section{
             margin-top:15px;
-            padding-top:10px; 
+            padding-top:20px; 
             
             &:first-child{
                 margin-top:10px;
@@ -97,21 +99,39 @@
     
     .diary__diary-content{
         flex:1;
+        max-width: calc(100% - 275px);
         
-        
+        background-color:var(--surface-color);
+        border-top-left-radius:30px;
+        padding-left:20px;
+        padding-top:10px;
         .day-nav{
-            display:flex;
-            flex-direction:row;
             width:100%;
             border-bottom: 1px solid var(--divider-color);
             margin:15px 0px;
             padding-bottom:15px;
             
+            .day-nav__swiper-wrapper {
+                width: 100%;
+            }
+            
+            .day-nav__swiper {
+                width: 100%;
+                height: auto;
+            }
+            
+            swiper-slide, .day-nav__slide {
+                width: calc(100% / 7) !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
             
             .day-nav__day{
-                flex:1;
+                width: 100%;
                 text-align:center;
                 position:relative;
+                cursor: pointer;
                 
                 h6{
                     margin:0px;
@@ -139,8 +159,6 @@
                 }
                 
                 &:hover{
-                    cursor:pointer;
-                    
                     h3{
                        background-color: var(--divider-color);
                     }
@@ -297,14 +315,22 @@
             .diary-workout__empty{
                 text-align:center;
                 padding-top:5%;
-                opacity: 0.08;
+                max-width:250px;
+                margin: 0 auto;
                 mat-icon{
-                    font-size:100px;
-                    width:100px;
-                    height:100px;
+                    font-size:150px;
+                    width:150px;
+                    height:150px;
+                    fill:var(--empty-color);
                 }
                 h2{
                     margin:0px;
+                    opacity:0.15;
+                }
+                p{
+                    margin:0px;
+                    margin-top:10px;
+                    opacity:0.15;
                 }
                 
             }
@@ -467,7 +493,7 @@
             font-size: 14px;
             line-height: 14px;
             padding: 6px 6px;
-
+            white-space: nowrap;
             &--sets-added{
                 margin-left:10px;
             }
@@ -605,6 +631,10 @@
                 display:none;
             }
 
+        }
+        
+        .diary__diary-content{
+            max-width: 100%;
         }
 
 

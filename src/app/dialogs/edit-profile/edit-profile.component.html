@@ -4,19 +4,23 @@
 </div>
 
 <mat-dialog-content class="edit-profile">
+    <!-- Avatar Section -->
+    <div class="avatar-section">
+        <div class="avatar-preview" [style.background-image]="'url(' + getDp(profile.dp || '') + ')'">
+            <div class="avatar-overlay" (click)="uploadAvatar()">
+                <mat-icon>photo_camera</mat-icon>
+            </div>
+        </div>
+        <div class="avatar-text">
+            <h3>{{ 'Profile Picture' | translate }}</h3>
+            <p>{{ 'Click to change your avatar' | translate }}</p>
+        </div>
+        <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarChange($event)">
+    </div>
+
     <mat-form-field>
         <mat-label>{{ 'Display Name' | translate }}</mat-label>
         <input matInput type="text" [(ngModel)]="profile.display">
-    </mat-form-field>
-    
-    <mat-form-field>
-        <mat-label>{{ 'Email' | translate }}</mat-label>
-        <input matInput type="text" [(ngModel)]="profile.email">
-    </mat-form-field>
-
-    <mat-form-field>
-        <mat-label>{{ 'Age' | translate }}</mat-label>
-        <input matInput type="number" [(ngModel)]="profile.age">
     </mat-form-field>
     
     <mat-form-field>
@@ -25,24 +29,13 @@
             <mat-option value="Male">{{ 'Male' | translate }}</mat-option>
             <mat-option value="Female">{{ 'Female' | translate }}</mat-option>
             <mat-option value="Other">{{ 'Other' | translate }}</mat-option>
-            <mat-option value="Alien">{{ 'Alien' | translate }}</mat-option>
         </mat-select>
     </mat-form-field>   
     
     <mat-form-field>
         <mat-label>{{ 'About Me' | translate }}</mat-label>
         <textarea matInput [(ngModel)]="profile.about" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
-    </mat-form-field>     
-    
-    <mat-form-field>
-        <mat-label>{{ 'Purpose' | translate }}</mat-label>
-        <textarea matInput [(ngModel)]="profile.why" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
-    </mat-form-field> 
-    
-    <mat-form-field>
-        <mat-label>{{ 'Goals' | translate }}</mat-label>
-        <textarea matInput [(ngModel)]="profile.goals" cdkTextareaAutosize cdkAutosizeMinRows="2"></textarea>
-    </mat-form-field>     
+    </mat-form-field>  
 </mat-dialog-content>
 
 <mat-dialog-actions>

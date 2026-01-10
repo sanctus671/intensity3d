@@ -86,8 +86,9 @@ export class AddProgramComponent {
         });          
         
         if (!this.program.workouts){
-            this.programService.getProgram(this.program.id).then((program) => {
-                this.program = program;
+            this.programService.getProgram(this.program.id).then((response) => {
+                // The API returns an array with a single program object
+                this.program = Array.isArray(response) ? response[0] : response;
                 this.getMaxes();
             })
         } else {
@@ -105,7 +106,11 @@ export class AddProgramComponent {
                 if (!this.maxes[exercise.exerciseid]){
                     this.maxes[exercise.exerciseid] = exercise
                     this.maxes[exercise.exerciseid]["max"] = "";
-                    this.exercises.push(exercise.exerciseid);
+                    
+                    // Only add exercises that have a percentage to the exercises array
+                    if (exercise.percentage && exercise.percentage !== "0"){
+                        this.exercises.push(exercise.exerciseid);
+                    }
                 }
                 if (!this.options.progressionexercises[exercise.exerciseid]){
                     this.options.progressionexercises[exercise.exerciseid] = "";
@@ -113,14 +118,17 @@ export class AddProgramComponent {
             }
         }
         
-        this.programService.getMaxes(this.exercises).then((data: Array<any>) => {
-            for (let exercise of data){
-                if (exercise["onerm"] && exercise["onerm"] > 0){
-                    this.maxes[exercise.exerciseid]["max"] = exercise["onerm"];
-                    this.maxCount = this.maxCount + 1;
+        // Only fetch maxes if there are exercises with percentages
+        if (this.exercises.length > 0) {
+            this.programService.getMaxes(this.exercises).then((data: Array<any>) => {
+                for (let exercise of data){
+                    if (exercise["onerm"] && exercise["onerm"] > 0){
+                        this.maxes[exercise.exerciseid]["max"] = exercise["onerm"];
+                        this.maxCount = this.maxCount + 1;
+                    }
                 }
-            }
-        })
+            })
+        }
     }
     
     public calculateMaxes(): void {

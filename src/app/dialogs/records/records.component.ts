@@ -1,8 +1,6 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -12,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountService } from '../../services/account/account.service';
 import { DiaryService } from '../../services/diary/diary.service';
+import { ViewRecordComponent } from '../view-record/view-record.component';
 import moment from 'moment';
 
 @Component({
@@ -21,7 +20,6 @@ import moment from 'moment';
   encapsulation: ViewEncapsulation.None,
   imports: [
     CommonModule,
-    RouterLink,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
@@ -36,6 +34,7 @@ export class RecordsComponent {
     
     public dialogRef = inject(MatDialogRef<RecordsComponent>);
     public data = inject(MAT_DIALOG_DATA);
+    private dialog = inject(MatDialog);
     private accountService = inject(AccountService);
     private diaryService = inject(DiaryService);
 
@@ -132,7 +131,38 @@ export class RecordsComponent {
     
     public formatDate(dateString: string): string {
         return moment(dateString).format("dddd, MMMM Do YYYY");
-    }      
+    }
+    
+    public openViewRecord(record: any, type: string): void {
+        const dialogRef = this.dialog.open(ViewRecordComponent, {
+            width: '300px',
+            data: {
+                title: this.getRecordTitle(record, type),
+                set: record,
+                type: type,
+                exercise: this.exercise
+            },
+            autoFocus: false
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.action === 'navigate') {
+                // Close this dialog and let the parent handle navigation
+                this.dialogRef.close({ action: 'navigate', date: result.date });
+            }
+        });
+    }
+    
+    private getRecordTitle(record: any, type: string): string {
+        if (type === 'overall') {
+            return `${record.rep}RM: ${record.max || record.weight}${this.account.units}`;
+        } else if (type === 'backoffs') {
+            return `${record.best}${this.account.units} volume for ${record.reps} rep sets`;
+        } else if (type === 'amrap') {
+            return `${record.reps || record.rep} reps with ${record.weight}${this.account.units}`;
+        }
+        return '';
+    }
     
     public dismiss(): void { 
         this.dialogRef.close();

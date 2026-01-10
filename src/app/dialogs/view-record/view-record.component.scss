@@ -1,0 +1,60 @@
+.dialog-title{
+    position:relative;
+    padding-right:40px;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.view-record {
+
+    .view-record__header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+
+        h3 {
+            margin: 0;
+            flex: 1;
+            font-size: 20px;
+            font-weight: 500;
+        }
+    }
+
+    .view-record__date {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .view-record__details {
+        margin: 0 0 24px 0;
+        opacity: 0.7;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .view-record__upgrade-button {
+        width: 100%;
+
+        mat-icon {
+            margin-right: 8px;
+        }
+    }
+
+    .view-record__footer {
+        justify-content: flex-end;
+        padding: 0;
+        margin-top: 8px;
+    }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+    .view-record {
+        // Theme-specific adjustments if needed
+    }
+}

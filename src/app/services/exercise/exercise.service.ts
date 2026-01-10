@@ -81,6 +81,25 @@ export class ExerciseService {
     ];
   }
 
+  getExerciseCategories(): any[] {
+    return [
+      { name: 'Squat Variations', musclegroups: [], exercisetypes: ['Squat'] },
+      { name: 'Deadlift Variations', musclegroups: [], exercisetypes: ['Deadlift'] },
+      { name: 'Press Variations', musclegroups: [], exercisetypes: ['Press'] },
+      { name: 'Pull Variations', musclegroups: [], exercisetypes: ['Pull'] },
+      { name: 'Abs', musclegroups: ['Rectus Abdominis', 'Obliques'], exercisetypes: [] },
+      { name: 'Back', musclegroups: ['Erector Spinae', 'Latissimus Dorsi', 'Rhomboids', 'Trapezius'], exercisetypes: [] },
+      { name: 'Biceps', musclegroups: ['Biceps'], exercisetypes: [] },
+      { name: 'Chest', musclegroups: ['Pectoralis'], exercisetypes: [] },
+      { name: 'Shoulders', musclegroups: ['Deltoids'], exercisetypes: [] },
+      { name: 'Triceps', musclegroups: ['Triceps'], exercisetypes: [] },
+      { name: 'Legs', musclegroups: ['Gluteus', 'Hamstrings', 'Quadriceps'], exercisetypes: [] },
+      { name: 'Calfs', musclegroups: ['Gastrocnemius', 'Soleus'], exercisetypes: [] },
+      { name: 'Cardio', musclegroups: [], exercisetypes: ['Cardio'] },
+      { name: 'All Exercises', musclegroups: [], exercisetypes: [] }
+    ];
+  }
+
   getExercisesLocal(): Promise<any> {
     return this.storage.get('intensity__exercises').then((exercises: string | null) => {
       return exercises ? JSON.parse(exercises) : [];

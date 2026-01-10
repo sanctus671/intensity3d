@@ -6,18 +6,20 @@
 <mat-dialog-content class="stats">
     <app-exercise-chart 
         [exercise]="exercise" 
-        [user]="account">
+        [user]="account"
+        [shouldLoad]="1">
     </app-exercise-chart>
     
-    @if (stats.notes > 0 || stats.videos > 0) {
+  
         <div class="stats__notes-stats" (click)="openNotes()">
-            <mat-icon>book</mat-icon>
+            <mat-icon fontSet="material-symbols-outlined">book_2</mat-icon>
             <div class="stats__notes-stats__inner">
-                <h4>{{ stats.notes }} {{ 'notes' | translate }} & {{ stats.videos }} {{ 'videos' | translate }}</h4>
+                <h4>{{ notesCount() }} {{ 'notes' | translate }} & {{ videosCount() }} {{ 'videos' | translate }}</h4>
                 <p>{{ 'Tracked against sets in your diary' | translate }}</p>
             </div>
+            <mat-icon class="stats__notes-stats__arrow">chevron_right</mat-icon>
         </div>
-    }
+
 </mat-dialog-content>
 
 <mat-dialog-actions>

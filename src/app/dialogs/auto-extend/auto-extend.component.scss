@@ -1,0 +1,90 @@
+.auto-extend {
+    max-width: 600px;
+    
+    &__close {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+    }
+    
+    &__intro-text {
+        margin-bottom: 24px;
+        color: var(--text-secondary);
+    }
+    
+    mat-form-field {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+    
+    &__progression-types {
+        margin-bottom: 24px;
+        
+        h3 {
+            margin: 16px 0 12px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        mat-checkbox {
+            display: block;
+            margin-bottom: 8px;
+        }
+    }
+    
+    &__progression-input {
+        margin-left: 32px;
+        margin-bottom: 16px;
+    }
+    
+    &__exercise-panel {
+        margin-bottom: 8px;
+        
+        mat-checkbox {
+            pointer-events: auto;
+        }
+    }
+    
+    &__exercise-settings {
+        padding: 16px;
+        
+        mat-checkbox {
+            display: block;
+            margin-bottom: 8px;
+        }
+    }
+    
+    &__summary {
+        margin-top: 24px;
+        padding: 16px;
+        background-color: var(--surface-color);
+        border-radius: 4px;
+        border-left: 4px solid var(--primary-color);
+        
+        h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        p {
+            margin: 8px 0;
+            color: var(--text-secondary);
+            
+            strong {
+                color: var(--text-primary);
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+mat-dialog-content.auto-extend {
+    padding: 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+mat-dialog-actions {
+    padding: 16px 24px;
+}

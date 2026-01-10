@@ -6,6 +6,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideEcharts } from 'ngx-echarts';
 import { shareIcons } from 'ngx-sharebuttons/icons';
+import { provideNgxStripe } from 'ngx-stripe';
 
 import { routes } from './app.routes';
 
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideEcharts(),
     shareIcons(),
+    provideNgxStripe('pk_live_oLx4cuSqaIFk113R45cFnXTV00wvLxxZ7k'),
     importProvidersFrom(
       TranslateModule.forRoot({
         defaultLanguage: 'en',

@@ -4,6 +4,14 @@
 
 .dialog-title{
     position:relative;
+    padding-right:40px;
+    
+    .dialog-title__reset {
+        position:absolute;
+        top:16px;
+        right:60px;
+    }
+    
     mat-icon{
         cursor:pointer;
         position:absolute;
@@ -25,5 +33,25 @@
             text-align: right;
             opacity:0.2;            
         }     
-    
+    .change-exercise__nav, .change-exercise__exercise-list{
+        mat-list-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            
+            &:hover {
+                background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+                
+                .dark-theme & {
+                    background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.04));
+                }
+            }
+            
+            &:focus-visible {
+                outline: 2px solid var(--mat-primary-color, #d44735);
+                outline-offset: 2px;
+            }
+        }
+    }
+
+
 }

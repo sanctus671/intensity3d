@@ -4,6 +4,14 @@
 
 .dialog-title{
     position:relative;
+    padding-right:40px;
+    
+    .dialog-title__reset {
+        position:absolute;
+        top:16px;
+        right:60px;
+    }
+    
     mat-icon{
         cursor:pointer;
         position:absolute;

@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>{{ exercise.name | translate }}</h2>
+
+<mat-dialog-content class="leaderboard-exercise">
+  @if (leaderboard.length < 1) {
+    <div class="leaderboard__exercises__exercise__empty">
+      {{ 'No rep sets tracked for this exercise' | translate:{ reps: reps } }}
+    </div>
+  }
+
+  @if (leaderboard.length > 0) {
+    <div class="leaderboard__exercises__exercise">
+      <div class="leaderboard__exercises__exercise__column-headers">
+        <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--rank">
+          {{ 'Rank' | translate }}
+        </div>
+        <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--weight">
+          {{ 'Weight' | translate }}
+        </div>
+        <div class="leaderboard__exercises__exercise__column-headers__header leaderboard__exercises__exercise__column-headers__header--name">
+          {{ 'Name' | translate }}
+        </div>
+      </div>
+
+      @for (item of leaderboard; track item.id; let i = $index) {
+        <div 
+          class="leaderboard__exercises__exercise__item" 
+          (click)="viewItem(exercise, item, i + 1)"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'View details for rank ' + (i + 1)">
+          <div 
+            class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--rank"
+            [class.leaderboard__exercises__exercise__item__value--gold]="i === 0"
+            [class.leaderboard__exercises__exercise__item__value--silver]="i === 1"
+            [class.leaderboard__exercises__exercise__item__value--bronze]="i === 2">
+            #{{ i + 1 }}
+          </div>
+          <div class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--weight">
+            {{ item.weight }}{{ item.unit }}
+          </div>
+          <div class="leaderboard__exercises__exercise__item__value leaderboard__exercises__exercise__item__value--name">
+            {{ formatName(item) }}
+          </div>
+          <mat-icon class="chevron">chevron_right</mat-icon>
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dismiss()">{{ 'Close' | translate }}</button>
+</mat-dialog-actions>

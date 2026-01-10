@@ -1,0 +1,164 @@
+<div class="create-template">
+    <h2 mat-dialog-title>
+        {{ 'Create Template' | translate }}
+        <button mat-icon-button mat-dialog-close class="create-template__close">
+            <mat-icon>close</mat-icon>
+        </button>
+    </h2>
+
+    <mat-dialog-content>
+        <p class="create-template__intro-text">
+            {{ 'Turn any workout from your diary into a reusable program template.' | translate }}
+        </p>
+
+        <div class="create-template__form">
+            <mat-form-field appearance="outline">
+                <mat-label>{{ 'Template Name' | translate }}</mat-label>
+                <input 
+                    matInput 
+                    [value]="templateName()"
+                    (input)="templateName.set($any($event.target).value)"
+                    [placeholder]="'Enter template name' | translate">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>{{ 'Start Date' | translate }}</mat-label>
+                <input 
+                    matInput 
+                    [matDatepicker]="startPicker"
+                    [value]="startDate()"
+                    (dateChange)="onStartDateChange($event.value)"
+                    [max]="endDate()">
+                <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>{{ 'End Date' | translate }}</mat-label>
+                <input 
+                    matInput 
+                    [matDatepicker]="endPicker"
+                    [value]="endDate()"
+                    (dateChange)="onEndDateChange($event.value)"
+                    [min]="startDate()">
+                <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        @if (isLoadingExercises()) {
+            <div class="create-template__spinner">
+                <mat-spinner diameter="50" color="primary"></mat-spinner>
+            </div>
+        }
+
+        @if (!isLoadingExercises()) {
+            <div class="create-template__program-info">
+                <p>
+                    {{ 'Using workouts between' | translate }}<br>
+                    <strong>{{ formatDate(startDate()) }}</strong> {{ 'and' | translate }} <strong>{{ formatDate(endDate()) }}</strong>
+                </p>
+
+                <div class="create-template__program-info__details">
+                    {{ 'You are creating a' | translate }} {{ getTotalDays() }} {{ 'day program template using' | translate }} {{ workouts().length }} {{ (workouts().length === 1 ? 'workout' : 'workouts') | translate }}
+                </div>
+            </div>
+
+            <mat-accordion class="create-template__options">
+                <!-- Exercises Accordion -->
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'Select Exercises' | translate }} ({{ exercises().length }})
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    
+                    <div class="create-template__options-content">
+                        <div class="create-template__select-all">
+                            <mat-checkbox 
+                                [checked]="allExercisesSelected"
+                                (change)="toggleAllExercises()">
+                                <strong>{{ 'Select All' | translate }}</strong>
+                            </mat-checkbox>
+                        </div>
+                        
+                        <mat-divider></mat-divider>
+                        
+                        @for (exercise of exercises(); track exercise.exerciseid; let i = $index) {
+                            <div class="create-template__option-item">
+                                <mat-checkbox 
+                                    [checked]="exercise.checked"
+                                    (change)="updateExerciseChecked(i, $event.checked)">
+                                    {{ exercise.name | translate }}
+                                </mat-checkbox>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+
+                <!-- Fields Accordion -->
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'Select Fields' | translate }} ({{ fields().length }})
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    
+                    <div class="create-template__options-content">
+                        @for (field of fields(); track field.value; let i = $index) {
+                            <div class="create-template__option-item">
+                                <mat-checkbox 
+                                    [checked]="field.checked"
+                                    (change)="updateFieldChecked(i, $event.checked)">
+                                    {{ field.name | translate }}
+                                </mat-checkbox>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+
+                <!-- Options Accordion -->
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'Select Options' | translate }} ({{ options().length }})
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    
+                    <div class="create-template__options-content">
+                        @for (option of options(); track option.value; let i = $index) {
+                            <div class="create-template__option-item">
+                                <mat-checkbox 
+                                    [checked]="option.checked"
+                                    (change)="updateOptionChecked(i, $event.checked)">
+                                    {{ option.name | translate }}
+                                </mat-checkbox>
+                            </div>
+                        }
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        }
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="dismiss()">
+            {{ 'Cancel' | translate }}
+        </button>
+        <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="generate()"
+            [disabled]="isLoadingExercises() || isGenerating()">
+            @if (isGenerating()) {
+                <mat-spinner diameter="20"></mat-spinner>
+                {{ 'Creating...' | translate }}
+            } @else {
+                @if (!account().premium) {
+                    <mat-icon>workspace_premium</mat-icon>
+                }
+                {{ 'Create Template' | translate }}
+            }
+        </button>
+    </mat-dialog-actions>
+</div>

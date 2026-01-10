@@ -46,12 +46,14 @@ export class ShareComponent {
     public details: any;
     public exercise: any;
     public workout: Array<any> = [];
+    public showShareTypeSelector: boolean;
     
     constructor() {
         this.title = this.data.title ? this.data.title : "Share";
         this.description = this.data.description ? this.data.description : "";
         this.link = this.data.link ? this.data.link : "https://www.intensityapp.com/";
         this.shareType = this.data.shareType ? this.data.shareType : "";
+        this.showShareTypeSelector = this.data.showShareTypeSelector !== undefined ? this.data.showShareTypeSelector : true;
         
         this.details = {};
         

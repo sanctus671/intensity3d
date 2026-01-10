@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,7 @@ import { NotesComponent } from '../../dialogs/notes/notes.component';
   templateUrl: './stats.component.html',
   styleUrls: ['./stats.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     MatDialogModule,
@@ -33,7 +34,8 @@ export class StatsComponent {
 
     public exercise: any;
     public account: any; 
-    public stats: any;
+    public notesCount = signal(0);
+    public videosCount = signal(0);
     
     constructor() {
         this.exercise = this.data.exercise ? this.data.exercise : {sets:[], goals:{goal:0,progress:0}};
@@ -42,19 +44,16 @@ export class StatsComponent {
             this.account = account;
         });
         
-        this.stats = {
-            notes: 0,
-            videos: 0
-        };
-        
         this.getNotesStats();
     }
     
     private getNotesStats(): void {
-        this.diaryService.getNotes(1, this.exercise.exerciseid).then((data: any) => {
-            if (data && data.length > 0) {
-                this.stats.notes = data.filter((note: any) => note.notes).length;
-                this.stats.videos = data.filter((note: any) => note.video).length;
+        this.diaryService.getStats({exerciseid: this.exercise.exerciseid, type:"notes"}).then((data: any) => {
+            console.log(data);
+            if (data) {
+      
+                this.notesCount.set(data.notes);
+                this.videosCount.set(data.videos);
             }
         }).catch(() => {
             // Handle error silently

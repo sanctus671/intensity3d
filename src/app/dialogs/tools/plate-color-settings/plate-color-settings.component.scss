@@ -1,0 +1,107 @@
+.plate-color-settings {
+ 
+
+
+    .dialog-title{
+        position:relative;
+        mat-icon{
+            cursor:pointer;
+            position:absolute;
+            top:20px;
+            right:20px;
+        }
+    }
+
+
+    .plate-color-settings__description{
+        margin-top:0px;
+        margin-left:15px;
+        margin-right:15px;
+        opacity:0.5;
+    }
+
+
+
+
+
+  ion-list {
+    padding-top: 0;
+  }
+
+  ion-item {
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --inner-padding-end: 0;
+
+    ion-label {
+      margin-right: 10px;
+      flex: 0 0 auto;
+      min-width: 120px;
+    }
+  }
+
+  .plate-color-settings__color-inputs {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;    
+  }
+
+  .plate-color-settings__color-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    label {
+      font-size: 11px;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    input[type="color"] {
+      width: 50px;
+      height: 40px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      padding: 0px;
+
+      &::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+
+      &::-webkit-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+
+      &::-moz-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+    }
+  }
+
+  .plate-color-settings__preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+
+  .plate-color-settings__actions {
+    padding: 20px 16px 30px;
+  }
+}
+

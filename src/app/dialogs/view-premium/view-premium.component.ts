@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountService } from '../../services/account/account.service';
+import { PremiumComponent } from '../../pages/premium/premium.component';
 
 @Component({
   selector: 'app-view-premium',
@@ -14,7 +15,8 @@ import { AccountService } from '../../services/account/account.service';
     CommonModule,
     MatDialogModule,
     MatIconModule,
-    TranslateModule
+    TranslateModule,
+    PremiumComponent
   ]
 })
 export class ViewPremiumComponent {

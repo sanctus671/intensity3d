@@ -56,7 +56,7 @@ export class DiaryService {
 
   addSet(workoutExerciseId: number, setData: any): Promise<any> {
     const requestData: any = {
-      workout_exercise_id: workoutExerciseId,
+      exerciseid: workoutExerciseId,
       reps: setData.reps,
       weight: setData.weight,
       sets: setData.sets,
@@ -66,7 +66,8 @@ export class DiaryService {
       time: setData.time,
       type: setData.type,
       unit: setData.unit,
-      completed: setData.completed
+      completed: setData.completed,
+      assigneddate: setData.assigneddate
     };
 
     if (setData.multiple) {
@@ -266,6 +267,88 @@ export class DiaryService {
       // Construct video URL from response
       const videoUrl = response.replace('index.php', '') + response;
       return videoUrl;
+    });
+  }
+
+  // Stats methods
+  getNotesStats(exerciseId: number | null): Promise<any> {
+    return this.request.get('view', 'getdata', `notesstats${exerciseId}`, { type: 'notes', exerciseid: exerciseId });
+  }
+
+  getMostTrackedExercises(): Promise<any> {
+    return this.request.get('view', 'getmosttrackedexercises', 'mosttracked', {});
+  }
+
+  getTotalVolumePerExercise(): Promise<any> {
+    return this.request.get('view', 'gettotalvolumeperexercise', 'totalvolumes', {});
+  }
+
+  getIntensityZones(options: any): Promise<any> {
+    let key = '';
+    for (const index in options) {
+      key = key + options[index];
+    }
+    return this.request.get('view', 'getintensityzones', `intensityzones${key}`, options);
+  }
+
+  getFatigueData(options: any): Promise<any> {
+    let key = '';
+    for (const index in options) {
+      key = key + options[index];
+    }
+    return this.request.get('view', 'getfatiguedata', `fatiguedata${key}`, options);
+  }
+
+  getRecordHistory(options: any): Promise<any> {
+    let key = '';
+    for (const index in options) {
+      key = key + options[index];
+    }
+    return this.request.get('view', 'getrecordshistory', `recordhistory${key}`, options);
+  }
+
+  exportDiary(userId: number): Promise<any> {
+    return this.request.get('view', 'getexport', `export${userId}`, { userid: userId });
+  }
+
+  importDiary(file: File, userId: number, importType: string): Promise<any> {
+    const formData = new FormData();
+    formData.append('fileToUpload', file, file.name);
+    formData.set('userid', userId.toString());
+    formData.set('type', importType);
+    return this.request.upload('uploadimport', formData);
+  }
+
+  // Advanced import methods for CSV import workflow
+  uploadImport(csvFile: File, userId: number): Promise<string> {
+    const formData = new FormData();
+    formData.append('fileToUpload', csvFile, csvFile.name);
+    formData.set('userid', userId.toString());
+    return this.request.upload('uploadimportfile', formData).then((response: any) => {
+      // Return the full URL to the uploaded CSV file
+      return response;
+    });
+  }
+
+  getCSVData(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      fetch(url)
+        .then(response => response.text())
+        .then(data => resolve(data))
+        .catch(error => reject(error));
+    });
+  }
+
+  getImports(): Promise<any> {
+    return this.request.get('view', 'getimports', 'imports', {});
+  }
+
+  importFile(fileUrl: string, delimiter: string, mapping: string, importType: string): Promise<any> {
+    return this.request.modify('edit', 'importfile', {
+      file: fileUrl,
+      delimiter,
+      mapping,
+      importtype: importType
     });
   }
 }

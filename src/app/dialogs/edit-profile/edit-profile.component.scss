@@ -4,6 +4,7 @@
 
 .dialog-title{
     position:relative;
+    padding-right:40px;
     mat-icon{
         cursor:pointer;
         position:absolute;
@@ -17,6 +18,74 @@
 
     mat-form-field{
         width:100%;
+    }
+
+    .avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        border-radius: 8px;
+
+        .avatar-preview {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+
+            &:hover {
+                transform: scale(1.05);
+
+                .avatar-overlay {
+                    opacity: 1;
+                }
+            }
+
+            .avatar-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+
+                mat-icon {
+                    color: white;
+                    font-size: 32px;
+                    width: 32px;
+                    height: 32px;
+                }
+            }
+        }
+
+        .avatar-text {
+            flex: 1;
+
+            h3 {
+                margin: 0 0 2px 0;
+                font-size: 16px;
+                font-weight: 500;
+                color: rgba(0, 0, 0, 0.87);
+            }
+
+            p {
+                margin: 0;
+                font-size: 14px;
+                color: rgba(0, 0, 0, 0.6);
+            }
+        }
     }
 
 }

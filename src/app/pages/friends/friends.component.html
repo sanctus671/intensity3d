@@ -1,0 +1,156 @@
+<div class="friends">
+    
+    <h2 class="friends__title">{{ 'Friends' | translate }}</h2>
+    
+    <div class="friends__actions">
+        <button mat-flat-button color="primary" (click)="addFriends()">{{ 'Add Friends' | translate }}</button>
+        <button mat-stroked-button color="primary" (click)="invite()">{{ 'Invite Friends' | translate }}</button>
+    </div>
+    
+    
+    <mat-tab-group class="friends__nav" mat-align-tabs="center">
+        <mat-tab [label]="'Friends' | translate">
+            
+            
+            <div class="friends__nav__friends-list friends-list">
+                
+                
+                @if (properties().loading) {
+                    <div class="friends-list__loading">
+                        <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                    </div>
+                }
+                
+                
+                @if (!properties().loading && friends().length < 1) {
+                    <div class="friends-list__empty">
+                        <mat-icon>group</mat-icon>
+                        <h2>{{ 'No Friends' | translate }}</h2>
+                    </div>
+                }
+                
+                @if (!properties().loading) {
+                    @for (friend of friends(); track friend.friendid) {
+                        <mat-card class="friends-list__friend friend">
+                                
+                            <div class="friend__avatar" [style.background-image]="'url(' + getDp(friend.dp) + ')'"></div>
+
+                            <h4>{{ formatName(friend) }}</h4>
+                            <div class="friend__actions">
+                                <button mat-flat-button color="primary" (click)="viewProfile(friend)">{{ 'View Profile' | translate }}</button>
+                            </div>
+                        </mat-card>
+                    }
+                }
+                
+                
+            </div>
+            
+            
+            
+        </mat-tab>    
+    
+        <mat-tab [label]="'Friend Activity' | translate">
+            <div class="friends__nav__friend-activity friend-activity">
+                
+                <!-- Loading State -->
+                @if (properties().activityLoading && friendActivity().length === 0) {
+                    <div class="friend-activity__loading">
+                        <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                        <p>{{ 'Loading activity...' | translate }}</p>
+                    </div>
+                }
+                
+                @if (!properties().activityLoading && friendActivity().length < 1) {
+                    <div class="friend-activity__empty">
+                        <mat-icon>timeline</mat-icon>
+                        <h2>{{ 'No Activity' | translate }}</h2>
+                    </div>
+                }
+
+                @if (friendActivity().length > 0) {
+                    <mat-list class='friend-activity__activity activity'>
+                    @for (exercise of friendActivity(); track exercise.assigneddate + exercise.exerciseid) {
+                        <mat-list-item (click)="copyExercise(exercise)">
+                            <img matListItemAvatar [src]="getDp(exercise.dp)" [attr.alt]="formatName(exercise)">
+                            <span matListItemTitle>
+                                {{ formatName(exercise) }} {{ 'tracked' | translate }} {{ exercise.sets}} {{ exercise.sets !== '1' ? ('sets' | translate) : ('set' | translate) }} {{ 'of' | translate }} {{exercise.name | translate}} {{ 'on' | translate }} {{formatDate(exercise.assigneddate)}}
+                            </span>
+                            <span matListItemLine>{{ 'The last set was' | translate }} {{exercise.reps}} {{ 'reps' | translate }} {{ 'of' | translate }} {{exercise.weight}}{{exercise.units}}</span>
+                            <div  matListItemMeta>
+                                <mat-icon>file_copy</mat-icon>
+                            </div>
+                        </mat-list-item>
+                    }
+                    </mat-list>  
+
+                    @if (friendActivity().length > 0 && properties().canloadmore) {
+               
+                        <div class="activity__load-more">
+                            <button 
+                                mat-stroked-button 
+                                color="primary"
+                                (click)="loadMoreActivity()" 
+                                [disabled]="properties().activityLoading">
+                                {{ "Load more" | translate }}
+                                @if (properties().activityLoading) {
+                                    <mat-spinner diameter="15" color="accent"></mat-spinner>
+                                }
+                            </button>
+                        </div>   
+
+
+                    }
+
+                 
+                    
+
+
+                }
+                
+            </div>
+            
+        </mat-tab>     
+        
+        
+        <mat-tab [label]="('Friend Requests' | translate) + (friendRequests().length > 0 ? (' (' + friendRequests().length + ')') : '')">
+            <div class="friends__nav__friend-requests friend-requests">
+                
+                <!-- Loading State -->
+                @if (properties().requestsLoading && friendRequests().length === 0) {
+                    <div class="friend-requests__loading">
+                        <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                        <p>{{ 'Loading requests...' | translate }}</p>
+                    </div>
+                }
+                
+                @if (!properties().requestsLoading && friendRequests().length < 1) {
+                    <div class="friend-requests__empty">
+                        <mat-icon>group_add</mat-icon>
+                        <h2>{{ 'No Requests' | translate }}</h2>
+                    </div>
+                }
+
+                @if (friendRequests().length > 0) {
+                    <mat-list class='friend-requests__requests requests'>
+                    @for (friend of friendRequests(); track friend.userid; let i = $index) {
+                        <a mat-list-item [routerLink]="['/friends/' + friend.userid]">
+                            <img matListItemAvatar [src]="getDp(friend.dp)" [attr.alt]="formatName(friend)">
+                            <span matListItemTitle>{{ formatName(friend) }}</span>
+                            <div  matListItemMeta>
+                            <button mat-icon-button (click)="approveFriend($event, friend, i)" [attr.aria-label]="'Approve friend request' | translate" [matTooltip]="'Approve friend request' | translate"><mat-icon>done</mat-icon></button>
+                            <button mat-icon-button color="primary" (click)="declineFriend($event, friend, i)" [attr.aria-label]="'Decline friend request' | translate" [matTooltip]="'Decline friend request' | translate"><mat-icon>close</mat-icon></button>
+                        </div>
+                        </a>
+                    }
+                    </mat-list>    
+                }
+                
+            </div>            
+            
+        </mat-tab>         
+        
+    </mat-tab-group>
+    
+    
+</div>

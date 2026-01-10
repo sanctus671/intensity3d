@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>{{ 'Change Reps' | translate }}</h2>
+
+<mat-dialog-content>
+  <p>{{ 'View the ranking of a differant rep range.' | translate }}</p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'Reps' | translate }}</mat-label>
+    <input 
+      matInput 
+      type="number" 
+      [(ngModel)]="reps" 
+      min="1"
+      [attr.aria-label]="'Reps' | translate">
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dismiss()">{{ 'Cancel' | translate }}</button>
+  <button mat-raised-button color="primary" (click)="update()">{{ 'Update' | translate }}</button>
+</mat-dialog-actions>

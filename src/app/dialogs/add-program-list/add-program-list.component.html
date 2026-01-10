@@ -16,7 +16,7 @@
     <mat-tab-group class="add-program-list__nav" [selectedIndex]="properties.selectedTab">
         <mat-tab [label]="'Recommended' | translate">
             <mat-nav-list>
-                @for (recommendedProgram of recommendedPrograms | exerciseSearch:properties.search; track recommendedProgram.id) {
+                @for (recommendedProgram of recommendedPrograms | exerciseSearch:properties.search; track recommendedProgram['id']) {
                     <mat-list-item (click)="selectProgram(recommendedProgram)">
                         {{ recommendedProgram.name }}
                         <mat-icon matListIcon>chevron_right</mat-icon>
@@ -27,7 +27,7 @@
         
         <mat-tab [label]="('Recent' | translate) + (recentPrograms.length > 0 ? ' (' + recentPrograms.length + ')' : '')">
             <mat-nav-list>
-                @for (recentProgram of recentPrograms | exerciseSearch:properties.search; track recentProgram.id) {
+                @for (recentProgram of recentPrograms | exerciseSearch:properties.search; track recentProgram['id']) {
                     <mat-list-item (click)="selectProgram(recentProgram)">
                         {{ recentProgram.name }}
                         <mat-icon matListIcon>chevron_right</mat-icon>
@@ -38,7 +38,7 @@
         
         <mat-tab [label]="('All Programs' | translate) + (programs.length > 0 ? ' (' + numberWithCommas(programs.length) + ')' : '')">
             <mat-nav-list class="program-list">
-                @for (program of programs | exerciseSearch:properties.search | slice:0:properties.programLimit; track program.id; let i = $index) {
+                @for (program of programs | exerciseSearch:properties.search | slice:0:properties.programLimit; track program['id']; let i = $index) {
                     <mat-list-item (click)="selectProgram(program)">
                         {{ program.name }}
                         <mat-icon matListIcon>chevron_right</mat-icon>

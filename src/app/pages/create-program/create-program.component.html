@@ -1,0 +1,191 @@
+<div class="create-program" [class.program--is-dialog]="properties().isDialog">
+    
+    @if (properties().loading) {
+        <div class="create-program__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+    
+    @if (!properties().loading) {
+        <div>
+    
+            <div class="create-program__header">
+                <mat-form-field>
+                    <input matInput 
+                           [placeholder]="'Program Name' | translate" 
+                           type="text" 
+                           name="name" 
+                           [(ngModel)]="program().name"
+                           [attr.aria-label]="'Program Name' | translate">
+                </mat-form-field>
+                
+                <mat-form-field>
+                    <textarea matInput 
+                              [placeholder]="'Description' | translate" 
+                              [(ngModel)]="program().description" 
+                              cdkTextareaAutosize 
+                              cdkAutosizeMinRows="2"
+                              [attr.aria-label]="'Description' | translate"></textarea>
+                </mat-form-field>
+                
+                <mat-checkbox [(ngModel)]="program().public" 
+                              labelPosition="before" 
+                              color="primary">
+                    {{ 'Public' | translate }}
+                </mat-checkbox>
+            </div>
+            
+            <div class="create-program__tabs" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropTab($event)">
+                @for (tab of tabs(); track tab; let i = $index) {
+                    <div class="create-program__tabs__tab tab" cdkDrag>
+                        <button (click)="setActiveTab(tab)" 
+                                mat-button 
+                                [class.mat-flat-button]="properties().activeTab === tab"
+                                [class.mat-stroked-button]="properties().activeTab !== tab"
+                                color="primary"
+                                [attr.aria-label]="tab">
+                            {{ tab }}
+                        </button>
+                        
+                        <div class="tab__actions">
+                            <button mat-icon-button 
+                                    color="primary" 
+                                    (click)="copyTab(tab, i)"
+                                    [attr.aria-label]="'Copy ' + tab | translate">
+                                <mat-icon>file_copy</mat-icon>
+                            </button>
+                            <button mat-icon-button 
+                                    color="primary" 
+                                    (click)="removeTab(tab, i)"
+                                    [attr.aria-label]="'Remove ' + tab | translate">
+                                <mat-icon>delete_outline</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                }
+                
+                <button mat-button 
+                        color="primary" 
+                        (click)="addWeek()"
+                        [attr.aria-label]="'Add Week' | translate">
+                    <mat-icon>add</mat-icon>
+                    {{ 'Add Week' | translate }}
+                </button>
+                
+                <button mat-button 
+                        (click)="openAutoExtend()"
+                        [attr.aria-label]="'Auto Extend' | translate">
+                    <mat-icon>sync</mat-icon>
+                    {{ 'Auto Extend' | translate }}
+                </button>
+            </div>            
+            
+            <div class="create-program__program-workouts" id="program-workouts" cdkDropList (cdkDropListDropped)="dropWorkout($event)">
+                @for (workout of program().workouts; track workout.day; let i = $index) {
+                    @if (isInTab(workout)) {
+                        <div class="create-program__program-workouts__workout-list workout-list" cdkDrag>
+                            <mat-list cdkDropList (cdkDropListDropped)="dropExercise($event, workout)">
+                                <h3 matSubheader>
+                                    <span cdkDragHandle>{{ workout.name }}</span>
+                                    <div class="workout-list__actions">
+                                        <button mat-button 
+                                                (click)="copyWorkout(workout)"
+                                                [attr.aria-label]="'Copy workout' | translate">
+                                            {{ 'Copy' | translate }}
+                                        </button>
+                                        <button mat-button 
+                                                (click)="editWorkout(workout)"
+                                                [attr.aria-label]="'Edit workout' | translate">
+                                            {{ 'Edit' | translate }}
+                                        </button>
+                                        <button mat-button 
+                                                (click)="deleteWorkout(i, workout)"
+                                                [attr.aria-label]="'Delete workout' | translate">
+                                            {{ 'Delete' | translate }}
+                                        </button>
+                                    </div>
+                                </h3>
+                                
+                                <div class="workout-list__notes">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>{{ 'Add notes...' | translate }}</mat-label>
+                                        <textarea matInput 
+                                                  [(ngModel)]="workout.workoutnotes"
+                                                  cdkTextareaAutosize
+                                                  cdkAutosizeMinRows="1"
+                                                  [attr.aria-label]="'Workout notes' | translate"></textarea>
+                                    </mat-form-field>
+                                </div>
+                                
+                                @for (exercise of workout.exercises; track exercise.exerciseid; let i2 = $index) {
+                                    <div class="mat-list-base" cdkDrag cdkDragHandle>
+                                        <mat-list-item class="workout-list__exercise">
+                                            <h2 matLine>{{ exercise.name }}</h2>
+                                            <p matLine>
+                                                {{ exercise.sets ? exercise.sets : 0 }} {{ 'set' | translate }}@if (exercise.sets !== '1') {<span>s</span>} {{ 'of' | translate }} {{ exercise.reps ? exercise.reps : 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ 'rep' | translate }}@if (exercise.maxreps || exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
+                                            </p>
+                                            <div class="workout-list__exercise__actions">
+                                                <button mat-button 
+                                                        (click)="copyExercise(workout, exercise)"
+                                                        [attr.aria-label]="'Copy exercise' | translate">
+                                                    {{ 'Copy' | translate }}
+                                                </button>
+                                                <button mat-button 
+                                                        (click)="editExercise(exercise)"
+                                                        [attr.aria-label]="'Edit exercise' | translate">
+                                                    {{ 'Edit' | translate }}
+                                                </button>
+                                                <button mat-button 
+                                                        (click)="deleteExercise(i2, workout)"
+                                                        [attr.aria-label]="'Delete exercise' | translate">
+                                                    {{ 'Delete' | translate }}
+                                                </button>
+                                            </div>
+                                        </mat-list-item>
+                                    </div>
+                                }
+                                
+                                <button mat-stroked-button 
+                                        color="primary" 
+                                        (click)="addExercise(workout)" 
+                                        class="workout-list__add-exercise"
+                                        [attr.aria-label]="'Add Exercise' | translate">
+                                    <mat-icon>add</mat-icon>
+                                    {{ 'Add Exercise' | translate }}
+                                </button>
+                            </mat-list>
+                        </div>
+                    }
+                }
+            </div>            
+            
+            <div class="create-program__add-workout" 
+                 (click)="addWorkout()"
+                 role="button"
+                 tabindex="0"
+                 [attr.aria-label]="'Add Workout' | translate">
+                <mat-icon>add</mat-icon>
+                {{ 'Add Workout' | translate }}
+            </div>
+            
+            <div class='create-program__actions'>
+                <div class='create-program__actions__inner'>
+                    <button mat-flat-button 
+                            color="primary" 
+                            (click)="createProgram()" 
+                            [disabled]="!program().name || properties().creating"
+                            [attr.aria-label]="'Create Program' | translate">
+                        {{ 'Create Program' | translate }}
+                        @if (properties().creating) {
+                            <mat-spinner class='button-spinner' diameter="14" mode="indeterminate"></mat-spinner>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+

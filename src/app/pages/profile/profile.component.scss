@@ -1,0 +1,389 @@
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  
+  .profile-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+  }
+  
+  // Back Button
+  .profile-back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    
+    button {
+      margin: 0;
+    }
+    
+    span {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--mat-app-on-surface);
+    }
+    
+    &:hover {
+      span {
+        color: var(--mat-app-primary);
+      }
+    }
+  }
+  
+  // Loading States
+  .profile-info-loading,
+  .activity-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    gap: 16px;
+    
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--mat-app-on-surface-variant);
+    }
+  }
+  
+  // Profile Header Section
+  .profile-header {
+    margin-bottom: 24px;
+    
+    &__content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+    }
+    
+    &__avatar-section {
+      flex-shrink: 0;
+      position:relative;
+    }
+    
+    &__info {
+      flex: 1;
+      min-width: 0;
+      
+      @media (max-width: 768px) {
+        width: 100%;
+      }
+    }
+    
+    &__name-section {
+      margin-bottom: 24px;
+
+      p{
+        margin:0 auto;
+        margin-top:10px;
+        max-width:300px;
+        text-align:center;
+      }
+    }
+    
+    &__actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      
+      @media (max-width: 768px) {
+        justify-content: center;
+      }
+      
+      button {
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+  
+  // Avatar Styling
+  .profile-avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background-color: var(--mat-app-surface-container);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    border: 4px solid var(--mdc-elevated-card-container-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.02);
+      
+      .profile-avatar__overlay {
+        opacity: 1;
+      }
+    }
+    
+    &__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        margin-bottom: 4px;
+      }
+      
+      span {
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+    
+    &__gender-icon {
+      position: absolute;
+      bottom: 5px;
+      right: 0px;
+      width: 32px;
+      height: 32px;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &--female {
+        color: #e91e63;
+      }
+      
+      &--male {
+        color: #2196f3;
+      }
+      
+      &--other {
+        color: #d44735;
+      }
+    }
+  }
+  
+  // Name and Username
+  .profile-username {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+    color: var(--mat-app-on-surface);
+  }
+  
+  // Main Content Area
+  .profile-main {
+    max-width:800px;
+    margin:0 auto;
+    margin-top:40px;
+  }
+  
+  // Sidebar
+  .profile-sidebar {
+    @media (max-width: 968px) {
+      order: 2;
+    }
+  }
+  
+
+  
+  // Activity Feed
+  .profile-activity-feed {
+    @media (max-width: 968px) {
+      order: 1;
+    }
+  }
+  
+  .activity-card {
+    border-radius: 12px;
+    background:none;
+    box-shadow:none;
+    
+    mat-card-header {
+      padding: 20px 20px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      mat-card-title {
+        font-size: 20px;
+        font-weight: 500;
+        margin: 0;
+      }
+    }
+    
+    mat-card-content {
+      padding: 0;
+    }
+    
+    .activity-card-actions {
+      button {
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+  
+  // Empty State
+  .activity-empty {
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--mat-app-on-surface-variant);
+    
+    mat-icon {
+      font-size: 80px;
+      width: 80px;
+      height: 80px;
+      opacity: 0.3;
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0 0 8px 0;
+    }
+    
+    p {
+      font-size: 14px;
+      margin: 0;
+      opacity: 0.7;
+    }
+  }
+  
+  // Activity List
+
+
+  mat-list-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+        background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+        
+        .dark-theme & {
+            background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.04));
+        }
+    }
+    
+    &:focus-visible {
+        outline: 2px solid var(--mat-primary-color, #d44735);
+        outline-offset: 2px;
+    }
+
+    .mat-mdc-list-item-meta{
+        align-self:center;
+    }
+
+    .mat-mdc-list-item-avatar{
+        background-color:White;
+        border: 1px solid var(--divider-color);
+    }
+    
+    mat-icon {
+        opacity: 0.4;
+        transition: opacity 0.2s ease;
+        
+        mat-list-item:hover & {
+            opacity: 0.7;
+        }
+    }
+}
+  
+    
+  .activity__load-more{
+    text-align: center;
+    padding: 20px 0 30px 0;
+    
+    button{
+        position: relative;
+        
+        mat-spinner{
+            width: 15px;
+            height: 15px;
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+}
+}
+
+// Responsive Design
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 16px;
+    
+    .profile-header__content {
+      padding: 24px 16px;
+    }
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      
+      &__gender-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+      }
+    }
+    
+    .profile-username {
+      font-size: 24px;
+    }
+    
+    .profile-main {
+      gap: 16px;
+    }
+    
+    .activity-item {
+      gap: 12px;
+      
+      &__icon {
+        width: 36px;
+        height: 36px;
+        
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .profile-container {
+    .profile-header__actions,
+    .activity-card-actions,
+    .activity-item__action {
+      display: none;
+    }
+  }
+}

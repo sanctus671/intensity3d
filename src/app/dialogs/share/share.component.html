@@ -4,7 +4,7 @@
 </div>
 
 <mat-dialog-content class="share">
-    @if (shareType === 'workout') {
+    @if (shareType === 'workout' && showShareTypeSelector) {
         <mat-form-field>
             <mat-label>{{ 'What sets do you want to share?' | translate }}</mat-label>
             <mat-select [(ngModel)]="details.type" (ngModelChange)="generateWorkoutDescription()">

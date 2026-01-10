@@ -1,0 +1,91 @@
+<div class="bodyweight">
+    <h2 class="bodyweight__title">{{ 'Bodyweight' | translate }}</h2>
+    
+    <div class="bodyweight__actions">
+        <button mat-flat-button color="primary" (click)="addBodyweight()">
+            <mat-icon>add</mat-icon>
+            {{ 'Add Bodyweight' | translate }}
+        </button>
+        <button mat-stroked-button color="primary" (click)="openImportExport()">
+            <mat-icon>import_export</mat-icon>
+            {{ 'Import/Export' | translate }}
+        </button>
+    </div>  
+    
+    @if (isLoading()) {
+        <div class="bodyweight__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+
+    @if (!isLoading() && bodyweights().length < 1) {
+        <div class="bodyweight__empty">
+            <mat-icon>accessibility</mat-icon>
+            <h2>{{ 'No Entries' | translate }}</h2>
+            <p>{{ 'You have no added bodyweight entries.' | translate }}</p>
+        </div>
+    }
+    
+    @if (bodyweights().length > 0 && chartOptions()) {
+        <div 
+            echarts 
+            [options]="chartOptions()" 
+            class="bodyweight__chart"
+            (chartInit)="onChartInit($event)">
+        </div>
+        
+        <mat-card class="bodyweight__list">
+            <mat-nav-list>
+                @for (bodyweight of visibleBodyweights(); track bodyweight.id || $index; let i = $index) {
+                    <mat-list-item (click)="editBodyweight(i, bodyweight)">
+                        <h3 matListItemTitle>
+                            {{bodyweight.weight}}{{account().units}}
+                        </h3>
+                        <p matListItemLine>
+                            {{formatDate(bodyweight.created)}}
+                        </p>    
+                        <button mat-button matListItemMeta>
+                            <mat-icon>edit</mat-icon>
+                            {{ 'Edit' | translate }}
+                        </button>
+                        <button 
+                            mat-button 
+                            color="warn" 
+                            matListItemMeta
+                            (click)="deleteBodyweight($event, i, bodyweight)">
+                            <mat-icon>delete</mat-icon>
+                            {{ 'Delete' | translate }}
+                        </button>
+                    </mat-list-item>
+                }
+            </mat-nav-list>
+            
+            @if (hasMore()) {
+                <div class="bodyweight__list-actions">
+                    <p class="bodyweight__list-info">
+                        {{ 'Showing' | translate }} {{visibleCount()}} {{ 'of' | translate }} {{bodyweights().length}} {{ 'entries' | translate }}
+                    </p>
+                    <div class="bodyweight__list-buttons">
+                        <button mat-button color="primary" (click)="showMore()">
+                            <mat-icon>expand_more</mat-icon>
+                            {{ 'Show More' | translate }}
+                        </button>
+                        <button mat-stroked-button color="primary" (click)="showAll()">
+                            {{ 'Show All' | translate }}
+                        </button>
+                    </div>
+                </div>
+            } @else if (bodyweights().length > 10) {
+                <div class="bodyweight__list-actions">
+                    <p class="bodyweight__list-info">
+                        {{ 'Showing all' | translate }} {{bodyweights().length}} {{ 'entries' | translate }}
+                    </p>
+                    <button mat-button color="primary" (click)="resetView()">
+                        <mat-icon>expand_less</mat-icon>
+                        {{ 'Show Less' | translate }}
+                    </button>
+                </div>
+            }
+        </mat-card>
+    }
+</div>

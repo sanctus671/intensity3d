@@ -1,0 +1,163 @@
+// Settings component styles
+.settings {
+    margin-top: 20px;
+    max-width: 600px;
+    padding: 50px 40px;
+    margin: 0 auto;
+    
+    .settings__title {
+        border-bottom: 1px solid var(--divider-color, rgba(213, 216, 222, 0.3));
+        margin: 0 auto;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        width: 50%;
+        text-align: center;
+        color: var(--text-primary);
+    }
+    
+    // Subheader styling
+    .mat-mdc-subheader {
+        color: var(--primary-color, #d44735);
+        font-weight: 500;
+    }
+    
+    // List item styling
+    .mat-mdc-list-item {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+            background-color: var(--hover-color, rgba(0, 0, 0, 0.04));
+        }
+        
+        .settings__chevron {
+            margin-left: auto;
+            opacity: 0.3;
+        }
+        
+        mat-spinner {
+            margin-left: auto;
+            margin-right: 10px;
+        }
+        
+        &.loading {
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        &.premium-link.purchased {
+            pointer-events: none;
+            opacity: 0.5;
+            
+            .settings__premium-badge {
+                color: var(--primary-color, #d44735);
+                font-size: 12px;
+                display: inline-block;
+                margin-left: auto;
+                padding: 4px 8px;
+                border-radius: 4px;
+                background-color: var(--primary-color-light, rgba(212, 71, 53, 0.1));
+            }
+        }
+    }
+    
+    // Delete account styling
+    .settings__delete-account {
+        .settings__delete-text {
+            color: var(--warn-color, #f44336);
+        }
+    }
+    
+    // Inline select styling
+    .settings__inline-select {
+        margin-left: auto;
+        width: 150px;
+        
+        .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+        }
+    }
+    
+    // Form elements styling
+    .settings__form-elements {
+        padding: 0 16px;
+        margin-bottom: 10px;
+        
+        mat-form-field,
+        .mat-mdc-form-field {
+            width: 100%;
+            display: block;
+            margin-bottom: 16px;
+        }
+        
+        .settings__form-elements__units {
+            margin-top: 5px;
+        }
+        
+        .mat-mdc-checkbox {
+            width: 100%;
+            display: block;
+            padding: 10px 0;
+            
+            .mdc-form-field {
+                display: flex;
+                width: 100%;
+                
+                label {
+                    flex: 1;
+                    order: -1;
+                }
+            }
+        }
+    }
+    
+    // Version text styling
+    .settings__version {
+        text-align: center;
+        font-size: 0.75rem;
+        opacity: 0.5;
+        margin-top: 30px;
+        color: var(--text-primary);
+    }
+}
+
+
+// Dark theme overrides
+:host-context(.dark-theme) {
+    .settings {
+        .settings__title {
+            border-bottom-color: rgba(255, 255, 255, 0.12);
+        }
+        
+        .mat-mdc-list-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+    }
+}
+
+// Responsive design
+@media screen and (max-width: 768px) {
+    .settings {
+        padding: 30px 20px;
+        
+        .settings__title {
+            width: 70%;
+        }
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .settings {
+        padding-left: 15px;
+        padding-right: 15px;
+        
+        .settings__title {
+            width: 90%;
+            font-size: 1.5rem;
+        }
+        
+        .settings__inline-select {
+            width: 120px;
+        }
+    }
+}

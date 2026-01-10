@@ -1,0 +1,295 @@
+
+.plate-options-popover{
+    --width:200px;
+}
+
+.warmup-calculator{
+
+
+    .dialog-title{
+        position:relative;
+        mat-icon{
+            cursor:pointer;
+            position:absolute;
+            top:20px;
+            right:20px;
+        }
+    }
+
+
+    h6.warmup-calculator__options-title {
+        margin: 0px;
+        margin-top: 35px;
+        margin-bottom: 10px;
+        font-weight: 500;
+        font-size:14px;
+
+    }
+
+    .warmup-calculator__options{
+        mat-expansion-panel{
+            border: 1px solid color-mix(in srgb, var(--mat-sidenav-content-text-color) 5%, transparent);
+            border-radius: 5px;
+            box-shadow: none;
+            margin-bottom:10px;
+        }
+    }
+
+    mat-form-field.full-width{
+        width:100%;
+    }
+
+    .warmup-result-title{
+        
+        font-weight: 500;
+        font-size:18px;
+    }
+
+    .warmup-result{
+
+        .warmup-set-item{
+
+            font-size:16px;
+            margin-top:10px;
+        }
+    }
+
+
+    .warmup-calculator__add-sets{
+        margin-left: 15px;
+        margin-right: 15px;
+        margin-top: 15px;
+    }
+
+    .warmup-calculator__color-settings{
+        padding-left: 16px;
+        padding-bottom: 10px;
+    }
+
+    .warmup-calculator__bar-weights{
+
+     
+        padding-bottom: 15px;
+
+
+        .warmup-calculator__bar-weights__title{
+            display:flex;
+            align-items: center;
+            padding-right:5px;
+            span{
+                flex:1;
+            }
+
+        }
+
+        .warmup-calculator__bar-weights__container{
+            white-space: nowrap;
+            overflow-x: auto;
+
+        }
+
+        .warmup-calculator__bar-weights__container__bar-weight{
+            display:inline-block;
+            opacity:0.5;
+            padding: 10px 5px;
+
+            &.warmup-calculator__bar-weights__container__bar-weight--selected{
+                opacity:1;
+            }
+        }
+
+    }
+
+
+    .warmup-calculator__plates-selection{
+     
+    
+        padding-bottom: 15px;
+
+        .warmup-calculator__plates-selection__title{
+            display:flex; 
+            align-items: center;
+            padding-right:5px;
+            span{
+                flex:1;
+            }
+
+        }
+
+        .warmup-calculator__plates-selection__container{
+
+            white-space: nowrap;
+            overflow-x: scroll;
+            margin-top:5px;
+
+        }
+
+        .warmup-calculator__plates-selection__container__plate{
+            width:50px;
+            height:50px;
+            border-radius:25px;
+            margin-right: 10px;
+            background-color:black;
+            display:inline-block;
+            opacity:0.3;
+            color:white;
+            text-align:center;
+            line-height:50px;
+            font-size:12px;
+
+            &.warmup-calculator__plates-selection__container__plate--selected{
+                opacity:1;
+            }
+
+            &.warmup-calculator__plates-selection__container__plate--25kg,
+            &.warmup-calculator__plates-selection__container__plate--55lbs
+            {
+                background-color: var(--plate-color-25kg-55lbs, #AC333A);
+                color: var(--plate-text-color-25kg-55lbs, #FFFFFF);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--20kg,
+            &.warmup-calculator__plates-selection__container__plate--45lbs{
+                background-color: var(--plate-color-20kg-45lbs, #194C96);
+                color: var(--plate-text-color-20kg-45lbs, #FFFFFF);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--15kg,
+            &.warmup-calculator__plates-selection__container__plate--35lbs{
+                background-color: var(--plate-color-15kg-35lbs, #ffdb2c);
+                color: var(--plate-text-color-15kg-35lbs, black);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--10kg,
+            &.warmup-calculator__plates-selection__container__plate--25lbs{
+                background-color: var(--plate-color-10kg-25lbs, #3A8459);
+                color: var(--plate-text-color-10kg-25lbs, #FFFFFF);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--5kg,
+            &.warmup-calculator__plates-selection__container__plate--10lbs{
+                background-color: var(--plate-color-5kg-10lbs, rgb(250, 250, 250));
+                color: var(--plate-text-color-5kg-10lbs, black);
+                position:relative;
+                &:after{
+                    content: "";
+                    width:48px;
+                    height:48px;
+                    border:1px solid var(--plate-text-color-5kg-10lbs, black);
+                    position: absolute;
+                    left: 0px;
+                    right: 0px;
+                    border-radius: 25px;
+                }
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--2point5kg,
+            &.warmup-calculator__plates-selection__container__plate--5lbs{
+                background-color: var(--plate-color-2point5kg-5lbs, #545454);
+                color: var(--plate-text-color-2point5kg-5lbs, #FFFFFF);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--1point25kg,
+            &.warmup-calculator__plates-selection__container__plate--2point5lbs{
+                background-color: var(--plate-color-1point25kg-2point5lbs, #9F9F9F);
+                color: var(--plate-text-color-1point25kg-2point5lbs, #FFFFFF);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--smaller{
+                background-color: var(--plate-color-smaller, #E9E9E7);
+                color: var(--plate-text-color-smaller, black);
+            }
+
+
+            &.warmup-calculator__plates-selection__container__plate--larger{
+                background-color: var(--plate-color-larger, #1a1a1a);
+                color: var(--plate-text-color-larger, #FFFFFF);
+            }
+
+
+
+
+
+        }
+
+    }
+
+
+    .warmup-calculator__units-selection{
+
+    }
+
+    .warmup-calculator__custom{
+        margin-top:15px;
+
+        .warmup-calculator__custom__set{
+            border: 1px solid #e1e1e0;
+            border-radius: 15px;
+            padding: 20px 20px;
+            margin-bottom:15px;
+            position:relative;
+            
+            
+            h6{
+                font-size:14px;
+                margin-top:0px;
+                margin-bottom:10px;
+
+            }
+            .warmup-calculator__custom__set__data{
+                display:flex;
+                gap:5px;
+                flex-wrap: wrap;
+                
+                .warmup-calculator__custom__set__data__reps{
+                    flex: 1 1 60px;
+                    min-width: 60px;
+                }
+
+                .warmup-calculator__custom__set__percentage{
+                    flex: 2 1 120px;
+                    min-width: 100px;
+                }
+
+                .warmup-calculator__custom__set__weight{
+                    flex: 2 1 140px;
+                    min-width: 120px;
+                }
+
+                // Stack vertically on very small screens
+                @media (max-width: 400px) {
+                    flex-direction: column;
+                    
+                    .warmup-calculator__custom__set__data__reps,
+                    .warmup-calculator__custom__set__percentage,
+                    .warmup-calculator__custom__set__weight {
+                        width: 100%;
+                        min-width: unset;
+                    }
+                }
+            }
+
+            ion-icon{
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 18px;
+            }
+        }
+
+        .warmup-calculator__add-set{
+            margin-inline:16px;
+        }
+
+
+    }
+    
+
+}

@@ -1,0 +1,84 @@
+<div class="points-calculator">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>IPF-GL/Wilks/DOTS {{ "Calculator" | translate }}</h2>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Weight Lifted" | translate }}</mat-label>
+      <input matInput type="number" [(ngModel)]="selectedValues().weight" (ngModelChange)="updateWeight($event)">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Gender" | translate }}</mat-label>
+      <mat-select [(ngModel)]="selectedValues().gender" (ngModelChange)="updateGender($event)">
+        <mat-option value="Male">{{ "Male" | translate }}</mat-option>
+        <mat-option value="Female">{{ "Female" | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Unit" | translate }}</mat-label>
+      <mat-select [(ngModel)]="selectedValues().units" (ngModelChange)="updateUnits($event)">
+        <mat-option value="kg">kg</mat-option>
+        <mat-option value="lbs">lbs</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Body Weight" | translate }}</mat-label>
+      <input matInput type="number" [(ngModel)]="selectedValues().bodyWeight" (ngModelChange)="updateBodyWeight($event)">
+    </mat-form-field>
+
+    <p class="points-calculator__info">{{ "These values only used in IPF GL and IPF calculations:" | translate }}</p>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Event" | translate }}</mat-label>
+      <mat-select [(ngModel)]="selectedValues().event" (ngModelChange)="updateEvent($event)">
+        <mat-option value="raw">{{ "Classic/Raw" | translate }}</mat-option>
+        <mat-option value="equipped">{{ "Equipped" | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Category" | translate }}</mat-label>
+      <mat-select [(ngModel)]="selectedValues().category" (ngModelChange)="updateCategory($event)">
+        <mat-option value="full">{{ "Full Meet" | translate }}</mat-option>
+        <mat-option value="bench">{{ "Bench Only" | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    @if (selectedValues().gender && selectedValues().units && selectedValues().weight && selectedValues().bodyWeight) {
+      <div class="points-calculator__results">
+        <p class="points-calculator__results__result">
+          {{ "Old" | translate }} Wilks: <strong>{{calculateOldWilks(selectedValues().bodyWeight, selectedValues().weight, selectedValues().gender) | number:'1.0-2'}}</strong>
+        </p>
+
+        <p class="points-calculator__results__result">
+          Wilks2: <strong>{{calculateNewWilks(selectedValues().bodyWeight, selectedValues().weight, selectedValues().gender) | number:'1.0-2'}}</strong>
+        </p>
+
+        <p class="points-calculator__results__result">
+          DOTS: <strong>{{calculateDOTS(selectedValues().bodyWeight, selectedValues().weight, selectedValues().gender) | number:'1.0-2'}}</strong>
+        </p>
+
+        @if (selectedValues().event && selectedValues().category) {
+          <div>
+            <p class="points-calculator__results__result">
+              IPF: <strong>{{calculateIPF(selectedValues().bodyWeight, selectedValues().weight, selectedValues().gender, selectedValues().event, selectedValues().category) | number:'1.0-2'}}</strong>
+            </p>
+
+            <p class="points-calculator__results__result">
+              IPF GL: <strong>{{calculateIPFGL(selectedValues().bodyWeight, selectedValues().weight, selectedValues().gender, selectedValues().event, selectedValues().category) | number:'1.0-2'}}</strong>
+            </p>
+          </div>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ "Close" | translate }}</button>
+  </mat-dialog-actions>
+</div>

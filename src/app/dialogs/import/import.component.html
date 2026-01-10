@@ -1,61 +1,340 @@
-<div class="dialog-title">
-    <h2 mat-dialog-title>{{ 'Import Data' | translate }}</h2>
-    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
-</div>
+<h2 mat-dialog-title>{{ "Import Data" | translate }}</h2>
 
-<mat-dialog-content class="import">
-    <mat-form-field>
-        <mat-label>{{ 'Import From' | translate }}</mat-label>
-        <mat-select [(ngModel)]="import.type" name="import-from">
-            <mat-option value="fitnotes">FitNotes</mat-option>
+<mat-dialog-content class="import-data">
+  <mat-stepper [linear]="true" [selectedIndex]="currentStep()" #stepper>
+    <!-- Step 1: Upload -->
+    <mat-step [completed]="uploadedFile() !== null">
+      <ng-template matStepLabel>{{ "Upload" | translate }}</ng-template>
+      
+      <div class="import-step">
+        <h3>{{ "Upload File" | translate }}</h3>
+        <p>{{ "Select your workout data file to import. This must be in .CSV format." | translate }}</p>
+        
+        <mat-form-field appearance="outline" class="import-type-select">
+          <mat-label>{{ "Import from" | translate }}</mat-label>
+          <mat-select [(ngModel)]="importType">
             <mat-option value="strong">Strong</mat-option>
+            <mat-option value="hevy">Hevy</mat-option>
             <mat-option value="stronglifts">Stronglifts 5x5</mat-option>
-            <mat-option value="fitocracy">Fitocracy</mat-option>
-            <mat-option value="intensity">Intensity</mat-option>
-            <mat-option value="custom">Custom</mat-option>
-        </mat-select>
-    </mat-form-field>   
-    
-    <p class="import__upload">CSV File</p>
-    
-    <button mat-flat-button matSuffix color="primary" (click)="uploadFile()">
-        {{ 'Choose File' | translate }}
-    </button>
-    <span class="import__filename">{{ import.filename }}</span>
-    <input id="csvFile" name="csvFile" hidden required type="file" accept=".csv" (change)="selectFile($event)">    
-    
-    @if (import.type) {
-        <p class="import__import-explaination">
-            {{ 'Make sure your file is in CSV format with the following columns in the correct order' | translate }}:
-            @if (import.type === 'fitnotes') {
-                <span>date (in yyyy-mm-dd format), exercise, (not imported), weight, reps, distance, distance unit, time</span>
-            }
-            @if (import.type === 'strong') {
-                <span>Note: columns must be seperated by a semicolon rather than a comma. Columns: date (in yyyy-mm-dd hh:mm:ss format), (not imported), exercise, set, weight, unit, reps, distance, distance unit, time, notes</span>
-            }
-            @if (import.type === 'stronglifts') {
-                <span>date (in mm/dd/yyyy format), notes, (not imported), bodyweight, repeated per exercise: exercise, weight (kg), weight(lbs), reps x 5</span>
-            }
-            @if (import.type === 'fitocracy') {
-                <span>exercise, date (in yyyy-mm-dd format), (not imported), weight, (not imported), reps, (not imported), unit</span>
-            }
-            @if (import.type === 'intensity') {
-                <span>date (in yyyy-mm-dd format), exercise, exercise id, reps, set, weight, rpe, percentage, set type, rest, unit, distance, distance unit, time, completed (0 = no, 1 = yes), notes</span>
-            }
-            @if (import.type === 'custom') {
-                <span>date (in dd/mm/yyyy format), exercise, reps, set, weight, rpe, percentage, completed (0 = no, 1 = yes), notes</span>
-            }
-        </p>
+            <mat-option value="fitnotes">FitNotes</mat-option>
+            <mat-option value="other">{{ "Other" | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-        <p class="import__import-explaination">
-            {{ 'If the columns above do not match your exported file or if your import fails in any way' | translate }}, <a href="mailto:support@intensityapp.com">{{ 'let us know' | translate }}</a>.        
-        </p>
+        <div class="file-select-container">
+          <input 
+            type="file" 
+            accept=".csv"
+            #fileInput
+            (change)="selectFile($event)"
+            style="display: none;">
+          
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="fileInput.click()"
+            [disabled]="isUploading()">
+            <mat-icon>cloud_upload</mat-icon>
+            {{ "Choose File" | translate }}
+          </button>
+          
+          @if (selectedFile()) {
+            <div class="selected-file">
+              <mat-icon>description</mat-icon>
+              <span>{{ selectedFile()?.name }}</span>
+            </div>
+          }
+          
+          @if (isUploading()) {
+            <mat-spinner diameter="30"></mat-spinner>
+          }
+        </div>
+
+        <!-- Format Instructions -->
+        @if (importType() === 'strong') {
+          <div class="format-instructions">
+            <h4>
+              <mat-icon>info</mat-icon>
+              {{ "Format Requirements" | translate }}
+            </h4>
+            <p>{{ "Your CSV file should contain the following columns in this order" | translate }}:</p>
+            <ul>
+              <li>Date</li>
+              <li>Workout Name</li>
+              <li>Exercise Name</li>
+              <li>Set Order</li>
+              <li>Weight</li>
+              <li>Weight Unit</li>
+              <li>Reps</li>
+              <li>RPE</li>
+              <li>Distance</li>
+              <li>Distance Unit</li>
+              <li>Seconds</li>
+              <li>Notes</li>
+              <li>Workout Notes</li>
+              <li>Workout Duration</li>
+            </ul>
+          </div>
+        }
+
+        @if (importType() === 'hevy') {
+          <div class="format-instructions">
+            <h4>
+              <mat-icon>info</mat-icon>
+              {{ "Format Requirements" | translate }}
+            </h4>
+            <p>{{ "Your CSV file should contain the following columns in this order" | translate }}:</p>
+            <ul>
+              <li>title</li>
+              <li>start_time</li>
+              <li>end_time</li>
+              <li>description</li>
+              <li>exercise_title</li>
+              <li>superset_id</li>
+              <li>exercise_notes</li>
+              <li>set_index</li>
+              <li>set_type</li>
+              <li>weight_kg/weight_lbs</li>
+              <li>reps</li>
+              <li>distance_km/distance_miles</li>
+              <li>duration_seconds</li>
+              <li>rpe</li>
+            </ul>
+          </div>
+        }
+
+        @if (importType() === 'stronglifts') {
+          <div class="format-instructions">
+            <h4>
+              <mat-icon>info</mat-icon>
+              {{ "Format Requirements" | translate }}
+            </h4>
+            <p>{{ "Your CSV file should contain the following columns in this order" | translate }}:</p>
+            <ul>
+              <li>Date (yyyy/mm/dd)</li>
+              <li>Workout</li>
+              <li>Workout Name</li>
+              <li>Program Name</li>
+              <li>Body Weight</li>
+              <li>Exercise</li>
+              <li>SetsxReps</li>
+              <li>Top Set Reps x Weight</li>
+              <li>e1RM</li>
+              <li>Reps</li>
+              <li>Volume</li>
+              <li>Workout Volume</li>
+              <li>Duration</li>
+              <li>Notes</li>
+              <li>Set 1-5 (Reps & Weight)</li>
+            </ul>
+          </div>
+        }
+
+        @if (importType() === 'fitnotes') {
+          <div class="format-instructions">
+            <h4>
+              <mat-icon>info</mat-icon>
+              {{ "Format Requirements" | translate }}
+            </h4>
+            <p>{{ "Your CSV file should contain the following columns in this order" | translate }}:</p>
+            <ul>
+              <li>Date</li>
+              <li>Exercise</li>
+              <li>Category</li>
+              <li>Weight</li>
+              <li>Weight Unit</li>
+              <li>Reps</li>
+              <li>Distance</li>
+              <li>Distance Unit</li>
+              <li>Time</li>
+              <li>Comment</li>
+            </ul>
+          </div>
+        }
+
+        @if (previousImports().length > 0) {
+          <mat-divider class="section-divider"></mat-divider>
+          
+          <div class="previous-imports">
+            <h4>{{ "Previous imports" | translate }}</h4>
+            <mat-list>
+              @for (previousImport of previousImports(); track previousImport.addid; let i = $index) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon>history</mat-icon>
+                  <span matListItemTitle>
+                    {{ "Imported" | translate }} {{ formatDate(previousImport.created) }}
+                  </span>
+                  <button 
+                    mat-button 
+                    color="warn"
+                    matListItemMeta
+                    (click)="removeImport(previousImport.addid, i)">
+                    <mat-icon>delete</mat-icon>
+                    {{ "Remove" | translate }}
+                  </button>
+                </mat-list-item>
+              }
+            </mat-list>
+          </div>
+        }
+
+        <div class="step-actions">
+          <button mat-button (click)="dismiss()">
+            {{ "Cancel" | translate }}
+          </button>
+          @if (importType() === 'other' || !importType()) {
+            <button 
+              mat-raised-button 
+              color="primary" 
+              matStepperNext
+              [disabled]="!uploadedFile()">
+              {{ "Next" | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          } @else {
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="currentStep.set(2); stepper.next()"
+              [disabled]="!uploadedFile()">
+              {{ "Import data" | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- Step 2: Assign Fields (Only for 'other' imports) -->
+    @if (importType() === 'other' || !importType()) {
+      <mat-step [completed]="selectedFields().includes('assigneddate') && selectedFields().includes('exercise')">
+        <ng-template matStepLabel>{{ "Assign" | translate }}</ng-template>
+        
+        <div class="import-step">
+          <h3>
+            {{ importedCount() }} 
+            {{ importedCount() === 1 ? ("Record Found!" | translate) : ("Records Found!" | translate) }}
+          </h3>
+          <p>{{ "Assign your data to the corresponding fields in Intensity." | translate }}</p>
+          
+          <div class="field-mapping-direction">
+            {{ "Your Data" | translate }}
+            <mat-icon color="primary">arrow_forward</mat-icon>
+            Intensity
+          </div>
+
+          <div class="field-mappings">
+            @for (importedField of importedFields(); track importedField.name) {
+              <mat-form-field appearance="outline">
+                <mat-label>{{ importedField.name }}</mat-label>
+                <mat-select 
+                  [(ngModel)]="importedField.mapped_value"
+                  (ngModelChange)="onFieldMappingChange()">
+                  <mat-option value="">{{ "Not Assigned" | translate }}</mat-option>
+                  @for (field of fields; track field.value) {
+                    <mat-option 
+                      [value]="field.value"
+                      [disabled]="selectedFields().includes(field.value) && importedField.mapped_value !== field.value">
+                      {{ field.label | translate }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+          </div>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ "Back" | translate }}
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              matStepperNext
+              [disabled]="!selectedFields().includes('assigneddate') || !selectedFields().includes('exercise')">
+              {{ "Next" | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-step>
     }
+
+    <!-- Step 3: Import -->
+    <mat-step>
+      <ng-template matStepLabel>{{ "Import" | translate }}</ng-template>
+      
+      <div class="import-step">
+        <h3>{{ "Start Your Import" | translate }}</h3>
+        <p>{{ "Use the button below to import your data. This can take several minutes." | translate }}</p>
+        
+        <div class="import-summary">
+          <mat-card>
+            <mat-card-content>
+              <div class="summary-item">
+                <mat-icon>description</mat-icon>
+                <div>
+                  <strong>{{ "File" | translate }}:</strong>
+                  {{ selectedFile()?.name }}
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>numbers</mat-icon>
+                <div>
+                  <strong>{{ "Records" | translate }}:</strong>
+                  {{ importedCount() }}
+                </div>
+              </div>
+              @if (importType() === 'other' || !importType()) {
+                <div class="summary-item">
+                  <mat-icon>link</mat-icon>
+                  <div>
+                    <strong>{{ "Mapped Fields" | translate }}:</strong>
+                    {{ selectedFields().length }} / {{ fields.length }}
+                  </div>
+                </div>
+              } @else {
+                <div class="summary-item">
+                  <mat-icon>category</mat-icon>
+                  <div>
+                    <strong>{{ "Import Type" | translate }}:</strong>
+                    {{ importType() }}
+                  </div>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="import-action">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="startImport()"
+            [disabled]="isImporting()">
+            @if (isImporting()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <mat-icon>upload</mat-icon>
+            }
+            {{ "Start Import" | translate }}
+          </button>
+        </div>
+
+        <div class="step-actions">
+          <button mat-button matStepperPrevious [disabled]="isImporting()">
+            <mat-icon>arrow_back</mat-icon>
+            {{ "Back" | translate }}
+          </button>
+        </div>
+      </div>
+    </mat-step>
+  </mat-stepper>
 </mat-dialog-content>
 
-<mat-dialog-actions>
-    <button mat-button mat-dialog-close>{{ 'Close' | translate }}</button>
-    <button mat-button (click)="importData()" color="primary" [disabled]="!import.file">
-        {{ 'Import' | translate }}
-    </button>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dismiss()" [disabled]="isUploading() || isImporting()">
+    {{ "Close" | translate }}
+  </button>
 </mat-dialog-actions>

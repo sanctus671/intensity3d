@@ -1,0 +1,270 @@
+<div class="stats">
+    <h2 class="stats__title">{{ 'Stats' | translate }}</h2>
+
+
+      <div class="stats__content">
+        <!-- Heatmap Section -->
+        <section class="stats__section stats__section--heatmap">
+          <div class="stats__section-header">
+            <h2>{{ 'Workouts in the last year' | translate }}</h2>
+          </div>
+          <div class="stats__heatmap" [class.stats__heatmap--compact]="heatmapMonths() < 6">
+            <div echarts [options]="heatmapChartOptions()" class="stats__chart stats__chart--heatmap" (chartInit)="onHeatmapChartInit($event)"></div>
+          </div>
+        </section>
+
+        <!-- Highlights Section -->
+        <section class="stats__highlights ">
+          <mat-card class="stats__highlight-card" (click)="openDetails('Most Recent Workout', highlights().last_tracked ? formatFromNow(highlights().last_tracked.assigneddate) : '', highlights().last_tracked ? formatDate(highlights().last_tracked.assigneddate) : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ highlights().last_tracked ? formatFromNow(highlights().last_tracked.assigneddate) : ('Never' | translate) }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Last workout' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Current Streak'), highlights().current_streak ? (highlights().current_streak + ' ' + translate.instant('Weeks')) : '', highlights().current_streak ? translate.instant('From') + ' ' + (dateFromNow(highlights().current_streak)) : '')">
+            <mat-card-content>
+              
+              @if (loading() > 0) {
+                <h3>{{ highlights().current_streak || 0 }} {{ (highlights().current_streak === 1 ? 'Week' : 'Weeks') | translate }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Current streak' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Workouts in the last year'), highlights().last_year ? highlights().last_year + ' ' + translate.instant('Workouts') : '', generalStats().heatmap && generalStats().heatmap.length > 0 ? translate.instant('From') + ' ' + (formatDate(generalStats().heatmap[generalStats().heatmap.length - 1].assigneddate)) : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ highlights().last_year || 0 }} {{ (highlights().last_year === 1 ? 'Workout' : 'Workouts') | translate }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Over the last year' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Longest Streak'), highlights().best_streak ? highlights().best_streak.streak + ' ' + translate.instant('Weeks') : '', highlights().best_streak ? translate.instant('From') + ' ' + formatDate(highlights().best_streak.start) + ' ' + translate.instant('to') + ' ' + formatDate(highlights().best_streak.end) : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ highlights().best_streak ? highlights().best_streak.streak : 0 }} {{ (highlights().best_streak && highlights().best_streak.streak === 1 ? 'Week' : 'Weeks') | translate }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Longest streak' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+        </section>
+
+        <!-- Notes Section -->
+        <section class="stats__section stats__section--notes">
+          <div class="stats__notes-stats" (click)="openNotes()">
+            <mat-icon fontSet="material-symbols-outlined">book_2</mat-icon>
+            <div class="stats__notes-stats__inner">
+              <h4>{{ notesStats().notes }} {{ (notesStats().notes !== 1 ? 'notes' : 'note') | translate }} & {{ notesStats().videos }} {{ (notesStats().videos !== 1 ? 'videos' : 'video') | translate }}</h4>
+              <p>{{ 'Tracked against sets in your diary' | translate }}</p>
+            </div>
+            <mat-icon class="stats__notes-stats__arrow">chevron_right</mat-icon>
+          </div>
+        </section>
+
+        <!-- Exercise Chart Section -->
+        <section class="stats__section">
+          <div class="stats__section-header">
+            <button mat-button (click)="openSelectExercise()" class="stats__exercise-button">
+              {{ selectedExercise().name || ('All Exercises' | translate) }}
+              <mat-icon  iconPositionEnd>edit</mat-icon>
+            </button>
+          </div>
+          <app-exercise-chart 
+            [exercise]="selectedExercise()" 
+            [user]="user()" 
+            [shouldLoad]="loading()" 
+            [metricsSelectPosition]="'bottom'"
+            (loadComplete)="onExerciseChartLoadComplete()">
+          </app-exercise-chart>
+        </section>
+
+        <!-- Intensity Zones Section -->
+        <section class="stats__section">
+          <div class="stats__section-header">
+            <h2>{{ 'Intensity Zones' | translate }}</h2>
+            <p>{{ 'See the percentage of time spent in each %1RM or RPE/RIR training zone.' | translate }}</p>
+          </div>
+
+          @if (user().premium) {
+            <div class="stats__zone-controls">
+              <button mat-button 
+                      class="stats__zone-controls__button"
+                      [class.selected]="zoneOptions().type === 'percentage'"
+                      (click)="changeZoneType('percentage')">
+                {{ '%1RM' | translate }}
+              </button>
+              <button mat-button 
+                      class="stats__zone-controls__button"
+                      [class.selected]="zoneOptions().type === 'rpe'"
+                      (click)="changeZoneType('rpe')">
+                {{ user().intensity_scale === 'rir' ? 'RIR' : 'RPE' }}
+              </button>
+              <button mat-icon-button (click)="openZoneOptions()">
+                <mat-icon>settings</mat-icon>
+              </button>
+            </div>
+            <div echarts [options]="zonesChartOptions()" class="stats__chart stats__chart--zones" (chartInit)="onZonesChartInit($event)"></div>
+          } @else {
+            <mat-card class="stats__premium-card">
+              <mat-card-content>
+                <button mat-flat-button color="primary" (click)="openPremium()">
+                    <mat-icon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+                  {{ 'Show intensity zones' | translate }}
+                </button>
+              </mat-card-content>
+            </mat-card>
+          }
+        </section>
+
+        <!-- Fatigue Management Section -->
+        <section class="stats__section">
+          <div class="stats__section-header">
+            <h2>{{ 'Fatigue Management' | translate }}</h2>
+            <p>{{ 'Monitor your training fatigue levels and recovery status to optimize performance and prevent overtraining.' | translate }}</p>
+          </div>
+
+          @if (user().premium) {
+            @if (fatigueData().currentStatus && loading() > 0) {
+              <mat-card class="stats__fatigue-card">
+                <mat-card-content>
+                  <div class="stats__fatigue-status">
+                    <h3 [class]="'stats__fatigue-value stats__fatigue-value--' + fatigueData().currentStatus.color">
+                      {{ fatigueData().currentStatus.fatigue.toFixed(1) }}
+                    </h3>
+                    <span [class]="'stats__fatigue-level stats__fatigue-level--' + fatigueData().currentStatus.color">
+                      {{ fatigueData().currentStatus.level | translate }}
+                    </span>
+                    <p>{{ 'Current Fatigue' | translate }}</p>
+                  </div>
+                  <button mat-icon-button (click)="openFatigueInfo()" class="stats__info-button">
+                    <mat-icon>info</mat-icon>
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            @if (loading() < 1) {
+              <mat-card class="stats__fatigue-card">
+                <mat-card-content>
+                  <div class="stats__fatigue-status">
+                    <h3><span class="skeleton-text" style="width: 60px; height: 32px; display: inline-block;"></span></h3>
+                    <span class="skeleton-text" style="width: 80px; height: 20px; display: inline-block;"></span>
+                    <p><span class="skeleton-text" style="width: 100px; height: 16px; display: inline-block;"></span></p>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            <div class="stats__fatigue-chart-wrapper">
+              <div echarts [options]="fatigueCombinedChartOptions()" class="stats__chart stats__chart--fatigue" (chartInit)="onFatigueCombinedChartInit($event)"></div>
+              @if (fatigueData().currentStatus) {
+                <button mat-icon-button (click)="openFatigueOptions()" class="stats__settings-button">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              }
+            </div>
+          } @else {
+            <mat-card class="stats__premium-card">
+              <mat-card-content>
+                <button mat-flat-button color="primary" (click)="openPremium()">
+                <mat-icon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+                  {{ 'Show fatigue management' | translate }}
+                </button>
+              </mat-card-content>
+            </mat-card>
+          }
+        </section>
+
+        <!-- Most Tracked Section -->
+        <section class="stats__section">
+          <div class="stats__section-header">
+            <h2>{{ 'Most Tracked' | translate }}</h2>
+            <p>{{ 'View your most tracked exercises by session.' | translate }}</p>
+          </div>
+          <div echarts [options]="barChartOptions()" class="stats__chart stats__chart--bar" (chartInit)="onBarChartInit($event)"></div>
+          @if (generalStats().most_tracked_exercises && generalStats().most_tracked_exercises.length > 9) {
+            <button mat-flat-button class="stats__button stats__button--view-more" (click)="openMostTracked()">
+              @if (!user().premium) {
+                <mat-icon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+              }
+              {{ 'View more' | translate }}
+            </button>
+          }
+        </section>
+
+        <!-- Percentage Breakdown Section -->
+        <section class="stats__section">
+          <div class="stats__section-header">
+            <h2>{{ 'Percentage Breakdown' | translate }}</h2>
+            <p>{{ 'Muscle groups and exercise types you have tracked as a percentage of total volume.' | translate }}</p>
+          </div>
+          <div echarts [options]="pieChartOptions()" class="stats__chart stats__chart--pie" (chartInit)="onPieChartInit($event)"></div>
+        </section>
+
+        <!-- Pie Highlights Section -->
+        <section class="stats__highlights stats__highlights--breakdown">
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Most Tracked Exercise Type'), generalStats().exercise_type ? generalStats().exercise_type.most_tracked.name : '', generalStats().exercise_type ? generalStats().exercise_type.most_tracked.data : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ generalStats().exercise_type ? generalStats().exercise_type.most_tracked.name : ('None' | translate) }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Most tracked' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Most Tracked Muscle Group'), generalStats().musclegroup ? generalStats().musclegroup.most_tracked.name : '', generalStats().musclegroup ? generalStats().musclegroup.most_tracked.data : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ generalStats().musclegroup ? generalStats().musclegroup.most_tracked.name : ('None' | translate) }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Most tracked' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Least Tracked Exercise Type'), generalStats().exercise_type ? generalStats().exercise_type.least_tracked.name : '', generalStats().exercise_type ? generalStats().exercise_type.least_tracked.data : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ generalStats().exercise_type ? generalStats().exercise_type.least_tracked.name : ('None' | translate) }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Least tracked' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="stats__highlight-card" (click)="openDetails(translate.instant('Least Tracked Muscle Group'), generalStats().musclegroup ? generalStats().musclegroup.least_tracked.name : '', generalStats().musclegroup ? generalStats().musclegroup.least_tracked.data : '')">
+            <mat-card-content>
+              @if (loading() > 0) {
+                <h3>{{ generalStats().musclegroup ? generalStats().musclegroup.least_tracked.name : ('None' | translate) }}</h3>
+              } @else {
+                <h3><span class="skeleton-text" style="width: 100px; height: 17px; display: inline-block;"></span></h3>
+              }
+              <p>{{ 'Least tracked' | translate }}</p>
+            </mat-card-content>
+          </mat-card>
+        </section>
+
+        <button mat-flat-button class="stats__button stats__button--view-details" (click)="openExerciseBreakdown()">
+          @if (!user().premium) {
+            <mat-icon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+          }
+          {{ 'View contributing exercises' | translate }}
+        </button>
+      </div>
+</div>

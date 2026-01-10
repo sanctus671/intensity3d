@@ -1,43 +1,372 @@
+.import-data {
+  min-width: 600px;
+  max-width: 800px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 20px;
 
+  @media screen and (max-width: 768px) {
+    min-width: auto;
+    width: 100%;
+    padding: 10px;
+  }
 
+  .import-step {
+    padding: 20px 0;
 
+    h3 {
+      margin: 0 0 16px;
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--mat-app-on-background, #000);
 
-.dialog-title{
-    position:relative;
-    mat-icon{
-        cursor:pointer;
-        position:absolute;
-        top:20px;
-        right:20px;
+      .dark-theme & {
+        color: var(--mat-app-on-background, #fff);
+      }
     }
+
+    p {
+      margin: 0 0 24px;
+      color: var(--mat-app-on-background-variant, rgba(0, 0, 0, 0.7));
+
+      .dark-theme & {
+        color: var(--mat-app-on-background-variant, rgba(255, 255, 255, 0.7));
+      }
+    }
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0 8px;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--mat-app-on-background, #000);
+
+      .dark-theme & {
+        color: var(--mat-app-on-background, #fff);
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .import-type-select {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .file-select-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 32px;
+    border: 2px dashed var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background-color: var(--mat-app-surface, #fafafa);
+    margin-bottom: 24px;
+
+    .dark-theme & {
+      border-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+      background-color: var(--mat-app-surface, #1e1e1e);
+    }
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+
+    .selected-file {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+      border-radius: 4px;
+
+      .dark-theme & {
+        background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.08));
+      }
+
+      mat-icon {
+        opacity: 0.7;
+      }
+
+      span {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .format-instructions {
+    background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+
+    .dark-theme & {
+      background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.05));
+    }
+
+    h4 {
+      margin-top: 0;
+    }
+
+    p {
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 24px;
+      color: var(--mat-app-on-background, #000);
+
+      .dark-theme & {
+        color: var(--mat-app-on-background, #fff);
+      }
+
+      li {
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .section-divider {
+    margin: 32px 0;
+  }
+
+  .previous-imports {
+    margin-top: 24px;
+
+    mat-list {
+      border: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+      border-radius: 8px;
+      overflow: hidden;
+
+      .dark-theme & {
+        border-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+      }
+
+      mat-list-item {
+        border-bottom: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+
+        .dark-theme & {
+          border-bottom-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        button {
+          mat-icon {
+            margin-right: 4px;
+          }
+        }
+      }
+    }
+  }
+
+  .field-mapping-direction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 24px 0;
+    padding: 16px;
+    background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+    border-radius: 8px;
+
+    .dark-theme & {
+      background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.08));
+    }
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .field-mappings {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .import-summary {
+    margin: 24px 0;
+
+    mat-card {
+      background-color: var(--mat-app-surface, #fff);
+
+      .dark-theme & {
+        background-color: var(--mat-app-surface, #1e1e1e);
+      }
+
+      mat-card-content {
+        padding: 16px;
+      }
+
+      .summary-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+
+        .dark-theme & {
+          border-bottom-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        mat-icon {
+          opacity: 0.7;
+        }
+
+        div {
+          flex: 1;
+          font-size: 14px;
+
+          strong {
+            font-weight: 500;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  .import-action {
+    text-align: center;
+    margin: 32px 0;
+
+    button {
+      min-width: 200px;
+      height: 48px;
+      font-size: 16px;
+
+      mat-icon,
+      mat-spinner {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .step-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+
+    .dark-theme & {
+      border-top-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+    }
+
+    button {
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
 }
 
+// Stepper customization
+::ng-deep .import-data {
+  mat-stepper {
+    background-color: transparent;
+  }
 
-.import{
-    
-    
-    mat-form-field{
-        width:100%;
+  .mat-stepper-horizontal {
+    background-color: transparent;
+  }
+
+  .mat-step-header {
+    .mat-step-icon {
+      background-color: var(--mat-app-surface-variant, rgba(0, 0, 0, 0.12));
+      color: var(--mat-app-on-surface-variant, rgba(0, 0, 0, 0.6));
+
+      .dark-theme & {
+        background-color: var(--mat-app-surface-variant, rgba(255, 255, 255, 0.12));
+        color: var(--mat-app-on-surface-variant, rgba(255, 255, 255, 0.6));
+      }
     }
-    
-    .import__upload{
-        margin: 0px;
-        margin-bottom: 5px;        
+
+    .mat-step-icon-selected,
+    .mat-step-icon-state-done {
+      background-color: var(--mat-primary-color, #D44735);
+      color: white;
     }
-    
-    .import__filename{
-        margin-left:5px;
+
+    .mat-step-label {
+      color: var(--mat-app-on-background, #000);
+
+      .dark-theme & {
+        color: var(--mat-app-on-background, #fff);
+      }
     }
-    
-    .import__import-explaination{
-        font-size:14px;
-        
-        span{
-            display: block;
-            font-weight: 700;
-            margin-top: 10px;    
-        }        
-        
+
+    .mat-step-label-selected {
+      color: var(--mat-primary-color, #D44735);
     }
-    
+  }
+
+  .mat-horizontal-stepper-header-container {
+    margin-bottom: 24px;
+  }
+}
+
+// Dialog actions
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+
+  .dark-theme & {
+    border-top-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+  }
+}
+
+// Responsive design
+@media screen and (max-width: 768px) {
+  .import-data {
+    .field-mapping-direction {
+      font-size: 14px;
+      padding: 12px;
+    }
+
+    .import-action button {
+      min-width: auto;
+      width: 100%;
+    }
+
+    .step-actions {
+      flex-direction: column-reverse;
+      gap: 12px;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
 }

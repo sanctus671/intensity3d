@@ -1,0 +1,125 @@
+<div class="diary">
+    <div class="diary__sidebar">
+        
+        @if (friendProfile()) {
+            <div class="diary__sidebar__profile">
+                <img [src]="getDp(friendProfile().dp)" [alt]="formatName(friendProfile())" class="diary__sidebar__profile__avatar">
+                <div class="diary__sidebar__profile__info">
+                    <h3 class="diary__sidebar__profile__name">{{ formatName(friendProfile()) }}</h3>
+                    <p class="diary__sidebar__profile__label">{{ "User's Diary" | translate }}</p>
+                </div>
+            </div>
+        }
+        
+        <div class="diary__sidebar__calendar">
+
+            <mat-calendar 
+                [selected]="selectedDateCalendar()" 
+                (selectedChange)="onCalendarSelect($event)"
+                [dateClass]="dateClass()"
+                [minDate]="minDate()"></mat-calendar>
+
+        </div>
+     
+        
+        
+    </div>
+    
+    
+    <div class="diary__diary-content">
+        
+        <div class="diary__diary-content__day-nav day-nav">
+            
+            @for (day of weekdays(); track day.moment) {
+                <div class="day-nav__day" (click)="selectDate(day.moment)" 
+                     [class.day-nav__day--active]="day.active" 
+                     [class.day-nav__day--has-workout]="day.hasWorkout" 
+                     [class.day-nav__day--is-today]="day.isToday">
+                    <h6>{{day.dayName}}</h6>
+                    <h3>{{day.day}}</h3>
+                </div>
+            }
+            
+        </div>
+
+
+        <div class="diary__diary-content__diary-workout diary-workout">
+            
+            @if (loading()) {
+                <div class="diary-workout__loading">
+                    <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            }
+            
+            @if (!loading() && workouts()[selectedDateString()] && workouts()[selectedDateString()].length < 1) {
+                <div class="diary-workout__empty">
+                    <mat-icon svgIcon="diary-empty"></mat-icon>
+                    <h2>{{ 'Diary Empty' | translate }}</h2>
+                    <p>{{ "No exercises have been added on this date" | translate }}</p>
+                </div>
+            }
+            
+            @if (!loading() && workouts()[selectedDateString()] && workouts()[selectedDateString()].length > 0) {
+                <div class="diary-workout__workout workout">
+                    @for (exercise of workouts()[selectedDateString()]; track exercise.exerciseid) {
+                        <div class="workout__exercise">
+                             
+                            <div class="workout__exercise__info">
+                                
+                                <div class="workout__exercise__name">{{exercise.name}}</div>
+                                
+                                <div class="workout__exercise__actions">
+                                    <div class="workout__exercise__actions__primary">
+                                        <button mat-button (click)="openGoals(exercise)">
+                                            <mat-icon>event_available</mat-icon> 
+                                            {{ 'Goals' | translate }}
+                                        </button>
+                                    </div>
+                                    <div class="workout__exercise__actions__secondary">
+                                        <button mat-icon-button (click)="copyExercise(exercise)" [attr.aria-label]="'Copy exercise' | translate">
+                                            <mat-icon>file_copy</mat-icon>
+                                        </button>                          
+                                        <button mat-icon-button (click)="shareExercise(exercise)" [attr.aria-label]="'Share exercise' | translate">
+                                            <mat-icon>share</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                             
+                            <div class="workout__exercise__sets">
+                                @for (set of exercise.sets; track $index) {
+                                    <div class="workout__exercise__sets__set set" 
+                                         (click)="viewSet(set, exercise)"
+                                         [class.set--set-incomplete]="!set.completed || set.completed === '0'"
+                                         [class.set--has-notes]="set.notes || set.video"
+                                         [class.set--is-record]="set.is_overall_record">
+                                        <mat-icon>check_circle</mat-icon>
+                                        <span class="set__details">{{set.reps}} x {{set.weight}}{{set.unit}}</span>
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="workout__exercise__bar-progress-container">
+                                <div class="workout__exercise__bar-progress" 
+                                     [style.width.%]="(exercise.goals.progress / exercise.goals.goal) * 100"
+                                     [class.calibrating]="exercise.calibrating">
+                                </div> 
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            
+        </div>
+        
+        
+        
+    </div>
+    
+    
+    
+    
+</div>
+
+
+

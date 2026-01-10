@@ -1,0 +1,317 @@
+.friends {
+    margin-top: 20px;
+    max-width: 1400px;
+    padding: 50px 40px;
+    margin: 0 auto;
+    
+
+    
+    .friends__title {
+        border-bottom: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.08));
+        margin: 0 auto;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        width: 300px;
+        max-width:100%;
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 500;
+        
+        .dark-theme & {
+          border-bottom-color: var(--mat-divider-color, rgba(255, 255, 255, 0.08));
+        }
+    }
+    
+    .friends__actions {
+        margin-bottom: 40px;
+        text-align: center;
+        
+        button {
+            margin: 0px 5px;
+        }
+    }
+    
+    .friends-list {
+        padding: 20px 0px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;   
+        width: 100%;
+        flex-wrap: wrap;
+        
+        .friends-list__loading {
+            margin-top: 60px;
+            display: flex;
+            justify-content: center;
+            
+            mat-spinner {
+                margin: 0 auto;     
+            }                
+        }
+
+        .friends-list__empty {
+            text-align: center;
+            padding-top: 60px;
+            opacity: 0.08;
+            color: var(--mat-sys-on-surface);
+            
+            mat-icon {
+                font-size: 100px;
+                width: 100px;
+                height: 100px;
+            }
+            
+            h2 {
+                margin: 0px;
+            }
+        }         
+        
+        .friends-list__friend {
+            width: 23%;
+            margin: 10px 1%;
+            display: inline-block;
+            padding: 50px 0px;
+            padding-top: 40px;
+            text-align: center;
+            border: 1px solid var(--divider-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            z-index: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow:None;
+            
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                
+                @media (prefers-color-scheme: dark) {
+                    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+                }
+            }
+            
+      
+
+            .friend__avatar {
+                width: 100px;
+                height: 100px;
+                background-color: white;
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+                border-radius: 50%;
+                margin: 0 auto;    
+                position: relative;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            h4 {
+                margin: 30px 0px 20px 0px;
+                font-weight: 500;
+                color: var(--mat-sys-on-surface);
+            }
+        }
+    }
+    
+    .friend-activity {
+        max-width: 800px;
+        margin: 0 auto;
+        margin-top: 20px;
+        
+        .friend-activity__loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            gap: 16px;
+            
+            p {
+                margin: 0;
+                font-size: 14px;
+                color: var(--mat-app-on-surface-variant, rgba(0, 0, 0, 0.6));
+                
+                @media (prefers-color-scheme: dark) {
+                    color: var(--mat-app-on-surface-variant, rgba(255, 255, 255, 0.6));
+                }
+            }
+        }
+        
+        .friend-activity__empty {
+            text-align: center;
+            padding-top: 60px;
+            opacity: 0.08;
+            color: var(--mat-sys-on-surface);
+            
+            mat-icon {
+                font-size: 100px;
+                width: 100px;
+                height: 100px;
+            }
+            
+            h2 {
+                margin: 0px;
+            }
+        }
+
+        mat-list-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            
+            &:hover {
+                background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+                
+                .dark-theme & {
+                    background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.04));
+                }
+            }
+            
+            &:focus-visible {
+                outline: 2px solid var(--mat-primary-color, #d44735);
+                outline-offset: 2px;
+            }
+
+            .mat-mdc-list-item-meta{
+                align-self:center;
+            }
+
+            .mat-mdc-list-item-avatar{
+                background-color:White;
+                border: 1px solid var(--divider-color);
+            }            
+
+            mat-icon {
+                opacity: 0.4;
+                transition: opacity 0.2s ease;
+                
+                mat-list-item:hover & {
+                    opacity: 0.7;
+                }
+            }
+        }
+
+
+
+    
+        .activity__load-more{
+            text-align: center;
+            padding: 20px 0 30px 0;
+            
+            button{
+                position: relative;
+                
+                mat-spinner{
+                    width: 15px;
+                    height: 15px;
+                    margin-left: 10px;
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+            }
+        }
+
+
+
+    }
+
+    .friend-requests {
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 20px;
+        
+        .friend-requests__loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            gap: 16px;
+            
+            p {
+                margin: 0;
+                font-size: 14px;
+                color: var(--mat-app-on-surface-variant, rgba(0, 0, 0, 0.6));
+                
+                @media (prefers-color-scheme: dark) {
+                    color: var(--mat-app-on-surface-variant, rgba(255, 255, 255, 0.6));
+                }
+            }
+        }
+
+        .friend-requests__requests{
+            .mat-mdc-list-item-avatar{
+                background-color:White;
+                border: 1px solid var(--divider-color);
+            }
+        }
+        
+        .friend-requests__empty {
+            text-align: center;
+            padding-top: 60px;
+            opacity: 0.08;
+            color: var(--mat-sys-on-surface);
+            
+            mat-icon {
+                font-size: 100px;
+                width: 100px;
+                height: 100px;
+            }
+            
+            h2 {
+                margin: 0px;
+            }
+        }
+    }
+}
+
+// Responsive Design
+@media screen and (max-width: 768px) {
+    .friends {
+        padding: 30px 20px;
+        
+        .friends__title {
+            width: 80%;
+            font-size: 1.5rem;
+        }
+        
+        .friends__actions {
+            button {
+                margin: 5px;
+            }
+        }
+        
+        .friends-list .friends-list__friend {
+            width: 48%;
+            margin: 10px 1%;
+        }
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .friends {
+        padding-left: 15px;
+        padding-right: 15px;
+        
+        .friends__title {
+            width: 100%;
+        }
+    }
+    
+    .friends .friends-list .friends-list__friend {
+        width: 100%;
+        margin: 10px 0px;
+    }
+}
+
+// Dark mode specific adjustments
+@media (prefers-color-scheme: dark) {
+    .friends {
+        .friends-list__friend {
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.05);
+            
+            .friend__avatar {
+                box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+            }
+        }
+    }
+}

@@ -10,7 +10,8 @@
             type="text" 
             [placeholder]="'Search exercises' | translate" 
             [(ngModel)]="properties.search" 
-            (ngModelChange)="refreshSelection()">
+            (ngModelChange)="refreshSelection()"
+            (input)="refreshSelection()">
         @if (properties.search) {
             <button 
                 mat-button 
@@ -23,13 +24,13 @@
         }
     </mat-form-field>
     
-    <mat-tab-group class="add-exercise__nav" [selectedIndex]="properties.selectedTab">
+    <mat-tab-group class="add-exercise__nav" [selectedIndex]="properties.selectedTab" (selectedIndexChange)="onTabChange($event)">
         <mat-tab [label]="'Recommended' | translate">
             <mat-selection-list [(ngModel)]="selectedExercisesRecommended">
-                @for (recommendedExercise of recommendedExercises | exerciseSearch:properties.search; track recommendedExercise.id) {
+                @for (recommendedExercise of recommendedExercises | exerciseSearch:properties.search; track recommendedExercise['id']) {
                     <mat-list-option 
-                        [value]="recommendedExercise.id" 
-                        (click)="onSelectionChanged(recommendedExercise.id, selectedExercisesRecommended)">
+                        [value]="recommendedExercise['id']" 
+                        (click)="onSelectionChanged(recommendedExercise['id'], selectedExercisesRecommended)">
                         {{ recommendedExercise.name }}
                     </mat-list-option>
                 }
@@ -38,10 +39,10 @@
         
         <mat-tab [label]="('Recent' | translate) + (recentExercises.length > 0 ? ' (' + recentExercises.length + ')' : '')">
             <mat-selection-list [(ngModel)]="selectedExercisesRecent">
-                @for (recentExercise of recentExercises | exerciseSearch:properties.search; track recentExercise.exerciseid) {
+                @for (recentExercise of recentExercises | exerciseSearch:properties.search; track recentExercise['exerciseid']) {
                     <mat-list-option 
-                        [value]="recentExercise.exerciseid" 
-                        (click)="onSelectionChanged(recentExercise.exerciseid, selectedExercisesRecent)">
+                        [value]="recentExercise['exerciseid']" 
+                        (click)="onSelectionChanged(recentExercise['exerciseid'], selectedExercisesRecent)">
                         {{ recentExercise.name }}
                     </mat-list-option>
                 }
@@ -49,30 +50,56 @@
         </mat-tab>
         
         <mat-tab [label]="('All Exercises' | translate) + (exercises.length > 0 ? ' (' + numberWithCommas(exercises.length) + ')' : '')">
-            <mat-selection-list [(ngModel)]="selectedExercisesAll" class="exercise-list">
-                @for (exercise of exercises | exerciseSearch:properties.search | slice:0:properties.exerciseLimit; track exercise.id; let i = $index) {
-                    <mat-list-option 
-                        [value]="exercise.id" 
-                        (click)="onSelectionChanged(exercise.id, selectedExercisesAll)">
-                        {{ exercise.name }}
-                    </mat-list-option>
-                }
+            @if (!selectedCategory) {
+                <mat-list #categoryList class="exercise-categories">
+                    @for (category of exerciseCategories; track category.name) {
+                        <mat-list-item class="exercise-category" button (click)="selectCategory(category)">
+                            <span matListItemTitle>{{ category.name | translate }}</span>
+                            <div matListItemMeta>
+                                <mat-icon>chevron_right</mat-icon>
 
-                @if (canLoadMoreExercises()) {
-                    <a mat-list-item (click)="loadMoreExercises()">
-                        {{ 'Load More Exercises' | translate }}
-                    </a>
-                }
-                
-                @if (properties.search) {
-                    <div mat-list-item class="exercise-list__add-exercise">
-                        {{ 'Can\'t find' | translate }} {{ properties.search }}?<br> 
-                        <button mat-flat-button color="primary" (click)="createExercise(properties.search)">
-                            {{ 'Create It' | translate }}
+                            </div>
+                        </mat-list-item>
+                    }
+                </mat-list>
+            }
+            
+            @if (selectedCategory) {
+                <div class="category-view" #exerciseList>
+                    <div class="category-header">
+                        <button mat-stroked-button (click)="backToCategories()" class="back-button">
+                            <mat-icon>chevron_left</mat-icon>
+                            {{ 'View All Categories' | translate }}
                         </button>
+                        <h3>{{ selectedCategory.name | translate }}</h3>
                     </div>
-                }
-            </mat-selection-list>
+                    
+                    <mat-selection-list [(ngModel)]="selectedExercisesAll" class="exercise-list">
+                        @for (exercise of exercises | exerciseSearch:properties.search | exerciseFilter:selectedCategory | slice:0:properties.exerciseLimit; track exercise['id']; let i = $index) {
+                            <mat-list-option 
+                                [value]="exercise['id']" 
+                                (click)="onSelectionChanged(exercise['id'], selectedExercisesAll)">
+                                {{ exercise.name }}
+                            </mat-list-option>
+                        }
+
+                        @if (canLoadMoreExercises()) {
+                            <a mat-list-item (click)="loadMoreExercises()">
+                                {{ 'Load More Exercises' | translate }}
+                            </a>
+                        }
+                        
+                        @if (properties.search && (exercises | exerciseSearch:properties.search | exerciseFilter:selectedCategory).length < 1) {
+                            <div mat-list-item class="exercise-list__add-exercise">
+                                {{ 'Can\'t find' | translate }} {{ properties.search }}?<br> 
+                                <button mat-flat-button color="primary" (click)="createExercise(properties.search)">
+                                    {{ 'Create It' | translate }}
+                                </button>
+                            </div>
+                        }
+                    </mat-selection-list>
+                </div>
+            }
         </mat-tab>
     </mat-tab-group>
 </mat-dialog-content>

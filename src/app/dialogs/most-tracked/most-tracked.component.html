@@ -1,0 +1,38 @@
+
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Most Tracked Exercises' | translate }}</h2>
+    <mat-icon (click)="close()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+  <mat-dialog-content>
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    } @else {
+      <mat-list>
+        @for (exercise of exercises(); track exercise.exerciseid) {
+          <mat-list-item>
+            <div class="exercise-item">
+              <div class="exercise-info">
+                <span class="exercise-name">{{ exercise.name | translate }}</span>
+                <span class="exercise-sessions">{{ formatNumber(exercise.sessions) }} {{ (exercise.sessions === 1 ? 'session' : 'sessions') | translate }}</span>
+              </div>
+              <span class="exercise-percentage">{{ formatPercentage(exercise.percentageOfTotal) }}</span>
+            </div>
+          </mat-list-item>
+        }
+        @empty {
+          <div class="empty-state">
+            <mat-icon>fitness_center</mat-icon>
+            <p>{{ 'No exercise data available' | translate }}</p>
+          </div>
+        }
+      </mat-list>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'Close' | translate }}</button>
+  </mat-dialog-actions>
+

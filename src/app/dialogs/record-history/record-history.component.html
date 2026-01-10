@@ -1,0 +1,47 @@
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ exercise().name | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
+
+<mat-dialog-content class="record-history">
+    @if (loading()) {
+        <div class="record-history__loading">
+            <mat-spinner color="primary" [diameter]="50"></mat-spinner>
+        </div>
+    }
+
+    @if (!loading()) {
+        <div class="record-history__content">
+            <div 
+                echarts 
+                [options]="chartOptions()" 
+                class="record-history__chart"
+                (chartInit)="onChartInit($event)">
+            </div>
+
+            <mat-list class="record-history__list">
+                <div mat-subheader>{{ getRecordTitle() }}</div>
+                @for (record of records(); track record.assigneddate; let last = $last) {
+                    <mat-list-item 
+                        (click)="openDate(record.assigneddate)"
+                        class="record-history__list-item">
+                        <span matListItemTitle>{{ getRecordValue(record) }}</span>
+                        <span matListItemLine>{{ formatDate(record.assigneddate) }}</span>
+                        <div matListItemMeta>
+
+                            <mat-icon >chevron_right</mat-icon>
+                        </div>
+                    </mat-list-item>
+                    @if (!last) {
+                        <mat-divider></mat-divider>
+                    }
+                }
+            </mat-list>
+        </div>
+    }
+</mat-dialog-content>
+
+
+<mat-dialog-actions>
+    <button mat-button (click)="dismiss()">{{ "Dismiss" | translate }}</button>
+</mat-dialog-actions>

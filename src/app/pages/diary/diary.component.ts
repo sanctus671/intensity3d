@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { ActivatedRoute } from '@angular/router';
@@ -8,14 +8,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import moment from 'moment';
+import { register } from 'swiper/element/bundle';
 
 import { DiaryService } from '../../services/diary/diary.service';
 import { ExerciseService } from '../../services/exercise/exercise.service';
+import { TimerService } from '../../services/timer/timer.service';
 
 import { AddExerciseComponent } from '../../dialogs/add-exercise/add-exercise.component';
 import { AddProgramListComponent } from '../../dialogs/add-program-list/add-program-list.component';
@@ -40,6 +43,7 @@ import { WorkoutPoolComponent } from '../../dialogs/workout-pool/workout-pool.co
   templateUrl: './diary.component.html',
   styleUrls: ['./diary.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     DragDropModule,
@@ -53,14 +57,18 @@ import { WorkoutPoolComponent } from '../../dialogs/workout-pool/workout-pool.co
     SlicePipe
   ]
 })
-export class DiaryComponent implements OnInit {
+export class DiaryComponent implements OnInit, AfterViewInit {
     
     private diaryService = inject(DiaryService);
     private exerciseService = inject(ExerciseService);
+    private timerService = inject(TimerService);
     public dialog = inject(MatDialog);
     public snackBar = inject(MatSnackBar);
     private route = inject(ActivatedRoute);
     private cdr = inject(ChangeDetectorRef);
+    private elementRef = inject(ElementRef);
+    private matIconRegistry = inject(MatIconRegistry);
+    private domSanitizer = inject(DomSanitizer);
     
     public selectedDate: any;
     public selectedDateString: string = '';
@@ -73,15 +81,29 @@ export class DiaryComponent implements OnInit {
          
     public weekdays: Array<any> = [];
     public skipWeekdayUpdate: boolean = false;
+    private isCalendarClick: boolean = false;
+    private swiperInstance: any = null;
+    
+    @ViewChild('swiperContainer') swiperContainer!: ElementRef;
     
     public quickAddExercises: Array<any> = [];
     
     public workoutPool: Array<any> = [];
     public activePrograms: Array<any> = [];    
 
-    constructor() {         
+    constructor() {   
+        // Register Swiper web component
+        register();
+        
+        // Register custom SVG icon
+        this.matIconRegistry.addSvgIcon(
+            'diary-empty',
+            this.domSanitizer.bypassSecurityTrustResourceUrl('assets/icon/diaryempty.svg')
+        );
+        
         const date = this.route.snapshot.params['date'];
         if (date) {
+            
             this.diaryService.setSelectedDate(moment(date));
         }
         
@@ -92,8 +114,45 @@ export class DiaryComponent implements OnInit {
     
 
     ngOnInit() {
-
   
+    }
+    
+    ngAfterViewInit() {
+        setTimeout(() => {
+            this.initSwiper();
+        }, 200);
+    }
+    
+    private initSwiper(): void {
+        if (this.swiperContainer && this.swiperContainer.nativeElement) {
+            const swiperEl = this.swiperContainer.nativeElement;
+            
+            // Configure swiper parameters before initialization
+            Object.assign(swiperEl, {
+                slidesPerView: 7,
+                spaceBetween: 0,
+                slidesPerGroup: 1,
+                centeredSlides: false,
+                initialSlide: 50, // Start at the selected date (middle of array)
+            });
+            
+            // Initialize the swiper
+            swiperEl.initialize();
+            
+            // Get the swiper instance
+            this.swiperInstance = swiperEl.swiper;
+            
+            if (this.swiperInstance) {
+                // Add event listeners
+                this.swiperInstance.on('slideChange', () => {
+                    this.onSlideChange();
+                });
+                
+                this.swiperInstance.on('slideChangeTransitionEnd', () => {
+                    this.onSlideChangeTransitionEnd();
+                });
+            }
+        }
     } 
     
     public viewWorkoutPool(workoutPool: any): void {
@@ -217,10 +276,16 @@ export class DiaryComponent implements OnInit {
     
     public openHistory(exercise: any): void {
         let dialogRef = this.dialog.open(HistoryComponent, {
-            width: '400px',
+            width: '450px',
             data: {exercise: exercise, date: this.selectedDateString},
             autoFocus: false
-        });         
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.action === 'viewDiary' && result.date) {
+                this.diaryService.setSelectedDate(moment(result.date));
+            }
+        });
     }
     
     
@@ -362,6 +427,8 @@ export class DiaryComponent implements OnInit {
                         this.updateSets(exercise); 
                     }
                     
+                    // Notify timer service that a set was added
+                    this.timerService.setAdded();
                     
                 }).catch(() => {
                                     
@@ -410,7 +477,7 @@ export class DiaryComponent implements OnInit {
     public editSet(set: any, exercise: any, index: any): void {
         let dialogRef = this.dialog.open(EditSetComponent, {
             width: '400px',
-            data: {set:set}
+            data: {set:set, exercise:exercise}
         });
         dialogRef.afterClosed().subscribe(data => {
             if (data && data.delete){
@@ -465,7 +532,10 @@ export class DiaryComponent implements OnInit {
             this.updateExerciseData(exercise);
         });
 
-        
+        // Notify timer service that a set was toggled/completed
+        if (set.completed){
+            this.timerService.setAdded();
+        }
     }  
     
     public addProgram(): void {
@@ -532,16 +602,29 @@ export class DiaryComponent implements OnInit {
     
     
     private updateExerciseData(exercise: any): void {
+        exercise["loadingFullData"] = true;
+        this.cdr.markForCheck();
+        
         this.exerciseService.getExerciseData(exercise["exerciseid"], this.selectedDateString).then((exerciseData:any) => {
+            exercise["loadingFullData"] = false;
             exercise["calibrating"] = exerciseData["history"] && exerciseData["history"].length < 1 ? true : false;
             exercise["goals"] = exerciseData["goals"];
-            exercise["history"] = exerciseData["history"];
+            
+            // Update history array in place to maintain reference for open dialogs
+            if (!exercise["history"]) {
+                exercise["history"] = [];
+            }
+            exercise["history"].length = 0; // Clear existing
+            exercise["history"].push(...exerciseData["history"]); // Add new data
+            
             exercise["records"] = exerciseData["records"];
             if (exerciseData["reps"] > 0)exercise["reps"] = exerciseData["reps"];
             if (exerciseData["weight"] > 0)exercise["weight"] = exerciseData["weight"];
             exercise["unit"] = exerciseData["unit"] ? exerciseData["unit"] : "kg";
             this.cdr.markForCheck();
-
+        }).catch(() => {
+            exercise["loadingFullData"] = false;
+            this.cdr.markForCheck();
         });        
     }
     
@@ -576,6 +659,7 @@ export class DiaryComponent implements OnInit {
     /**
      * Merges preloaded workout data (which may contain user changes) with full workout data
      * Preserves user changes like completed sets, modified reps/weight, added/removed sets, etc.
+     * Updates objects IN PLACE to maintain references (e.g., for open dialogs)
      */
     private mergeWorkoutData(preloadedData: any[], fullData: any[]): any[] {
 
@@ -593,38 +677,37 @@ export class DiaryComponent implements OnInit {
             fullDataMap.set(exercise.exerciseid, exercise);
         });
         
-        // Use preloaded data as the base (since it contains the most recent user changes)
-        // and merge in additional data from full data (goals, records, history, etc.)
-        return preloadedData.map(preloadedExercise => {
+        // Update preloaded exercises IN PLACE with full data
+        preloadedData.forEach(preloadedExercise => {
             const fullExercise = fullDataMap.get(preloadedExercise.exerciseid);
             
-            if (!fullExercise) {
-                // Exercise doesn't exist in full data, use preloaded data
-                return preloadedExercise;
+            if (fullExercise) {
+                // Update existing object properties instead of replacing the object
+                preloadedExercise.calibrating = fullExercise.calibrating;
+                preloadedExercise.goals = fullExercise.goals;
+                preloadedExercise.records = fullExercise.records;
+                
+                // Update history array in place to maintain reference
+                if (!preloadedExercise.history) {
+                    preloadedExercise.history = [];
+                }
+                preloadedExercise.history.length = 0; // Clear existing
+                preloadedExercise.history.push(...fullExercise.history); // Add new data
+                
+                // Preserve any additional fields from full data that might be useful
+                if (fullExercise.reps && fullExercise.reps > 0) {
+                    preloadedExercise.reps = fullExercise.reps;
+                }
+                if (fullExercise.weight && fullExercise.weight > 0) {
+                    preloadedExercise.weight = fullExercise.weight;
+                }
+                if (fullExercise.unit) {
+                    preloadedExercise.unit = fullExercise.unit;
+                }
             }
-            
-            // Create a deep copy of the preloaded exercise data (preserves user changes)
-            const mergedExercise = JSON.parse(JSON.stringify(preloadedExercise));
-            
-            // Merge in additional data from full exercise that's not in preloaded data
-            mergedExercise.calibrating = fullExercise.calibrating;
-            mergedExercise.goals = fullExercise.goals;
-            mergedExercise.history = fullExercise.history;
-            mergedExercise.records = fullExercise.records;
-            
-            // Preserve any additional fields from full data that might be useful
-            if (fullExercise.reps && fullExercise.reps > 0) {
-                mergedExercise.reps = fullExercise.reps;
-            }
-            if (fullExercise.weight && fullExercise.weight > 0) {
-                mergedExercise.weight = fullExercise.weight;
-            }
-            if (fullExercise.unit) {
-                mergedExercise.unit = fullExercise.unit;
-            }
-            
-            return mergedExercise;
         });
+        
+        return preloadedData;        
     }
        
     
@@ -662,6 +745,14 @@ export class DiaryComponent implements OnInit {
         this.workouts[selectedDate] = [];
         
         this.diaryService.preloadWorkout(selectedDate).then((data) => {
+            // Set loading flag for each exercise while full data is being fetched
+            for (let exercise of data) {
+                exercise.loadingFullData = true;
+                // Initialize history array if it doesn't exist so we can update it in place later
+                if (!exercise.history) {
+                    exercise.history = [];
+                }
+            }
 
             this.workouts[selectedDate] = data;
             this.loading = false;
@@ -684,12 +775,37 @@ export class DiaryComponent implements OnInit {
 
             // Merge the full workout data with any user changes from preloaded data
             
-        let currentWorkoutData = this.workouts[selectedDate] || [];
+            let currentWorkoutData = this.workouts[selectedDate] || [];
 
             this.workouts[selectedDate] = this.mergeWorkoutData(currentWorkoutData, data);
+            
+            // Clear loading flag now that full data is loaded
+            for (let exercise of this.workouts[selectedDate]) {
+                exercise.loadingFullData = false;
+                
+                // Update record properties for each set from the full data
+                if (exercise.sets && Array.isArray(exercise.sets)) {
+                    const fullExercise = data.find((e: any) => e.exerciseid === exercise.exerciseid);
+                    if (fullExercise && fullExercise.sets && Array.isArray(fullExercise.sets)) {
+                        for (let i = 0; i < exercise.sets.length; i++) {
+                            const fullSet = fullExercise.sets.find((s: any) => s.id === exercise.sets[i].id);
+                            if (fullSet) {
+                                exercise.sets[i].is_overall_record = fullSet.is_overall_record;
+                            }
+                        }
+                    }
+                }
+            }
+            
             this.loading = false;
             this.cdr.markForCheck();
         }).catch(() => {
+            // Clear loading flag on error
+            if (this.workouts[selectedDate]) {
+                for (let exercise of this.workouts[selectedDate]) {
+                    exercise.loadingFullData = false;
+                }
+            }
             this.loading = false;
             this.cdr.markForCheck();
         })
@@ -733,6 +849,7 @@ export class DiaryComponent implements OnInit {
             
             if (!this.skipWeekdayUpdate){
                 //reload the weekdays
+                this.isCalendarClick = true;
                 this.setWeekdays();
             }
             else{
@@ -753,16 +870,32 @@ export class DiaryComponent implements OnInit {
     
     public onCalendarSelect(ev: any): void {
         this.selectedDateCalendar = ev;
+        this.isCalendarClick = true;
+        this.skipWeekdayUpdate = false; // Force weekday regeneration for calendar clicks
         this.diaryService.setSelectedDate(moment(ev));
     }
     
     
     private setWeekdays(): void {
         this.weekdays = [];
-        let currentDay = moment(this.selectedDate);
-        let today = moment();
-        for (let i = 0; i < 7; i++) {
-            let currentDayObj = {dayName:currentDay.format("ddd"), day:currentDay.format("D"), moment:currentDay, active:false, hasWorkout:false, isToday:false};
+        const today = moment();
+        // Generate 50 days before and 50 days after the selected date (total 101 days)
+        const daysToGenerate = 101;
+        const daysBeforeSelected = 50;
+        
+        // Start from 50 days before the selected date
+        let startDay = moment(this.selectedDate).subtract(daysBeforeSelected, "days");
+        
+        for (let i = 0; i < daysToGenerate; i++) {
+            let currentDay = moment(startDay).clone().add(i, "days");
+            let currentDayObj = {
+                dayName: currentDay.format("ddd"), 
+                day: currentDay.format("D"), 
+                moment: moment(currentDay), 
+                active: false, 
+                hasWorkout: false, 
+                isToday: false
+            };
 
             if (currentDay.isSame(this.selectedDate, "day")){
                 currentDayObj.active = true;
@@ -777,9 +910,17 @@ export class DiaryComponent implements OnInit {
             }
             
             this.weekdays.push(currentDayObj);
-            currentDay = moment(currentDay).add(1, "days");
         }
+        
         this.cdr.markForCheck();
+        
+        // When weekdays are regenerated from calendar click, slide to the new selected date
+        if (this.isCalendarClick && this.swiperInstance) {
+            setTimeout(() => {
+                this.swiperInstance.slideTo(daysBeforeSelected, 300);
+                this.isCalendarClick = false; // Reset the flag
+            }, 0);
+        }
     }
     
     
@@ -793,6 +934,119 @@ export class DiaryComponent implements OnInit {
             }            
         }
         this.skipWeekdayUpdate = false;
+        this.cdr.markForCheck();
+    }
+    
+    
+    private onSlideChange(): void {
+        if (!this.swiperInstance) return;
+        
+        const activeIndex = this.swiperInstance.activeIndex;
+        
+        // Load more days when approaching the edges
+        if (activeIndex < 10) {
+            this.loadPreviousDays();
+        } else if (activeIndex > this.weekdays.length - 10) {
+            this.loadNextDays();
+        }
+    }
+    
+    private onSlideChangeTransitionEnd(): void {
+        if (!this.swiperInstance) return;
+        
+        const activeIndex = this.swiperInstance.activeIndex;
+        
+        // Update selected date when slide transition ends (from swiping or clicking a day)
+        if (this.weekdays[activeIndex]) {
+            //this.selectDate(this.weekdays[activeIndex].moment);
+        }
+    }
+    
+    public onDayClick(index: number): void {
+        // Slide to the clicked day
+        if (this.swiperInstance) {
+            //this.swiperInstance.slideTo(index, 300);
+        }      if (this.weekdays[index]) {
+            this.selectDate(this.weekdays[index].moment);
+        }
+        // Date will be selected automatically by onSlideChangeTransitionEnd
+    }
+    
+    private loadPreviousDays(): void {
+        const today = moment();
+        const firstDay = moment(this.weekdays[0].moment);
+        const daysToAdd = 20;
+        const newDays = [];
+        
+        for (let i = daysToAdd; i > 0; i--) {
+            let currentDay = moment(firstDay).subtract(i, "days");
+            let currentDayObj = {
+                dayName: currentDay.format("ddd"), 
+                day: currentDay.format("D"), 
+                moment: moment(currentDay), 
+                active: false, 
+                hasWorkout: false, 
+                isToday: false
+            };
+            
+            if (currentDay.isSame(this.selectedDate, "day")){
+                currentDayObj.active = true;
+            }
+            
+            if (currentDay.isSame(today, "day")){
+                currentDayObj.isToday = true;
+            }            
+            
+            if (this.workoutDates.indexOf(currentDay.format("YYYY-MM-DD")) > -1){
+                currentDayObj.hasWorkout = true;
+            }
+            
+            newDays.push(currentDayObj);
+        }
+        
+        this.weekdays = [...newDays, ...this.weekdays];
+        
+        // Adjust the active index to maintain position after adding days to the beginning
+        setTimeout(() => {
+            if (this.swiperInstance) {
+                this.swiperInstance.slideTo(this.swiperInstance.activeIndex + daysToAdd, 0, false);
+            }
+        }, 0);
+        
+        this.cdr.markForCheck();
+    }
+    
+    private loadNextDays(): void {
+        const today = moment();
+        const lastDay = moment(this.weekdays[this.weekdays.length - 1].moment);
+        const daysToAdd = 20;
+        
+        for (let i = 1; i <= daysToAdd; i++) {
+            let currentDay = moment(lastDay).add(i, "days");
+            let currentDayObj = {
+                dayName: currentDay.format("ddd"), 
+                day: currentDay.format("D"), 
+                moment: moment(currentDay), 
+                active: false, 
+                hasWorkout: false, 
+                isToday: false
+            };
+            
+            if (currentDay.isSame(this.selectedDate, "day")){
+                currentDayObj.active = true;
+            }
+            
+            if (currentDay.isSame(today, "day")){
+                currentDayObj.isToday = true;
+            }            
+            
+            if (this.workoutDates.indexOf(currentDay.format("YYYY-MM-DD")) > -1){
+                currentDayObj.hasWorkout = true;
+            }
+            
+            this.weekdays.push(currentDayObj);
+        }
+        
         this.cdr.markForCheck();
     }    
     

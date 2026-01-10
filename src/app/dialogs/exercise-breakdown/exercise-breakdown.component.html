@@ -1,0 +1,93 @@
+
+  <div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Exercise Breakdown' | translate }}</h2>
+    <mat-icon (click)="close()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>  
+
+  <mat-dialog-content>
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    } @else {
+      <mat-tab-group>
+        <mat-tab [label]="'Exercise Types' | translate">
+          <div class="tab-content">
+            @if (exerciseTypes().length > 0) {
+              <mat-accordion>
+                @for (type of exerciseTypes(); track type) {
+                  <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        <div class="breakdown-header">
+                          <span>{{ type | translate }}</span>
+                          <span class="volume">{{ formatVolume(breakdown().types[type].total_volume) }}</span>
+                        </div>
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="exercise-list">
+                      @for (exercise of breakdown().types[type].exercises; track exercise.name) {
+                        <div class="exercise-item">
+                          <div class="exercise-info">
+                            <span class="name">{{ exercise.name | translate }}</span>
+                            <span class="volume">{{ formatVolume(exercise.volume) }}</span>
+                          </div>
+                          <span class="percentage">{{ formatPercentage(exercise.percentage) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </mat-expansion-panel>
+                }
+              </mat-accordion>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>category</mat-icon>
+                <p>{{ 'No exercise type data available' | translate }}</p>
+              </div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Muscle Groups' | translate">
+          <div class="tab-content">
+            @if (muscleGroups().length > 0) {
+              <mat-accordion>
+                @for (muscleGroup of muscleGroups(); track muscleGroup) {
+                  <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        <div class="breakdown-header">
+                          <span>{{ muscleGroup | translate }}</span>
+                          <span class="volume">{{ formatVolume(breakdown().muscleGroups[muscleGroup].total_volume) }}</span>
+                        </div>
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="exercise-list">
+                      @for (exercise of breakdown().muscleGroups[muscleGroup].exercises; track exercise.name) {
+                        <div class="exercise-item">
+                          <div class="exercise-info">
+                            <span class="name">{{ exercise.name | translate }}</span>
+                            <span class="volume">{{ formatVolume(exercise.volume) }}</span>
+                          </div>
+                          <span class="percentage">{{ formatPercentage(exercise.percentage) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </mat-expansion-panel>
+                }
+              </mat-accordion>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>fitness_center</mat-icon>
+                <p>{{ 'No muscle group data available' | translate }}</p>
+              </div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'Close' | translate }}</button>
+  </mat-dialog-actions>

@@ -1,0 +1,103 @@
+.records-page {
+    margin-top: 20px;
+    max-width: 600px;
+    padding: 50px 40px;
+    margin: 0 auto;
+
+    .records-page__loading {
+        margin-top: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        mat-spinner {
+            margin: 0 auto;
+        }
+    }
+    
+    .records-page__title {
+        border-bottom: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.08));
+        margin: 0 auto;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        width: 300px;
+        max-width:100%;
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 500;
+        
+        .dark-theme & {
+          border-bottom-color: var(--mat-divider-color, rgba(255, 255, 255, 0.08));
+        }
+    }
+    
+    .records-page__search {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .records-page__exercise-list {
+        mat-list-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            
+            &:hover {
+                background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+                
+                .dark-theme & {
+                    background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.04));
+                }
+            }
+            
+            &:focus-visible {
+                outline: 2px solid var(--mat-primary-color, #d44735);
+                outline-offset: 2px;
+            }
+        }
+
+        mat-icon {
+            order: 10;
+            flex: 1;
+            text-align: right;
+            opacity: 0.4;
+            transition: opacity 0.2s ease;
+            
+            mat-list-item:hover & {
+                opacity: 0.7;
+            }
+        }
+    }
+    
+    .records-page__no-results {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--mat-text-secondary, rgba(0, 0, 0, 0.6));
+        font-size: 1rem;
+        
+        .dark-theme & {
+            color: var(--mat-text-secondary, rgba(255, 255, 255, 0.6));
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .records-page {
+        padding: 30px 20px;
+        
+        .records-page__title {
+            width: 70%;
+            font-size: 1.5rem;
+        }
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .records-page {
+        padding: 20px 15px;
+        
+        .records-page__title {
+            width: 90%;
+            font-size: 1.25rem;
+        }
+    }
+}

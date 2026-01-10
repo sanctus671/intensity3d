@@ -1,0 +1,36 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>{{ 'Zone Options' | translate }}</h2>
+
+  <mat-dialog-content>
+    <div class="form-field form-field--exercise-select">
+      <label>{{ 'Exercise' | translate }}</label>
+      <button mat-stroked-button (click)="openSelectExercise()">
+        {{ exerciseName() || ('All Exercises' | translate) }}
+        <mat-icon iconPositionEnd>edit</mat-icon>
+      </button>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'Start Date' | translate }}</mat-label>
+        <input matInput [matDatepicker]="startPicker" [ngModel]="startdate()" (ngModelChange)="startdate.set($event)">
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'End Date' | translate }}</mat-label>
+        <input matInput [matDatepicker]="endPicker" [ngModel]="enddate()" (ngModelChange)="enddate.set($event)">
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ 'Cancel' | translate }}</button>
+    <button mat-button color="primary" (click)="save()">{{ 'Apply' | translate }}</button>
+  </mat-dialog-actions>
+</div>

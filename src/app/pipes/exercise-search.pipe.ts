@@ -1,12 +1,19 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+interface ExerciseItem {
+  name: string;
+  category?: string;
+  muscle_group?: string;
+  [key: string]: unknown;
+}
+
 @Pipe({
   name: 'exerciseSearch'
 })
 export class ExerciseSearchPipe implements PipeTransform {
-  transform(exercises: any[], searchTerm: string): any[] {
+  transform(exercises: ExerciseItem[] | null | undefined, searchTerm: string): ExerciseItem[] {
     if (!exercises || !searchTerm) {
-      return exercises;
+      return exercises || [];
     }
 
     const lowerSearch = searchTerm.toLowerCase();

@@ -1,0 +1,110 @@
+<div class="program" [class.program--is-dialog]="properties().isDialog">
+    <div class="program__header">
+        <h2>
+            <span (click)="viewProgramDetails()">
+                {{ program().name || ('Loading...' | translate) }}
+            </span>
+            @if (properties().isDialog) {
+                <a [routerLink]="['/programs', program().id]" 
+                   [queryParams]="{name: formatURL(program().name)}" 
+                   target="_blank"
+                   [attr.aria-label]="'Open in new window' | translate">
+                    <mat-icon>open_in_new</mat-icon>
+                </a>
+            }
+        </h2>
+        @if (program().description) {
+            <p>{{ program().description }}</p>
+        }
+    </div>
+
+    @if (properties().loading) {
+        <div class="program__loading">
+            <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
+        </div>
+    }
+    
+    @if (tabs().length > 1) {
+        <div class="program__tabs">
+            @for (tab of tabs(); track tab) {
+                @if (properties().activeTab === tab) {
+                    <button 
+                        mat-flat-button
+                        color="primary"
+                        (click)="setActiveTab(tab)">
+                        {{ tab | translate }}
+                    </button>
+                } @else {
+                    <button 
+                        mat-stroked-button
+                        color="primary"
+                        (click)="setActiveTab(tab)">
+                        {{ tab | translate }}
+                    </button>
+                }
+            }
+        </div>
+    }
+    
+    <div class="program__program-workouts">
+        @for (workout of program().workouts; track workout.workoutid || workout.id) {
+            @if (isInTab(workout)) {
+                <div class="program__program-workouts__workout-list workout-list">
+                    <mat-nav-list>
+                        <h3 mat-subheader>
+                            <span (click)="viewWorkoutDetails(workout)">{{ workout.name }}</span>
+                            <button 
+                                mat-button 
+                                class="workout-list__add-workout" 
+                                (click)="addWorkout(workout)">
+                                {{ 'Add Workout' | translate }}
+                            </button>
+                        </h3>
+                        
+                        @for (exercise of workout.exercises; track exercise.exerciseid || $index) {
+                            <mat-list-item (click)="openExercise(exercise, workout)">
+                                <h2 matLine>{{ exercise.name }}</h2>
+                                <p matLine>
+                                    {{ exercise.sets || 0 }} {{ (exercise.sets === 1 ? 'set' : 'sets') | translate }}
+                                    {{ 'of' | translate }}
+                                    {{ exercise.reps || 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ (exercise.maxreps || exercise.reps !== 1 ? 'reps' : 'rep') | translate }}
+                                    @if (exercise.percentage && exercise.percentage > 0) {
+                                        <span>, {{ exercise.percentage }}%</span>
+                                    }
+                                    @if (exercise.rpe && exercise.rpe > 0) {
+                                        <span>, @{{ exercise.rpe }}RPE</span>
+                                    }
+                                    @if (exercise.type && exercise.type !== '') {
+                                        <span>, {{ formatExerciseType(exercise.type) | translate }}</span>
+                                    }
+                                </p>
+                                <mat-icon matListIcon>chevron_right</mat-icon>
+                            </mat-list-item>
+                        }
+                    </mat-nav-list>
+                </div>
+            }
+        }
+    </div>
+    
+    <div class="program__actions">
+        <div class="program__actions__inner">
+            <button mat-flat-button color="primary" (click)="addProgram()">
+                <mat-icon>add</mat-icon>
+                {{ 'Add To Diary' | translate }}
+            </button>
+            
+            @if (isCreator()) {
+                <button mat-stroked-button color="primary" (click)="editProgram()">
+                    <mat-icon>edit</mat-icon>
+                    {{ 'Edit Program' | translate }}
+                </button>
+            }
+            
+            <button mat-stroked-button (click)="customizeProgram()">
+                <mat-icon>tune</mat-icon>
+                {{ 'Customize Program' | translate }}
+            </button>
+        </div>
+    </div>
+</div>

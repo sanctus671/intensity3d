@@ -1,5 +1,6 @@
 .dialog-title{
     position:relative;
+    padding-right:40px;
     mat-icon{
         cursor:pointer;
         position:absolute;
@@ -20,11 +21,10 @@
         text-align: center;
         padding-bottom: 40px;
         padding-top: 40px;
-        background-color: var(--primary-color);
         margin-bottom: 20px;
         color: var(--mat-sys-on-primary);
-        border-radius: 4px;
-        margin-top:10px;
+        border-radius: 20px;
+        margin-top:20px;
         
         h2{
             margin: 5px 0px;
@@ -59,9 +59,8 @@
     .records__record{
         padding: 30px 30px;
         margin: 20px 0px;
-        background-color: var(--primary-color);
-        color: var(--mat-sys-on-primary);
-        border-radius: 4px;
+        border:1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);
+        border-radius: 20px;
         
         &--red-background{
             background-color:#d44735;
@@ -82,17 +81,16 @@
         .record__records-bar{
             height: 5px;
             position: relative;
-            background-color: rgba(68,68,68,0.4);
+            background-color: color-mix(in srgb, var(--text-primary) 20%, transparent);
             border-radius: 50px;
             
             .record__records-bar__current-bar{
                 height: 5px;
-                background-color: #ffffff;
+                background-color:var(--mat-sys-primary);
                 position: absolute;
                 top: 0;
                 width: 0px;
                 left: 0px;
-                color: White;
                 border-top-left-radius: 50px;
                 border-bottom-left-radius: 50px;
                 max-width: 100%;
@@ -105,7 +103,6 @@
         }
 
         .record__bar-text{
-            color: #fff;
             font-weight: 700;
             line-height: 20px;
             font-size: 20px;
@@ -124,28 +121,44 @@
     }
     
     .records__records-list{
-        max-width:400px;
         margin:0 auto;
         padding-top:0px;
         
-        &.mat-list-base .mat-list-item.mat-2-line{
-            height:56px;
-        }
-        
         h3{
-           line-height: 20px; 
+    
         }
         
         p{
             opacity:0.4;
         }
+
+        .mat-mdc-list-item-meta{
+            align-self:center;
+        }
         
         mat-icon{
-            order: 10;
-            flex: 1;
-            text-align: right;
-            opacity:0.2;            
+            opacity:0.5;            
         }
+        
+        .clickable {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.04);
+                
+                mat-icon {
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+    .records__records-list .clickable:hover {
+        background-color: rgba(255, 255, 255, 0.08);
     }
 }
 

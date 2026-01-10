@@ -1,0 +1,67 @@
+.dialog-title{
+    position:relative;
+    padding-right:40px;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+.record-history {
+    min-height: 400px;
+
+    .record-history__loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 400px;
+        padding: 60px 0;
+    }
+
+    .record-history__content {
+        padding: 16px 0;
+    }
+
+    .record-history__chart {
+        width: 100%;
+        height: 400px;
+        margin-bottom: 24px;
+    }
+
+    .record-history__list {
+        padding: 0;
+
+        [mat-subheader] {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+    }
+
+    .record-history__list-item {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        mat-icon {
+            opacity: 0.5;
+        }
+
+        .mat-mdc-list-item-meta{
+            align-self: center;
+        }
+    }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+    .record-history__list-item:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+}

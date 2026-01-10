@@ -1,6 +1,6 @@
-import { Component, signal, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,13 +16,31 @@ import { AuthenticationService } from '../../services/authentication/authenticat
 import { AccountService } from '../../services/account/account.service';
 import { DiaryService } from '../../services/diary/diary.service';
 import { ThemeService } from '../../services/theme/theme.service';
+import { TimerService } from '../../services/timer/timer.service';
 import { ConfirmationComponent } from '../../dialogs/confirmation/confirmation.component';
+import { TimerComponent } from '../../dialogs/timer/timer.component';
+import { PlateCalculatorComponent } from '../../dialogs/tools/plate-calculator/plate-calculator.component';
+import { WarmupCalculatorComponent } from '../../dialogs/tools/warmup-calculator/warmup-calculator.component';
+import { OnermCalculatorComponent } from '../../dialogs/tools/onerm-calculator/onerm-calculator.component';
+import { PointsCalculatorComponent } from '../../dialogs/tools/points-calculator/points-calculator.component';
+import { WeightConverterComponent } from '../../dialogs/tools/weight-converter/weight-converter.component';
+import { ViewPremiumComponent } from '../../dialogs/view-premium/view-premium.component';
 import { Subscription } from 'rxjs';
 import moment from 'moment';
 
 interface Account {
+  id?: number;
   dp: string;
   premium: boolean;
+  display?: string;
+  username?: string;
+  email?: string;
+}
+
+interface UserStats {
+  current_streak: number;
+  last_workout: string | null;
+  loading: boolean;
 }
 
 @Component({
@@ -42,18 +60,33 @@ interface Account {
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.light-theme]': '!themeService.isDark()',
+    '[class.dark-theme]': 'themeService.isDark()'
+  }
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   private authService = inject(AuthenticationService);
   private accountService = inject(AccountService);
   private diaryService = inject(DiaryService);
   public themeService = inject(ThemeService);
+  public timerService = inject(TimerService);
   private router = inject(Router);
   private matIconRegistry = inject(MatIconRegistry);
   private domSanitizer = inject(DomSanitizer);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+  
+  timerStatus = signal<{
+    stopwatchStarted: boolean;
+    countdownTimerStarted: boolean;
+    intervalStarted: boolean;
+  }>({
+    stopwatchStarted: false,
+    countdownTimerStarted: false,
+    intervalStarted: false
+  });
   
   sidenavOpened = signal(false);
   selectedDate = signal(new Date());
@@ -61,10 +94,37 @@ export class LayoutComponent implements OnInit, OnDestroy {
     dp: 'http://api.intensityapp.com/uploads/default.png',
     premium: false
   });
+  userStats = signal<UserStats>({
+    current_streak: 0,
+    last_workout: null,
+    loading: true
+  });
+  
+  currentRoute = signal<string>('');
+  friendUserId = signal<string | null>(null);
+  
+  // Computed property to determine the diary link
+  diaryLink = computed(() => {
+    const userId = this.friendUserId();
+    return userId ? `/friends/${userId}/diary` : '/diary';
+  });
 
   private subscriptions: Subscription[] = [];
 
   ngOnInit(): void {
+    // Track current route to detect if we're on friend diary
+    const routerSub = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.currentRoute.set(event.url);
+        this.updateFriendUserId(event.url);
+      }
+    });
+    this.subscriptions.push(routerSub);
+    
+    // Initialize with current route
+    this.currentRoute.set(this.router.url);
+    this.updateFriendUserId(this.router.url);
+    
     // Load account data
     this.accountService.getAccount().then((data) => {
 
@@ -95,10 +155,14 @@ export class LayoutComponent implements OnInit, OnDestroy {
     });
     this.subscriptions.push(accountSub);
 
+    // Load user stats
+    this.loadUserStats();
+
     // Subscribe to diary date changes
-    const diarySub = this.diaryService.getDiaryObservable().subscribe((date) => {
+    const diarySub = this.diaryService.getSelectedDate().subscribe((date) => {
       if (date) {
-        this.selectedDate.set(new Date(date));
+  
+        this.selectedDate.set(date.toDate());
       }
     });
     this.subscriptions.push(diarySub);
@@ -108,6 +172,31 @@ export class LayoutComponent implements OnInit, OnDestroy {
       'trophy',
       this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/md-trophy.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'plates',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/icon/platesicon.svg')
+    );
+
+    // Subscribe to timer status
+    const timerSub = this.timerService.timerStatusObservable.subscribe((data: any) => {
+      if (data) {
+        this.timerStatus.set(data);
+        this.cdr.markForCheck();
+      }
+    });
+    this.subscriptions.push(timerSub);
+
+    // Subscribe to counter for continuous UI updates when any timer is running
+    const counterSub = this.timerService.counter.subscribe(() => {
+      // Only trigger change detection if at least one timer is running
+      if (this.timerStatus().stopwatchStarted || 
+          this.timerStatus().countdownTimerStarted || 
+          this.timerStatus().intervalStarted) {
+        this.cdr.markForCheck();
+      }
+    });
+    this.subscriptions.push(counterSub);
+
   }
 
   ngOnDestroy(): void {
@@ -116,6 +205,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   getSelectedMonth(): string {
     const date = this.selectedDate();
+
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
     return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
@@ -151,8 +241,22 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   navigateToDiary(): void {
-    if (this.router.url !== '/diary') {
-      this.router.navigate(['/diary']);
+    const userId = this.friendUserId();
+    const targetLink = this.diaryLink();
+    
+    // Only navigate if not already on the correct page
+    if (!this.router.url.startsWith(targetLink.split('?')[0])) {
+      this.router.navigate([targetLink]);
+    }
+  }
+  
+  updateFriendUserId(url: string): void {
+    // Check if we're on a friend diary page: /friends/:userid/diary
+    const friendDiaryMatch = url.match(/^\/friends\/(\d+)\/diary/);
+    if (friendDiaryMatch) {
+      this.friendUserId.set(friendDiaryMatch[1]);
+    } else {
+      this.friendUserId.set(null);
     }
   }
 
@@ -162,6 +266,22 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   toggleMenu(): void {
     this.sidenavOpened.update(value => !value);
+  }
+
+  openTimer(): void {
+    this.dialog.open(TimerComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      panelClass: 'timer-dialog-container'
+    });
+  }
+
+  getStopwatchTime(): string {
+    return this.timerService.formatNavTime(this.timerService.stopwatchDuration);
+  }
+
+  getTimerTime(): string {
+    return this.timerService.formatNavTime(this.timerService.countdownTimerDuration);
   }
 
   logout(): void {
@@ -181,6 +301,118 @@ export class LayoutComponent implements OnInit, OnDestroy {
           // Even if logout fails, navigate to login
           this.router.navigate(['/login']);
         });
+      }
+    });
+  }
+
+  openPlateCalculator(): void {
+    this.dialog.open(PlateCalculatorComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      panelClass: 'plate-calculator-dialog-container'
+    });
+  }
+
+  openWarmupCalculator(): void {
+    this.dialog.open(WarmupCalculatorComponent, {
+      width: '550px',
+      maxWidth: '95vw',
+      panelClass: 'warmup-calculator-dialog-container'
+    });
+  }
+
+  openOnermCalculator(): void {
+    this.dialog.open(OnermCalculatorComponent, {
+      width: '350px',
+      maxWidth: '95vw',
+      panelClass: 'onerm-calculator-dialog-container'
+    });
+  }
+
+  openPointsCalculator(): void {
+    this.dialog.open(PointsCalculatorComponent, {
+      width: '450px',
+      maxWidth: '95vw',
+      panelClass: 'points-calculator-dialog-container'
+    });
+  }
+
+  openWeightConverter(): void {
+    this.dialog.open(WeightConverterComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      panelClass: 'weight-converter-dialog-container'
+    });
+  }
+
+  loadUserStats(): void {
+    this.diaryService.getStats({ type: 'generaluserdata' }).then((data: any) => {
+      const stats: UserStats = {
+        current_streak: data.current_streak || 0,
+        last_workout: data.heatmap && data.heatmap.length > 0 ? data.heatmap[0].assigneddate : null,
+        loading: false
+      };
+      this.userStats.set(stats);
+      this.cdr.markForCheck();
+    }).catch(() => {
+      this.userStats.update(stats => ({ ...stats, loading: false }));
+      this.cdr.markForCheck();
+    });
+  }
+
+  formatUserName(): string {
+    const user = this.account();
+    if (!user) return '';
+    let name = user.display || user.username || '';
+    if (!name) return '';
+    return name.split('@')[0];
+  }
+
+  formatLastWorkout(): string {
+    const lastWorkout = this.userStats().last_workout;
+    if (!lastWorkout) return 'Never';
+    
+    const workoutDate = moment(lastWorkout);
+    const today = moment().startOf('day');
+    const yesterday = moment().subtract(1, 'day').startOf('day');
+    
+    if (workoutDate.isSame(today, 'day')) {
+      return 'Today';
+    } else if (workoutDate.isSame(yesterday, 'day')) {
+      return 'Yesterday';
+    } else if (workoutDate.isAfter(moment().subtract(7, 'days'))) {
+      return workoutDate.format('dddd');
+    } else {
+      return workoutDate.format('MMMM D, YYYY');
+    }
+  }
+
+  getDp(): string {
+    const user = this.account();
+    return user?.dp || 'https://api.intensityapp.com/uploads/default.png';
+  }
+
+  openUpgrade(): void {
+    const dialogRef = this.dialog.open(ViewPremiumComponent, {
+      width: '550px',
+      maxWidth: '95vw',
+      panelClass: 'view-premium-dialog-container'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Premium status was updated, reload user stats
+        this.loadUserStats();
+      }
+    });
+  }
+
+  navigateToProfile(): void {
+    // Pass the already-loaded account data to the profile component
+    // so it can display immediately without waiting for a full reload
+    this.router.navigate(['/profile'], {
+      state: {
+        account: this.account()
       }
     });
   }

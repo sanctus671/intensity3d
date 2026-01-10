@@ -1,5 +1,8 @@
 <div class="dialog-title">
     <h2 mat-dialog-title>{{ 'Select Exercise' | translate }}</h2>
+
+        <button mat-button color="primary" class="dialog-title__reset" (click)="clearSelection()">{{ 'Reset' | translate }}</button>
+
     <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
 </div>
 
@@ -16,10 +19,12 @@
     <mat-tab-group class="select-exercise__nav" [selectedIndex]="properties.selectedTab">
         <mat-tab [label]="'Recommended' | translate">
             <mat-nav-list>
-                @for (recommendedExercise of recommendedExercises | exerciseSearch:properties.search; track recommendedExercise.id) {
+                @for (recommendedExercise of recommendedExercises | exerciseSearch:properties.search; track recommendedExercise['id']) {
                     <mat-list-item (click)="selectExercise(recommendedExercise)">
                         {{ recommendedExercise.name }}
-                        <mat-icon matListIcon>chevron_right</mat-icon>
+                        <div matListItemMeta>
+                            <mat-icon>chevron_right</mat-icon>
+                        </div>
                     </mat-list-item>
                 }
             </mat-nav-list>            
@@ -27,10 +32,13 @@
         
         <mat-tab [label]="('Recent' | translate) + (recentExercises.length > 0 ? ' (' + recentExercises.length + ')' : '')">
             <mat-nav-list>
-                @for (recentExercise of recentExercises | exerciseSearch:properties.search; track recentExercise.exerciseid) {
+                @for (recentExercise of recentExercises | exerciseSearch:properties.search; track recentExercise['exerciseid']) {
                     <mat-list-item (click)="selectExercise(recentExercise)">
                         {{ recentExercise.name }}
-                        <mat-icon matListIcon>chevron_right</mat-icon>
+
+                        <div matListItemMeta>
+                            <mat-icon>chevron_right</mat-icon>
+                        </div>
                     </mat-list-item>
                 }
             </mat-nav-list>             
@@ -38,10 +46,13 @@
         
         <mat-tab [label]="('All Exercises' | translate) + (exercises.length > 0 ? ' (' + numberWithCommas(exercises.length) + ')' : '')">
             <mat-nav-list>
-                @for (exercise of exercises | exerciseSearch:properties.search | slice:0:properties.exerciseLimit; track exercise.id; let i = $index) {
+                @for (exercise of exercises | exerciseSearch:properties.search | slice:0:properties.exerciseLimit; track exercise['id']; let i = $index) {
                     <mat-list-item (click)="selectExercise(exercise)">
                         {{ exercise.name }}
-                        <mat-icon matListIcon>chevron_right</mat-icon>
+
+                        <div matListItemMeta>
+                            <mat-icon>chevron_right</mat-icon>
+                        </div>
                     </mat-list-item>
                 }
 

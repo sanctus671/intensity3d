@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RequestService } from '../request/request.service';
+import { StorageService } from '../storage/storage.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -7,8 +8,14 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class FriendsService {
   private friendsObservable: BehaviorSubject<any>;
+  private friendsCache: any = null;
+  private friendsCacheTimestamp: number = 0;
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-  constructor(private request: RequestService) {
+  constructor(
+    private request: RequestService,
+    private storage: StorageService
+  ) {
     this.friendsObservable = new BehaviorSubject<any>(null);
   }
 
@@ -20,8 +27,30 @@ export class FriendsService {
     this.friendsObservable.next(update);
   }
 
-  getFriends(): Promise<any> {
-    return this.request.get('view', 'getfriends', 'friends', {});
+  async getFriends(forceRefresh: boolean = false): Promise<any> {
+    // Check if cache is valid
+    const now = Date.now();
+    const cacheIsValid = this.friendsCache && (now - this.friendsCacheTimestamp < this.CACHE_DURATION);
+    
+    if (!forceRefresh && cacheIsValid) {
+      return Promise.resolve(this.friendsCache);
+    }
+
+    // Fetch fresh data
+    const session = await this.storage.get('intensity__session');
+    const data = await this.request.get('view', 'getfriends', 'friends', { sessionid: session });
+    
+    // Update cache
+    this.friendsCache = data;
+    this.friendsCacheTimestamp = now;
+    this.friendsObservable.next(data);
+    
+    return data;
+  }
+
+  clearFriendsCache(): void {
+    this.friendsCache = null;
+    this.friendsCacheTimestamp = 0;
   }
 
   searchFriends(query: string): Promise<any> {

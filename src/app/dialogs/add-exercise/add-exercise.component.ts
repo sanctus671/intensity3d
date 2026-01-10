@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, inject, ViewEncapsulation, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -14,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ExerciseService } from '../../services/exercise/exercise.service';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
 import { ExerciseSearchPipe } from '../../pipes/exercise-search.pipe';
+import { ExerciseFilterPipe } from '../../pipes/exercise-filter.pipe';
 
 @Component({
   selector: 'app-add-exercise',
@@ -32,7 +33,8 @@ import { ExerciseSearchPipe } from '../../pipes/exercise-search.pipe';
     MatListModule,
     TranslateModule,
     SlicePipe,
-    ExerciseSearchPipe
+    ExerciseSearchPipe,
+    ExerciseFilterPipe
   ]
 })
 export class AddExerciseComponent {
@@ -42,6 +44,10 @@ export class AddExerciseComponent {
     public exerciseService = inject(ExerciseService);
     private dialog = inject(MatDialog);
     private snackBar = inject(MatSnackBar);
+    private cdr = inject(ChangeDetectorRef);
+
+    @ViewChild('categoryList') categoryList?: ElementRef<HTMLElement>;
+    @ViewChild('exerciseList') exerciseListEl?: ElementRef<HTMLElement>;
 
     public recommendedExercises:Array<any>;
     public exercises:Array<any>;
@@ -51,6 +57,9 @@ export class AddExerciseComponent {
     public selectedExercisesRecent:Array<string>;
     public selectedExercisesAll:Array<string>;
     public selectedExercisesOrdered:Array<string>;
+    
+    public selectedCategory:any;
+    public exerciseCategories:Array<any>;
     
     public properties: any;
     
@@ -62,6 +71,9 @@ export class AddExerciseComponent {
         this.selectedExercisesAll = [];
         
         this.selectedExercisesOrdered = [];
+        
+        this.selectedCategory = null;
+        this.exerciseCategories = this.exerciseService.getExerciseCategories();
         
         this.recommendedExercises = this.exerciseService.getRecommendedExercises(); 
         this.recentExercises = [];
@@ -87,13 +99,40 @@ export class AddExerciseComponent {
     
     public clearSearch(): void {
         this.properties.search='';
+        // Reset to categories view when clearing search in All Exercises tab
+        if (this.properties.selectedTab === 2 && this.selectedCategory) {
+            this.selectedCategory = null;
+        }
         this.refreshSelection();
     }
     
     public refreshSelection(): void {
         this.selectedExercisesRecommended = this.selectedExercisesOrdered.slice();
         this.selectedExercisesRecent = this.selectedExercisesOrdered.slice();
-        this.selectedExercisesAll = this.selectedExercisesOrdered.slice();        
+        this.selectedExercisesAll = this.selectedExercisesOrdered.slice();
+        
+        // If searching in All Exercises tab, auto-select "All Exercises" category
+        if (this.properties.search && this.properties.selectedTab === 2 && !this.selectedCategory) {
+            this.autoSelectAllExercisesCategory();
+        }
+    }
+    
+    private autoSelectAllExercisesCategory(): void {
+        const allExercisesCategory = this.exerciseCategories.find(cat => cat.name === 'All Exercises');
+        if (allExercisesCategory) {
+            this.selectedCategory = allExercisesCategory;
+            // Trigger change detection to update the view
+            this.cdr.detectChanges();
+        }
+    }
+    
+    public onTabChange(tabIndex: number): void {
+        this.properties.selectedTab = tabIndex;
+        
+        // If switching to All Exercises tab with active search and no category selected
+        if (tabIndex === 2 && this.properties.search && !this.selectedCategory) {
+            this.autoSelectAllExercisesCategory();
+        }
     }
     
     private getRecentExercises(): void {
@@ -157,11 +196,11 @@ export class AddExerciseComponent {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-            this.snackBar.open('Creating exercise...', '', {
-              duration: 5000
-            });             
-                        
             if (result && result.confirm){
+                this.snackBar.open('Creating exercise...', '', {
+                  duration: 5000
+                });
+                
                 this.exerciseService.createExercise(exerciseName).then((exercise) => {
                     this.snackBar.open('Exercise created!', '', {
                       duration: 5000
@@ -195,7 +234,38 @@ export class AddExerciseComponent {
     
     public numberWithCommas(x: number): string {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }      
+    }
+    
+    public selectCategory(category: any): void {
+        this.selectedCategory = category;
+        this.scrollToTop();
+    }
+    
+    public backToCategories(): void {
+        this.selectedCategory = null;
+        this.scrollToTop();
+    }
+    
+    private scrollToTop(): void {
+        // Ensure change detection runs to update the DOM
+        this.cdr.detectChanges();
+        
+        // Use queueMicrotask to ensure DOM is fully rendered
+        queueMicrotask(() => {
+            const element = this.categoryList?.nativeElement || this.exerciseListEl?.nativeElement;
+            if (element) {
+                console.log(element);
+                // Find the Material tab's scrollable container (parent)
+                const scrollContainer = element.closest('.mat-mdc-dialog-content.mdc-dialog__content.add-exercise');
+                if (scrollContainer) {
+                    scrollContainer.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    }
                 
                 
     ngOnInit(){}    

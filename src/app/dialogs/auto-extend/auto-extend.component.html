@@ -1,0 +1,234 @@
+<h2 mat-dialog-title>
+    {{ 'Auto Extend Program' | translate }}
+    <button mat-icon-button mat-dialog-close class="auto-extend__close" [attr.aria-label]="'Close dialog' | translate">
+        <mat-icon>close</mat-icon>
+    </button>
+</h2>
+
+<mat-dialog-content class="auto-extend">
+    <p class="auto-extend__intro-text">
+        {{ 'Automatically extend your program and generate new weeks using the options below.' | translate }}
+    </p>
+
+    <!-- Number of Weeks -->
+    <mat-form-field appearance="outline">
+        <mat-label>{{ 'Number of Weeks' | translate }}</mat-label>
+        <input matInput 
+               type="number" 
+               [(ngModel)]="options().numberOfWeeks" 
+               min="1" 
+               max="52"
+               [attr.aria-label]="'Number of Weeks' | translate">
+    </mat-form-field>
+
+    <!-- Progression Types -->
+    <div class="auto-extend__progression-types">
+        <h3>{{ 'Progression Types' | translate }}</h3>
+
+        <!-- Percentage -->
+        <mat-checkbox [(ngModel)]="options().progressionTypes.percentage.enabled" color="primary">
+            {{ 'Increase Percentage' | translate }}
+        </mat-checkbox>
+        @if (options().progressionTypes.percentage.enabled) {
+            <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                <mat-label>{{ 'Percentage (%)' | translate }}</mat-label>
+                <input matInput 
+                       type="number" 
+                       [(ngModel)]="options().progressionTypes.percentage.amount" 
+                       min="0.1" 
+                       step="0.1">
+            </mat-form-field>
+        }
+
+        <!-- RPE -->
+        <mat-checkbox [(ngModel)]="options().progressionTypes.rpe.enabled" color="primary">
+            {{ 'Increase RPE' | translate }}
+        </mat-checkbox>
+        @if (options().progressionTypes.rpe.enabled) {
+            <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                <mat-label>{{ 'RPE' | translate }}</mat-label>
+                <input matInput 
+                       type="number" 
+                       [(ngModel)]="options().progressionTypes.rpe.amount" 
+                       min="0.1" 
+                       step="0.1">
+            </mat-form-field>
+        }
+
+        <!-- Reps -->
+        <mat-checkbox [(ngModel)]="options().progressionTypes.reps.enabled" color="primary">
+            {{ 'Increase Reps' | translate }}
+        </mat-checkbox>
+        @if (options().progressionTypes.reps.enabled) {
+            <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                <mat-label>{{ 'Reps' | translate }}</mat-label>
+                <input matInput 
+                       type="number" 
+                       [(ngModel)]="options().progressionTypes.reps.amount" 
+                       min="1" 
+                       step="1">
+            </mat-form-field>
+        }
+
+        <!-- Sets -->
+        <mat-checkbox [(ngModel)]="options().progressionTypes.sets.enabled" color="primary">
+            {{ 'Increase Sets' | translate }}
+        </mat-checkbox>
+        @if (options().progressionTypes.sets.enabled) {
+            <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                <mat-label>{{ 'Sets' | translate }}</mat-label>
+                <input matInput 
+                       type="number" 
+                       [(ngModel)]="options().progressionTypes.sets.amount" 
+                       min="1" 
+                       step="1">
+            </mat-form-field>
+        }
+    </div>
+
+    <!-- Progression Frequency -->
+    <mat-form-field appearance="outline">
+        <mat-label>{{ 'Progression Frequency' | translate }}</mat-label>
+        <mat-select [(ngModel)]="options().progressionFrequency" (selectionChange)="updateFrequency()">
+            <mat-option value="every">{{ 'Every Week' | translate }}</mat-option>
+            <mat-option value="everyX">{{ 'Every X Weeks' | translate }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    @if (options().progressionFrequency === 'everyX') {
+        <mat-form-field appearance="outline">
+            <mat-label>{{ 'Every X Weeks' | translate }}</mat-label>
+            <input matInput 
+                   type="number" 
+                   [(ngModel)]="options().progressionTimeframe" 
+                   min="1" 
+                   max="12">
+        </mat-form-field>
+    }
+
+    <!-- Exercise-specific settings -->
+    @if (exercises().length > 0) {
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{ 'Adjust Per Exercise' | translate }}
+                </mat-panel-title>
+                <mat-panel-description>
+                    {{ getEnabledExercisesCount() }} {{ 'exercises with custom settings' | translate }}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            @for (exercise of exercises(); track exercise.exerciseid) {
+                <mat-expansion-panel class="auto-extend__exercise-panel">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-checkbox 
+                                [checked]="isExerciseEnabled(exercise)"
+                                (change)="toggleExerciseProgression(exercise)"
+                                (click)="$event.stopPropagation()">
+                                {{ exercise.name | translate }}
+                            </mat-checkbox>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    @if (isExerciseEnabled(exercise)) {
+                        <div class="auto-extend__exercise-settings">
+                            <mat-checkbox 
+                                [checked]="isExerciseProgressionTypeEnabled(exercise, 'percentage')"
+                                (change)="toggleExerciseProgressionType(exercise, 'percentage')">
+                                {{ 'Increase Percentage' | translate }}
+                            </mat-checkbox>
+                            @if (isExerciseProgressionTypeEnabled(exercise, 'percentage')) {
+                                <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                                    <mat-label>{{ 'Percentage (%)' | translate }}</mat-label>
+                                    <input matInput 
+                                           type="number" 
+                                           [value]="getExerciseProgressionAmount(exercise, 'percentage')"
+                                           (input)="updateExerciseProgressionAmount(exercise, 'percentage', $any($event.target).value)"
+                                           min="0.1" 
+                                           step="0.1">
+                                </mat-form-field>
+                            }
+
+                            <mat-checkbox 
+                                [checked]="isExerciseProgressionTypeEnabled(exercise, 'rpe')"
+                                (change)="toggleExerciseProgressionType(exercise, 'rpe')">
+                                {{ 'Increase RPE' | translate }}
+                            </mat-checkbox>
+                            @if (isExerciseProgressionTypeEnabled(exercise, 'rpe')) {
+                                <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                                    <mat-label>{{ 'RPE' | translate }}</mat-label>
+                                    <input matInput 
+                                           type="number" 
+                                           [value]="getExerciseProgressionAmount(exercise, 'rpe')"
+                                           (input)="updateExerciseProgressionAmount(exercise, 'rpe', $any($event.target).value)"
+                                           min="0.1" 
+                                           step="0.1">
+                                </mat-form-field>
+                            }
+
+                            <mat-checkbox 
+                                [checked]="isExerciseProgressionTypeEnabled(exercise, 'reps')"
+                                (change)="toggleExerciseProgressionType(exercise, 'reps')">
+                                {{ 'Increase Reps' | translate }}
+                            </mat-checkbox>
+                            @if (isExerciseProgressionTypeEnabled(exercise, 'reps')) {
+                                <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                                    <mat-label>{{ 'Reps' | translate }}</mat-label>
+                                    <input matInput 
+                                           type="number" 
+                                           [value]="getExerciseProgressionAmount(exercise, 'reps')"
+                                           (input)="updateExerciseProgressionAmount(exercise, 'reps', $any($event.target).value)"
+                                           min="1" 
+                                           step="1">
+                                </mat-form-field>
+                            }
+
+                            <mat-checkbox 
+                                [checked]="isExerciseProgressionTypeEnabled(exercise, 'sets')"
+                                (change)="toggleExerciseProgressionType(exercise, 'sets')">
+                                {{ 'Increase Sets' | translate }}
+                            </mat-checkbox>
+                            @if (isExerciseProgressionTypeEnabled(exercise, 'sets')) {
+                                <mat-form-field appearance="outline" class="auto-extend__progression-input">
+                                    <mat-label>{{ 'Sets' | translate }}</mat-label>
+                                    <input matInput 
+                                           type="number" 
+                                           [value]="getExerciseProgressionAmount(exercise, 'sets')"
+                                           (input)="updateExerciseProgressionAmount(exercise, 'sets', $any($event.target).value)"
+                                           min="1" 
+                                           step="1">
+                                </mat-form-field>
+                            }
+                        </div>
+                    }
+                </mat-expansion-panel>
+            }
+        </mat-expansion-panel>
+    }
+
+    <!-- Summary -->
+    <div class="auto-extend__summary">
+        <h3>{{ 'Summary' | translate }}</h3>
+        <p>{{ 'This will add' | translate }} <strong>{{ options().numberOfWeeks }}</strong> {{ options().numberOfWeeks === 1 ? ('week to your program' | translate) : ('weeks to your program' | translate) }}</p>
+        
+        @for (type of getEnabledProgressionTypes(); track type) {
+            <p>{{ 'Progression:' | translate }} <strong>{{ getProgressionTypeLabel(type) }}</strong> {{ 'by' | translate }} <strong>{{ getProgressionAmount(type) }}{{ getProgressionAmountSuffix(type) }}</strong></p>
+        }
+        
+        @if (options().progressionFrequency === 'every') {
+            <p>{{ 'Applied every week' | translate }}</p>
+        }
+        @if (options().progressionFrequency === 'everyX') {
+            <p>{{ 'Applied every' | translate }} <strong>{{ options().progressionTimeframe }}</strong> {{ options().progressionTimeframe === 1 ? ('week' | translate) : ('weeks' | translate) }}</p>
+        }
+        @if (getEnabledExercisesCount() > 0) {
+            <p>{{ 'Custom settings applied to' | translate }} <strong>{{ getEnabledExercisesCount() }}</strong> {{ getEnabledExercisesCount() === 1 ? ('exercise' | translate) : ('exercises' | translate) }}</p>
+        }
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ 'Cancel' | translate }}</button>
+    <button mat-flat-button color="primary" (click)="save()">{{ 'Auto Extend' | translate }}</button>
+</mat-dialog-actions>

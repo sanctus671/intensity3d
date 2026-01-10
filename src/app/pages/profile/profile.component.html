@@ -1,0 +1,172 @@
+<div class="profile-container">
+  
+  <!-- Loading State -->
+  @if (properties().loading) {
+    <div class="profile-loading">
+      <mat-spinner diameter="50" color="primary"></mat-spinner>
+    </div>
+  }
+  
+  <!-- Profile Content -->
+  @if (!properties().loading) {
+    <!-- Back Button for Friend Profiles -->
+    @if (showBackButton()) {
+      <div class="profile-back-button">
+        <button mat-icon-button (click)="goBack()" [attr.aria-label]="'Go back' | translate">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <span>{{ 'Back' | translate }}</span>
+      </div>
+    }
+    
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-header__content">
+        <!-- Avatar Section -->
+        <div class="profile-header__avatar-section">
+          <div class="profile-avatar" [style.background-image]="'url(' + getDp(profile().dp || '') + ')'">
+            @if (isOwnProfile()) {
+              <div class="profile-avatar__overlay" (click)="uploadDp()">
+                <mat-icon>photo_camera</mat-icon>
+                <span>{{ 'Change' | translate }}</span>
+              </div>
+              <input id="dpFile" type="file" accept="image/*" hidden (change)="dpFileChangeListener($event)">
+            }
+          </div>
+          @if (profile().gender) {
+            <mat-icon 
+              class="profile-avatar__gender-icon"
+              [class.profile-avatar__gender-icon--female]="profile().gender === 'Female'"
+              [class.profile-avatar__gender-icon--male]="profile().gender === 'Male'"
+              [class.profile-avatar__gender-icon--other]="profile().gender === 'Other'">
+              @if (profile().gender === 'Female') {
+                female
+              } @else if (profile().gender === 'Male') {
+                male
+              } @else {
+<!--                 transgender -->
+              }
+            </mat-icon>
+          }
+        </div>
+        
+        <!-- Info Section -->
+        <div class="profile-header__info">
+          <div class="profile-header__name-section">
+            <h1 class="profile-username">{{ formatName(profile()) }}</h1>
+            @if (profile().about) {
+              <p>{{ profile().about }}</p>
+            }
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="profile-header__actions">
+            @if (isOwnProfile()) {
+              <button mat-flat-button color="primary" (click)="editProfile()">
+                <mat-icon>edit</mat-icon>
+                {{ 'Edit Profile' | translate }}
+              </button>
+            } @else {
+              @if (!profile().added || profile().pending) {
+                <button mat-flat-button color="primary" (click)="addFriend()">
+                  <mat-icon>person_add</mat-icon>
+                  @if (profile().pending) {
+                    {{ 'Accept Friend' | translate }}
+                  } @else {
+                    {{ 'Add Friend' | translate }}
+                  }
+                </button>
+              }
+              @if (profile().added) {
+                <button mat-stroked-button (click)="removeFriend()">
+                  <mat-icon>person_remove</mat-icon>
+                  {{ 'Remove Friend' | translate }}
+                </button>
+              }
+              <a mat-stroked-button [routerLink]="['/messages/' + (profile().userid || profile().id)]">
+                <mat-icon>message</mat-icon>
+                {{ 'Send Message' | translate }}
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="profile-main">
+      
+    
+      
+      <!-- Activity Feed -->
+      <div class="profile-activity-feed">
+        <mat-card class="activity-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'Recent Activity' | translate }}</mat-card-title>
+            @if (!isOwnProfile()) {
+              <div class="activity-card-actions">
+                <a mat-flat-button color="primary" [routerLink]="['/friends/' + (profile().userid || profile().id) + '/diary']">
+                  <mat-icon>event</mat-icon>
+                  {{ 'View Diary' | translate }}
+                </a>
+              </div>
+            }
+          </mat-card-header>
+          
+          <mat-card-content>
+            
+            <!-- Loading State for Activity -->
+            @if (properties().activityLoading && (profile().activity?.length ?? 0) === 0) {
+              <div class="activity-loading">
+                <mat-spinner diameter="40" color="primary"></mat-spinner>
+                <p>{{ 'Loading activity...' | translate }}</p>
+              </div>
+            }
+            
+            <!-- Empty State -->
+            @if (!properties().activityLoading && (profile().activity?.length ?? -1) === 0) {
+              <div class="activity-empty">
+                <h3>{{ 'No Activity Yet' | translate }}</h3>
+                <p>{{ 'Start tracking workouts to see activity here' | translate }}</p>
+              </div>
+            }
+            
+            <!-- Activity List -->
+            @if ((profile().activity?.length ?? 0) > 0) {
+              <mat-list class="activity-list">
+                @for (exercise of profile().activity; track exercise.assigneddate + exercise.name) {
+                  <mat-list-item (click)="copyExercise(exercise)">
+                    <img matListItemAvatar [src]="getDp(profile().dp || '')" [attr.alt]="formatName(profile())">
+                    <span matListItemTitle>{{ 'Tracked' | translate }} {{ exercise.sets }} {{ exercise.sets !== '1' ? ('sets' | translate) : ('set' | translate) }} {{ 'of' | translate }} {{ exercise.name | translate }} {{ 'on' | translate }} {{ formatDate(exercise.assigneddate) }}</span>
+                    <span matListItemLine>{{ 'The last set was' | translate }} {{ exercise.reps }} {{ 'reps' | translate }} {{ 'of' | translate }} {{ exercise.weight }}{{ profile().units }}</span>
+                    <div matListItemMeta>
+                      <mat-icon>file_copy</mat-icon>
+                    </div>
+                  </mat-list-item>
+                }
+              </mat-list>
+              
+              @if ((profile().activity?.length ?? 0) > 0 && properties().canloadmore) {
+                <div class="activity__load-more">
+                  <button 
+                    mat-stroked-button 
+                    color="primary"
+                    (click)="loadMoreActivity()" 
+                    [disabled]="properties().activityLoading">
+                    {{ "Load more" | translate }}
+                    @if (properties().activityLoading) {
+                      <mat-spinner diameter="15" color="accent"></mat-spinner>
+                    }
+                  </button>
+                </div>
+              }
+            }
+            
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+    </div>
+  }
+  
+</div>

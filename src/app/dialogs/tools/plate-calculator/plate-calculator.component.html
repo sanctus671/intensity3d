@@ -1,0 +1,110 @@
+<div class="plate-calculator">
+  <div class="dialog-title">
+    <h2 mat-dialog-title>{{ "Plate Calculator" | translate }}</h2>
+    <mat-icon (click)="cancel()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+  </div>
+
+  <mat-dialog-content>
+    @if (showWarmup()) {
+      <div class="plate-calculator__warmup">
+        <button mat-button color="primary" (click)="openWarmupCalculator()">{{ "Warmup" | translate }}</button>
+      </div>
+    }
+
+    <div class="plate-calculator__initial-display">
+      <div class="plate-calculator__plates-container">
+        <div class="plate-calculator__plates-container__barbell">
+          <div class="plate-calculator__plates-container__barbell__shaft"></div>
+          <div class="plate-calculator__plates-container__barbell__collar"></div>
+          <div class="plate-calculator__plates-container__barbell__sleeve"></div>
+        </div>
+
+        <div class="plate-calculator__plates-container__plates">
+          @for (plate of displayedPlates; track $index) {
+            <div class="plate-calculator__plates-container__plate plate-calculator__plates-container__plate--{{cssPlateName(plate)}}"></div>
+          }
+          @if (collarWeight > 0) {
+            <div class="plate-calculator__plates-container__weight-collar"></div>
+          }
+        </div>
+      </div>
+
+      <div class="plate-calculator__plates-text">
+        {{currentBarWeight}}{{selectedValues().units}} {{ "bar weight" | translate }}
+        @if (collarWeight > 0) {
+          <span> + {{collarWeight}}{{selectedValues().units}} {{ "collar weight" | translate }} ({{ "each side" | translate }})</span>
+        }
+        @if (selectedValues().platesString) {
+          <span> + {{selectedValues().platesString}} {{ "each side" | translate }}</span>
+        }
+      </div>
+    </div>
+
+    <h6>{{ "Calculator Options" | translate }}</h6>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Total weight" | translate }} ({{selectedValues().units}})</mat-label>
+      <input matInput type="number" [value]="selectedValues().weight" (input)="updateWeight($any($event.target).value)">
+    </mat-form-field>
+
+    <div class="plate-calculator__bar-weights">
+      <div class="plate-calculator__bar-weights__title">
+        <span>{{ "Select bar weight" | translate }}</span>
+        <button mat-button color="primary" (click)="openAddCustomBarWeight()">{{ "Add custom bar weight" | translate }}</button>
+      </div>
+      <div class="plate-calculator__bar-weights__container">
+        @for (barWeight of currentBarWeights; track barWeight) {
+          <div class="plate-calculator__bar-weights__container__bar-weight"
+               (click)="selectBarWeight(barWeight)"
+               [class.plate-calculator__bar-weights__container__bar-weight--selected]="barWeight === currentBarWeight">
+            {{barWeight}}{{selectedValues().units}}
+          </div>
+        }
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Collar weight" | translate }} ({{selectedValues().units}})</mat-label>
+      <input matInput type="number" [value]="collarWeight" (input)="updateCollarWeight($any($event.target).value)">
+    </mat-form-field>
+
+    <div class="plate-calculator__plates-selection">
+      <div class="plate-calculator__plates-selection__title">
+        <span>{{ "Select available plates" | translate }}</span>
+        <button mat-icon-button [matMenuTriggerFor]="plateOptionsMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #plateOptionsMenu="matMenu">
+          <button mat-menu-item (click)="openAddCustomPlate()">
+            <span>{{ "Add custom plate" | translate }}</span>
+          </button>
+          <button mat-menu-item (click)="openColorSettings()">
+            <span>{{ "Change plate colors" | translate }}</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <div class="plate-calculator__plates-selection__container">
+        @for (plateOption of currentPlates; track plateOption) {
+          <div class="plate-calculator__plates-selection__container__plate plate-calculator__plates-selection__container__plate--{{cssPlateName(plateOption)}}"
+               (click)="togglePlateOption(plateOption)"
+               [class.plate-calculator__plates-selection__container__plate--selected]="currentDefaultPlates.indexOf(plateOption) > -1">
+            {{plateOption}}{{selectedValues().units}}
+          </div>
+        }
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ "Unit" | translate }}</mat-label>
+      <mat-select [value]="selectedValues().units" (selectionChange)="updateUnits($event.value)">
+        <mat-option value="kg">kg</mat-option>
+        <mat-option value="lbs">lbs</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">{{ "Close" | translate }}</button>
+  </mat-dialog-actions>
+</div>

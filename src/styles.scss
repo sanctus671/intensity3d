@@ -2,6 +2,7 @@
 @use './styles/themes/light-theme' as light;
 @use './styles/themes/dark-theme' as dark;
 
+
 // Include the common styles for Angular Material
 @include mat.core();
 
@@ -31,14 +32,23 @@
   --mat-tab-active-indicator-color: #d44735;
   --mat-tab-active-focus-indicator-color: #d44735;
   
-  --mat-button-filled-hover-state-layer-color: rgba(212, 71, 53, 0.08);
-  --mat-button-filled-pressed-state-layer-color: rgba(212, 71, 53, 0.12);
+
+
+  /* Ripple */
+  --mat-ripple-color: rgba(0, 0, 0, 0.2);
+
+  .mat-mdc-outlined-button.mat-dark {
+    --mdc-outlined-button-label-text-color: #333;
+    --mdc-outlined-button-outline-color: #bbb;
+  }
   --mat-sys-primary: #d44735;
   --mat-sys-on-primary: #ffffff;
   --mat-toolbar-container-background-color: #ffffff;
   --mat-sidenav-content-background-color: #ffffff;
   --mat-sidenav-container-background-color: #ffffff;
-  --mat-menu-container-color: #fff8f6;
+  --mat-menu-container-color: #fafafa;
+
+  --empty-color: #fafafa;
 }
 
 // Apply the dark theme
@@ -49,7 +59,7 @@
   --primary-color: #d44735;
   --accent-color: #757575;
   --background-color: #303030;
-  --surface-color: #424242;
+  --surface-color: #353535;
   --text-primary: rgba(255, 255, 255, 0.87);
   --text-secondary: rgba(255, 255, 255, 0.60);
   --divider-color: rgba(255, 255, 255, 0.12);
@@ -61,10 +71,11 @@
   --mat-button-outlined-label-text-color:  #d44735;
   --mat-datepicker-calendar-date-today-selected-state-outline-color: #d44735;
   --mat-datepicker-calendar-date-selected-state-background-color: #d44735;
-  --mat-button-filled-hover-state-layer-color: rgba(212, 71, 53, 0.08);
-  --mat-button-filled-pressed-state-layer-color: rgba(212, 71, 53, 0.12);
+
   --mat-sys-primary: #d44735;
   --mat-sys-on-primary: #ffffff;
+
+  --empty-color: #313131;
 }
 
 // Global styles
@@ -85,6 +96,11 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.premium-icon {
+    color: #f7d665;
+  }
+
+
 // Apply light theme by default
 body {
   @extend .light-theme;
@@ -93,4 +109,41 @@ body {
 // Override with dark theme when class is applied
 body.dark-theme {
   @extend .dark-theme;
+}
+
+// Timer dialog styles
+.timer-dialog-container {
+  .mat-mdc-dialog-container {
+    padding: 0;
+    
+    .mat-mdc-dialog-surface {
+      overflow: visible;
+    }
+  }
+}
+
+// Progress spinner customization for timer
+.timer__tab {
+  .mat-mdc-progress-spinner {
+    circle {
+      stroke-linecap: round;
+    }
+  }
+}
+
+// Custom panel positioning for chart selects
+.accumulation-select-panel {
+  min-width: 200px !important;
+  
+  .mat-mdc-option {
+    min-height: 48px;
+  }
+}
+
+.metrics-select-panel {
+  min-width: 250px !important;
+  
+  .mat-mdc-option {
+    min-height: 48px;
+  }
 }

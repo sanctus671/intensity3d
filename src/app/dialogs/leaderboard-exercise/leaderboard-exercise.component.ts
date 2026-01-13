@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DisplayInformationComponent } from '../display-information/display-information.component';
+import { ShareComponent } from '../share/share.component';
 
 interface LeaderboardItem {
   assigneddate: string;
@@ -70,7 +71,7 @@ export class LeaderboardExerciseComponent {
         content: message,
         actions: [
           {
-            text: this.translate.instant('Share'),
+            name: this.translate.instant('Share'),
             handler: () => {
               dialogRef.close();
               this.share(exercise, item, rank);
@@ -89,29 +90,20 @@ export class LeaderboardExerciseComponent {
     return name;
   }
 
-  public async share(exercise: Exercise, set: LeaderboardItem, rank: number): Promise<void> {
+  public share(exercise: Exercise, set: LeaderboardItem, rank: number): void {
     const name = set.display ? set.display : set.username;
     const text = `${name} tracked ${exercise.name} for ${this.reps} reps with ${set.weight}${set.unit}. They are ranked number ${rank} on the Intensity leaderboard!`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Intensity leaderboard',
-          text: text,
-          url: 'https://www.intensityapp.com'
-        });
-      } catch (err) {
-        console.log('Share failed:', err);
+    this.dialog.open(ShareComponent, {
+      width: '600px',
+      data: {
+        title: 'Intensity leaderboard',
+        description: text,
+        link: 'https://www.intensityapp.com',
+        shareType: 'leaderboard',
+        showShareTypeSelector: false
       }
-    } else {
-      // Fallback: copy to clipboard
-      try {
-        await navigator.clipboard.writeText(`${text} https://www.intensityapp.com`);
-        alert(this.translate.instant('Link copied to clipboard!'));
-      } catch (err) {
-        console.error('Failed to copy:', err);
-      }
-    }
+    });
   }
 
   public formatDate(date: string): string {

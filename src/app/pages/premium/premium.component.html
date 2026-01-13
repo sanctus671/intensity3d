@@ -111,43 +111,59 @@
         <section class="premium__testimonials">
             <h2 class="premium__section-title">{{ 'What Our Users Say' | translate }}</h2>
             
-            <div class="premium__testimonials__container">
-                <mat-card class="premium__testimonials__card">
-                    <div class="premium__testimonials__rating">
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                    </div>
-                    <p class="premium__testimonials__comment">"Premium has transformed my training. The program builder alone is worth the price!"</p>
-                    <p class="premium__testimonials__author">- John E.</p>
-                </mat-card>
+            <swiper-container
+                class="premium__testimonials__swiper"
+                slides-per-view="1"
+                space-between="24"
+                loop="true"
+                navigation="false"
+                pagination="false"
+                autoplay-delay="5000"
+                autoplay-disable-on-interaction="false"
+                breakpoints='{"768": {"slidesPerView": 1}, "1024": {"slidesPerView": 2}}'>
                 
-                <mat-card class="premium__testimonials__card">
-                    <div class="premium__testimonials__rating">
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                    </div>
-                    <p class="premium__testimonials__comment">"The video upload feature helps me track my form progression. Amazing app!"</p>
-                    <p class="premium__testimonials__author">- Sarah M.</p>
-                </mat-card>
+                <swiper-slide>
+                    <mat-card class="premium__testimonials__card">
+                        <div class="premium__testimonials__rating">
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                        </div>
+                        <p class="premium__testimonials__comment">"Premium has transformed my training. The program builder alone is worth the price!"</p>
+                        <p class="premium__testimonials__author">- John E.</p>
+                    </mat-card>
+                </swiper-slide>
                 
-                <mat-card class="premium__testimonials__card">
-                    <div class="premium__testimonials__rating">
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                        <mat-icon>star</mat-icon>
-                    </div>
-                    <p class="premium__testimonials__comment">"The warmup calculator saves me so much time. Premium features are game-changing."</p>
-                    <p class="premium__testimonials__author">- Mike R.</p>
-                </mat-card>
-            </div>
+                <swiper-slide>
+                    <mat-card class="premium__testimonials__card">
+                        <div class="premium__testimonials__rating">
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                        </div>
+                        <p class="premium__testimonials__comment">"The video upload feature helps me track my form progression. Amazing app!"</p>
+                        <p class="premium__testimonials__author">- Sarah M.</p>
+                    </mat-card>
+                </swiper-slide>
+                
+                <swiper-slide>
+                    <mat-card class="premium__testimonials__card">
+                        <div class="premium__testimonials__rating">
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                            <mat-icon>star</mat-icon>
+                        </div>
+                        <p class="premium__testimonials__comment">"The warmup calculator saves me so much time. Premium features are game-changing."</p>
+                        <p class="premium__testimonials__author">- Mike R.</p>
+                    </mat-card>
+                </swiper-slide>
+            </swiper-container>
         </section>
 
         <!-- Comparison Table -->

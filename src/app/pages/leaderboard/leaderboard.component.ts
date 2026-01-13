@@ -13,6 +13,7 @@ import { AddExerciseComponent } from '../../dialogs/add-exercise/add-exercise.co
 import { LeaderboardExerciseComponent } from '../../dialogs/leaderboard-exercise/leaderboard-exercise.component';
 import { ChangeRepsComponent } from '../../dialogs/change-reps/change-reps.component';
 import { DisplayInformationComponent } from '../../dialogs/display-information/display-information.component';
+import { ShareComponent } from '../../dialogs/share/share.component';
 
 type LeaderboardData = {
   [key: string]: {
@@ -151,7 +152,7 @@ export class LeaderboardComponent implements OnInit {
         content: message,
         actions: [
           {
-            text: this.translate.instant('Share'),
+            name: this.translate.instant('Share'),
             handler: () => {
               dialogRef.close();
               this.share(exercise, item, rank);
@@ -170,32 +171,23 @@ export class LeaderboardComponent implements OnInit {
     return name;
   }
 
-  public async share(exercise: Exercise, set: any, rank: number) {
+  public share(exercise: Exercise, set: any, rank: number): void {
     const name = set.display ? set.display : set.username;
     const reps = this.selectedTab() === 'maxes' 
       ? this.leaderboardsReps()[exercise.exerciseid]
       : this.friendsLeaderboardsReps()[exercise.exerciseid];
     const text = `${name} tracked ${exercise.name} for ${reps} reps with ${set.weight}${set.unit}. They are ranked number ${rank} on the Intensity leaderboard!`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Intensity leaderboard',
-          text: text,
-          url: 'https://www.intensityapp.com'
-        });
-      } catch (err) {
-        console.log('Share failed:', err);
+    this.dialog.open(ShareComponent, {
+      width: '600px',
+      data: {
+        title: 'Intensity leaderboard',
+        description: text,
+        link: 'https://www.intensityapp.com',
+        shareType: 'leaderboard',
+        showShareTypeSelector: false
       }
-    } else {
-      // Fallback: copy to clipboard
-      try {
-        await navigator.clipboard.writeText(`${text} https://www.intensityapp.com`);
-        alert(this.translate.instant('Link copied to clipboard!'));
-      } catch (err) {
-        console.error('Failed to copy:', err);
-      }
-    }
+    });
   }
 
   public changeReps(exercise: Exercise) {

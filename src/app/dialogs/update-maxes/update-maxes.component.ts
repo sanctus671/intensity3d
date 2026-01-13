@@ -77,6 +77,7 @@ export class UpdateMaxesComponent {
         }
         
         this.programService.getMaxes(this.exercises).then((data: Array<any>) => {
+            console.log(data);
             for (let exercise of data){
                 if (exercise["onerm"] && exercise["onerm"] > 0){
                     this.maxes[exercise.exerciseid]["max"] = exercise["onerm"];

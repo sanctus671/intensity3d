@@ -12,24 +12,28 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { ProgramService } from '../../services/program/program.service';
 import { AccountService } from '../../services/account/account.service';
 
 import { DisplayInformationComponent } from '../../dialogs/display-information/display-information.component';
-import { SelectExerciseComponent } from '../../dialogs/select-exercise/select-exercise.component';
+import { AddExerciseComponent } from '../../dialogs/add-exercise/add-exercise.component';
 import { CopyProgramWorkoutComponent } from '../../dialogs/copy-program-workout/copy-program-workout.component';
 import { EditProgramWorkoutComponent } from '../../dialogs/edit-program-workout/edit-program-workout.component';
 import { CopyProgramExerciseComponent } from '../../dialogs/copy-program-exercise/copy-program-exercise.component';
 import { EditProgramExerciseComponent } from '../../dialogs/edit-program-exercise/edit-program-exercise.component';
 import { ViewPremiumComponent } from '../../dialogs/view-premium/view-premium.component';
 import { AutoExtendComponent } from '../../dialogs/auto-extend/auto-extend.component';
+import { ConfirmationComponent } from '../../dialogs/confirmation/confirmation.component';
 
 interface ProgramProperties {
     activeTab: string;
     creating: boolean;
     loading: boolean;
+    savingDraft: boolean;
     isDialog?: boolean;
 }
 
@@ -77,6 +81,8 @@ interface Program {
         MatCheckboxModule,
         MatListModule,
         MatProgressSpinnerModule,
+        MatBadgeModule,
+        MatButtonToggleModule,
         TranslateModule
     ],
     templateUrl: './create-program.component.html',
@@ -102,7 +108,8 @@ export class CreateProgramComponent implements OnInit {
     public properties = signal<ProgramProperties>({
         activeTab: 'Week 1',
         creating: false,
-        loading: false
+        loading: false,
+        savingDraft: false
     });
     
     public program = signal<Program>({
@@ -115,6 +122,8 @@ export class CreateProgramComponent implements OnInit {
     
     public tabs = signal<string[]>([]);
     public account = signal<any>({});
+    public workoutNotesVisible = signal<Set<number>>(new Set());
+    public displayMode = signal<'stacked' | 'grid'>('stacked');
 
     constructor() {
         // Load account data
@@ -132,6 +141,9 @@ export class CreateProgramComponent implements OnInit {
         });
         
         this.calculateTabs();
+        
+        // Load draft program if exists
+        this.loadDraftProgram();
         
         // Check if customizing an existing program (from query params)
         const customizeId = this.route.snapshot.queryParams['customize'];
@@ -158,6 +170,7 @@ export class CreateProgramComponent implements OnInit {
                 this.program.set(programData);
                 this.calculateTabs();
                 this.properties.update(p => ({ ...p, loading: false }));
+                this.doSaveDraft();
             }).catch((error) => {
                 console.error('Error loading program to customize:', error);
                 this.properties.update(p => ({ ...p, loading: false }));
@@ -200,6 +213,8 @@ export class CreateProgramComponent implements OnInit {
         
         this.programService.createProgram(currentProgram).then((program: any) => {
             this.properties.update(p => ({ ...p, creating: false }));
+            // Remove draft after successful creation
+            this.programService.removeProgramDraft();
             this.router.navigate(['/programs/' + program.id, { name: currentProgram.name }]);
         }).catch(() => {
             this.properties.update(p => ({ ...p, creating: false }));
@@ -209,14 +224,78 @@ export class CreateProgramComponent implements OnInit {
         });
     }
     
+    public async saveDraft(): Promise<void> {
+        this.properties.update(p => ({ ...p, savingDraft: true }));
+        await this.doSaveDraft();
+        this.properties.update(p => ({ ...p, savingDraft: false }));
+        this.snackBar.open(this.translate.instant('Draft saved successfully'), '', {
+            duration: 3000,
+            verticalPosition: 'top'
+            
+        });
+        this.router.navigate(['/programs']);
+    }
+    
+    private async doSaveDraft(): Promise<void> {
+        const programString = JSON.stringify(this.program());
+        await this.programService.saveProgramDraft(programString);
+    }
+    
+    private async loadDraftProgram(): Promise<void> {
+        try {
+            const draftProgram = await this.programService.getProgramDraft();
+            if (draftProgram) {
+                const parsedProgram = JSON.parse(draftProgram);
+                this.program.set(parsedProgram);
+                this.calculateTabs();
+            }
+        } catch (error) {
+            console.error('Error loading draft program:', error);
+        }
+    }
+    
+    public clearDraft(): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Clear Draft'),
+                content: this.translate.instant('Are you sure you want to clear this draft? This will remove all workouts in this program. This cannot be undone.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.program.set({
+                    name: '',
+                    description: '',
+                    public: false,
+                    duration: 7,
+                    workouts: [{ day: 1, name: 'Day 1', added: true, exercises: [] }]
+                });
+                this.calculateTabs();
+                this.properties.update(p => ({ ...p, activeTab: 'Week 1' }));
+                this.programService.removeProgramDraft();
+                this.snackBar.open(this.translate.instant('Draft cleared'), '', {
+                    duration: 3000
+                });
+            }
+        });
+    }
+    
 
 
     public dropExercise(event: CdkDragDrop<Exercise[]>, workout: Workout): void {
         moveItemInArray(workout.exercises, event.previousIndex, event.currentIndex);
+        // Trigger change detection by creating a new reference
+        this.program.update(p => ({ ...p }));
+        this.doSaveDraft();
     }
 
     public deleteExercise(index: number, workout: Workout): void {
         workout.exercises.splice(index, 1);
+        // Trigger change detection by creating a new reference
+        this.program.update(p => ({ ...p }));
+        this.doSaveDraft();
     }
     
     public editExercise(exercise: Exercise): void {
@@ -242,6 +321,9 @@ export class CreateProgramComponent implements OnInit {
                     }
                     delete (exercise as any).switchAll;
                 }
+                // Trigger change detection by creating a new reference
+                this.program.update(p => ({ ...p }));
+                this.doSaveDraft();
             }
         });
     }    
@@ -267,43 +349,76 @@ export class CreateProgramComponent implements OnInit {
                     }
                 }
                 this.program.set(currentProgram);
+                this.doSaveDraft();
             }
         });
     }    
     
     public dropWorkout(event: CdkDragDrop<Workout[]>): void {
-        const currentProgram = this.program();
-        moveItemInArray(currentProgram.workouts, event.previousIndex, event.currentIndex);
-        
         if (event.currentIndex === event.previousIndex) {
             return;
         }
         
-        const weekStart = (Math.floor(currentProgram.workouts[event.previousIndex].day / 7) * 7) + 1;
+        const currentProgram = this.program();
+        const workoutsInTab = this.getWorkoutsInTab();
+        
+        // Get the actual workout being moved and the target workout
+        const movedWorkout = workoutsInTab[event.previousIndex];
+        const targetWorkout = workoutsInTab[event.currentIndex];
+        
+        if (!movedWorkout || !targetWorkout) {
+            return;
+        }
+        
+        // Find actual indices in the full workouts array
+        const actualPreviousIndex = currentProgram.workouts.indexOf(movedWorkout);
+        const actualCurrentIndex = currentProgram.workouts.indexOf(targetWorkout);
+        
+        if (actualPreviousIndex === -1 || actualCurrentIndex === -1) {
+            return;
+        }
+        
+        // Move in the array
+        moveItemInArray(currentProgram.workouts, actualPreviousIndex, actualCurrentIndex);
+        
+        // Calculate new day based on position in the week
+        const currentTabs = this.tabs();
+        const currentProperties = this.properties();
+        const weekIndex = currentTabs.indexOf(currentProperties.activeTab);
+        const weekStart = (weekIndex * 7) + 1;
         const weekEnd = weekStart + 6;
-        const daysChanged = event.currentIndex - event.previousIndex;
-        let newDay = currentProgram.workouts[event.currentIndex].day + daysChanged;
-        const replacedDay = currentProgram.workouts[event.previousIndex].day;
         
-        if ((event.currentIndex < event.previousIndex && newDay > replacedDay) || 
-            (event.currentIndex > event.previousIndex && newDay < replacedDay)) {
-            newDay = replacedDay;
-        }
+        // Calculate the new day based on position in the filtered list
+        const newDay = weekStart + event.currentIndex;
         
-        if (newDay < weekStart) {
-            newDay = weekStart;
-        } else if (newDay > weekEnd) {
-            newDay = weekEnd;
-        }
+        // Ensure the day is within the current week bounds
+        movedWorkout.day = Math.min(Math.max(newDay, weekStart), weekEnd);
         
-        currentProgram.workouts[event.currentIndex].day = newDay;
         this.program.set(currentProgram);
+        this.doSaveDraft();
     }    
+    
+    public confirmDeleteWorkout(index: number, workout: Workout): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Confirm Delete'),
+                content: this.translate.instant('Are you sure you want to delete this workout? All exercises in this workout will be removed.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.deleteWorkout(index, workout);
+            }
+        });
+    }
     
     public deleteWorkout(index: number, workout: Workout): void {
         const currentProgram = this.program();
         currentProgram.workouts.splice(index, 1);
         this.program.set(currentProgram);
+        this.doSaveDraft();
     }
     
     public editWorkout(workout: Workout): void {
@@ -329,7 +444,11 @@ export class CreateProgramComponent implements OnInit {
                     } else {
                         this.program.set(currentProgram);
                     }
+                } else {
+                    // Trigger change detection even if only name changed
+                    this.program.update(p => ({ ...p }));
                 }
+                this.doSaveDraft();
             }
         });
     }
@@ -355,6 +474,7 @@ export class CreateProgramComponent implements OnInit {
                     }
                 }
                 this.program.set(currentProgram);
+                this.doSaveDraft();
             }
         });
     }
@@ -393,6 +513,7 @@ export class CreateProgramComponent implements OnInit {
         this.tabs.set(currentTabs);
         this.program.set(currentProgram);
         this.properties.update(p => ({ ...p, activeTab: 'Week ' + (event.currentIndex + 1) }));
+        this.doSaveDraft();
     }
     
     public copyTab(week: string, index: number): void {
@@ -413,6 +534,23 @@ export class CreateProgramComponent implements OnInit {
             }
         }
         this.program.set(currentProgram);
+        this.doSaveDraft();
+    }
+    
+    public confirmRemoveTab(week: string, index: number): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Confirm Delete'),
+                content: this.translate.instant('Are you sure you want to delete this week? All workouts in this week will be removed.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.removeTab(week, index);
+            }
+        });
     }
     
     public removeTab(week: string, index: number): void {
@@ -442,6 +580,7 @@ export class CreateProgramComponent implements OnInit {
         let weekNumber = parseInt(week.split(' ')[1]) - 1;
         weekNumber = weekNumber ? weekNumber : 1;
         this.properties.update(p => ({ ...p, activeTab: 'Week ' + weekNumber }));
+        this.doSaveDraft();
     }
     
     private calculateTabs(): void {
@@ -462,6 +601,45 @@ export class CreateProgramComponent implements OnInit {
         const tab = Math.ceil(workout.day / 7);
         
         return index === tab;
+    }
+    
+    public getWorkoutsInTab(): Workout[] {
+        return this.program().workouts.filter(workout => this.isInTab(workout));
+    }
+    
+    public setDisplayMode(mode: 'stacked' | 'grid'): void {
+        this.displayMode.set(mode);
+    }
+    
+    public getGridData(): { weeks: string[], days: string[], workoutsByWeekAndDay: Map<string, Workout | null> } {
+        const weeks = this.tabs();
+        const daysOfWeek = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+        const workoutsByWeekAndDay = new Map<string, Workout | null>();
+        
+        // Initialize all cells as null
+        weeks.forEach((week, weekIndex) => {
+            daysOfWeek.forEach((_, dayIndex) => {
+                const key = `${weekIndex}-${dayIndex}`;
+                workoutsByWeekAndDay.set(key, null);
+            });
+        });
+        
+        // Fill in workouts
+        const currentProgram = this.program();
+        currentProgram.workouts.forEach(workout => {
+            const weekIndex = Math.ceil(workout.day / 7) - 1;
+            const dayIndex = ((workout.day - 1) % 7);
+            const key = `${weekIndex}-${dayIndex}`;
+            workoutsByWeekAndDay.set(key, workout);
+        });
+        
+        return { weeks, days: daysOfWeek, workoutsByWeekAndDay };
+    }
+    
+    public getWorkoutForCell(weekIndex: number, dayIndex: number): Workout | null {
+        const gridData = this.getGridData();
+        const key = `${weekIndex}-${dayIndex}`;
+        return gridData.workoutsByWeekAndDay.get(key) || null;
     }
     
     public formatExerciseType(setType: string): string {
@@ -486,6 +664,46 @@ export class CreateProgramComponent implements OnInit {
         currentProgram.duration = currentProgram.duration + 7;
         this.program.set(currentProgram);
         this.calculateTabs();
+        this.doSaveDraft();
+    }
+    
+    public updateProgramName(name: string): void {
+        this.program.update(p => ({ ...p, name }));
+        this.doSaveDraft();
+    }
+    
+    public updateProgramDescription(description: string): void {
+        this.program.update(p => ({ ...p, description }));
+        this.doSaveDraft();
+    }
+    
+    public updateProgramPublic(isPublic: boolean): void {
+        this.program.update(p => ({ ...p, public: isPublic }));
+        this.doSaveDraft();
+    }
+    
+    public updateWorkoutNotes(workout: Workout, notes: string): void {
+        workout.workoutnotes = notes;
+        this.program.update(p => ({ ...p }));
+        this.doSaveDraft();
+    }
+    
+    public toggleWorkoutNotes(workout: Workout): void {
+        const currentVisible = this.workoutNotesVisible();
+        const newVisible = new Set(currentVisible);
+        
+        if (newVisible.has(workout.day)) {
+            newVisible.delete(workout.day);
+        } else {
+            newVisible.add(workout.day);
+        }
+        
+        this.workoutNotesVisible.set(newVisible);
+    }
+    
+    public isWorkoutNotesVisible(workout: Workout): boolean {
+        // Show notes if explicitly toggled visible or if workout has notes content
+        return this.workoutNotesVisible().has(workout.day);
     }
     
     public openAutoExtend(): void {
@@ -498,6 +716,7 @@ export class CreateProgramComponent implements OnInit {
         dialogRef.afterClosed().subscribe(data => {
             if (data?.options) {
                 this.autoExtendProgram(data.options);
+                this.doSaveDraft();
             }
         });
     }
@@ -633,21 +852,30 @@ export class CreateProgramComponent implements OnInit {
         currentProgram.workouts.push({ name: 'Day ' + newDay, day: newDay, added: true, exercises: [] });
         this.program.set(currentProgram);
         this.scrollToBottom();
+        this.doSaveDraft();
     }
     
     public addExercise(workout: Workout): void {
-        const dialogRef = this.dialog.open(SelectExerciseComponent, {
+        const dialogRef = this.dialog.open(AddExerciseComponent, {
             width: '600px',
             data: {}
         });
         
-        dialogRef.afterClosed().subscribe(exercise => {
-            if (exercise) {
-                exercise.type = '';
-                workout.exercises.push(exercise);
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.exercises && result.exercises.length > 0) {
+                // Add all selected exercises to the workout
+                result.exercises.forEach((exercise: any) => {
+                    exercise.type = '';
+                    exercise.sets = 1;
+                    workout.exercises.push(exercise);
+                });
+                // Update ordering for all exercises
                 workout.exercises.forEach((ex: Exercise, index: number) => {
                     ex.ordering = index;
                 });
+                // Trigger change detection by creating a new reference
+                this.program.update(p => ({ ...p }));
+                this.doSaveDraft();
             }
         });
     }

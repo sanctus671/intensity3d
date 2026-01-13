@@ -191,7 +191,7 @@ export class FriendsComponent implements OnInit {
     return name;      
   }
 
-  public viewProfile(friend: Friend): void {
+  public viewProfile(friend: Friend, added:boolean = true): void {
 
     // Navigate with friend data in router state for instant display
     this.router.navigate(['/friends', friend.friendid], {
@@ -201,7 +201,7 @@ export class FriendsComponent implements OnInit {
           username: friend.username,
           display: friend.display,
           dp: friend.dp,
-          added: true
+          added: added
         }
       }
     });
@@ -323,7 +323,7 @@ export class FriendsComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmationComponent, {
       width: '300px',
       data: {
-        title: this.translate.instant('Add') + ' ' + (friend.display ? friend.display : friend.username) + '?',
+        title: this.translate.instant('Add') + ' ' + this.formatName(friend) + '?',
         content: this.translate.instant('Are you sure you want to add this user as a friend?')
       }
     });
@@ -359,7 +359,7 @@ export class FriendsComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmationComponent, {
       width: '300px',
       data: {
-        title: this.translate.instant('Decline') + ' ' + (friend.display ? friend.display : friend.username) + '?',
+        title: this.translate.instant('Decline') + ' ' + this.formatName(friend) + '?',
         content: this.translate.instant('Are you sure you want to decline this user?')
       }
     });

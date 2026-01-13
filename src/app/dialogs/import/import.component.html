@@ -1,7 +1,15 @@
-<h2 mat-dialog-title>{{ "Import Data" | translate }}</h2>
+
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ "Import Data" | translate }}</h2>
+    <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
 
 <mat-dialog-content class="import-data">
-  <mat-stepper [linear]="true" [selectedIndex]="currentStep()" #stepper>
+  <mat-stepper 
+    [linear]="true" 
+    [selectedIndex]="currentStep()" 
+    (selectionChange)="currentStep.set($event.selectedIndex)"
+    #stepper>
     <!-- Step 1: Upload -->
     <mat-step [completed]="uploadedFile() !== null">
       <ng-template matStepLabel>{{ "Upload" | translate }}</ng-template>
@@ -30,7 +38,7 @@
             style="display: none;">
           
           <button 
-            mat-raised-button 
+            mat-button 
             color="primary"
             (click)="fileInput.click()"
             [disabled]="isUploading()">
@@ -177,31 +185,6 @@
             </mat-list>
           </div>
         }
-
-        <div class="step-actions">
-          <button mat-button (click)="dismiss()">
-            {{ "Cancel" | translate }}
-          </button>
-          @if (importType() === 'other' || !importType()) {
-            <button 
-              mat-raised-button 
-              color="primary" 
-              matStepperNext
-              [disabled]="!uploadedFile()">
-              {{ "Next" | translate }}
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
-          } @else {
-            <button 
-              mat-raised-button 
-              color="primary" 
-              (click)="currentStep.set(2); stepper.next()"
-              [disabled]="!uploadedFile()">
-              {{ "Import data" | translate }}
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
-          }
-        </div>
       </div>
     </mat-step>
 
@@ -241,21 +224,6 @@
                 </mat-select>
               </mat-form-field>
             }
-          </div>
-
-          <div class="step-actions">
-            <button mat-button matStepperPrevious>
-              <mat-icon>arrow_back</mat-icon>
-              {{ "Back" | translate }}
-            </button>
-            <button 
-              mat-raised-button 
-              color="primary" 
-              matStepperNext
-              [disabled]="!selectedFields().includes('assigneddate') || !selectedFields().includes('exercise')">
-              {{ "Next" | translate }}
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
           </div>
         </div>
       </mat-step>
@@ -309,7 +277,7 @@
 
         <div class="import-action">
           <button 
-            mat-raised-button 
+            mat-flat-button 
             color="primary"
             (click)="startImport()"
             [disabled]="isImporting()">
@@ -321,20 +289,56 @@
             {{ "Start Import" | translate }}
           </button>
         </div>
-
-        <div class="step-actions">
-          <button mat-button matStepperPrevious [disabled]="isImporting()">
-            <mat-icon>arrow_back</mat-icon>
-            {{ "Back" | translate }}
-          </button>
-        </div>
       </div>
     </mat-step>
   </mat-stepper>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="dismiss()" [disabled]="isUploading() || isImporting()">
-    {{ "Close" | translate }}
-  </button>
+  @if (currentStep() === 0) {
+    <button mat-button (click)="dismiss()">
+      {{ "Cancel" | translate }}
+    </button>
+    @if (importType() === 'other' || !importType()) {
+      <button 
+        mat-flat-button 
+        color="primary" 
+        (click)="stepper.next()"
+        [disabled]="!uploadedFile()">
+        {{ "Next" | translate }}
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    } @else {
+      <button 
+        mat-flat-button 
+        color="primary" 
+        (click)="currentStep.set(2); stepper.next()"
+        [disabled]="!uploadedFile()">
+        {{ "Import data" | translate }}
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    }
+  }
+  
+  @if (currentStep() === 1) {
+    <button mat-button (click)="stepper.previous()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ "Back" | translate }}
+    </button>
+    <button 
+      mat-flat-button 
+      color="primary" 
+      (click)="stepper.next()"
+      [disabled]="!selectedFields().includes('assigneddate') || !selectedFields().includes('exercise')">
+      {{ "Next" | translate }}
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  }
+  
+  @if (currentStep() === 2) {
+    <button mat-button (click)="stepper.previous()" [disabled]="isImporting()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ "Back" | translate }}
+    </button>
+  }
 </mat-dialog-actions>

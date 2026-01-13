@@ -11,10 +11,10 @@
     }
     
     <mat-list>
-        @for (exercise of workout.exercises; track exercise.exerciseid) {
+        @for (exercise of workout.exercises; track $index) {
             <mat-list-item>
-                <h2 matLine>{{ exercise.name }}</h2>
-                <p matLine>
+                <h2 matListItemTitle>{{ exercise.name }}</h2>
+                <p matListItemLine>
                     {{ exercise.sets }} {{ 'set' | translate }}@if (exercise.sets !== '1') {<span>s</span>} 
                     {{ 'of' | translate }} {{ exercise.reps }} {{ 'rep' | translate }}@if (exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
                 </p>

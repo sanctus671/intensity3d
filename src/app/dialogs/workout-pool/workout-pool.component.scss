@@ -18,17 +18,28 @@
         }                
     }    
     
-    .workout-pool__program__name.mat-subheader{
-        background-color: var(--primary-color);
-        color: var(--mat-sys-on-primary);    
-        margin-top:5px;  
-        cursor:pointer;
+    
+    .workout-pool__program__name.mat-mdc-subheader{
+        background-color: var(--primary-color, #d44735);
+        color: white;
+        margin: 0px;
+        padding: 5px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 0px;
+        font-weight:500;
+        font-size:16px;
+        line-height:1.2;
+        white-space:nowrap;
         
         button{
             display: inline-block;
-            margin-left: auto;            
+            margin-left: auto;     
+            color:White;       
         }
     } 
+    
     
     .workout-pool__program__workouts{
         padding: 0px 20px;
@@ -57,6 +68,19 @@
             padding: 0px 12px;
             height: 32px; 
             width:140px;
-        }        
+        }  
+            
+        mat-list-item {
+            cursor: pointer;
+            transition: background-color 0.2s cubic-bezier(0.35, 0, 0.25, 1);
+            
+            &:hover {
+                background-color: var(--hover-color, rgba(0, 0, 0, 0.04));
+            }
+
+            .mat-mdc-list-item-meta{
+                align-self:center;
+            }
+        }      
     }
 }

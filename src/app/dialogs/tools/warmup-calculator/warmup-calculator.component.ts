@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { AccountService } from '../../../services/account/account.service';
 import { PlateColorSettingsComponent } from '../plate-color-settings/plate-color-settings.component';
 import { InputDialogComponent } from '../../input-dialog/input-dialog.component';
+import { DisplayInformationComponent } from '../../display-information/display-information.component';
 
 @Component({
   selector: 'app-warmup-calculator',
@@ -139,14 +140,21 @@ export class WarmupCalculatorComponent implements OnInit {
     }
 
     openWarmupPlates(set: any): void {
-        alert(
-            `${set.reps} ${this.translate.instant('reps at')} ${set.weight}${this.selectedValues().units}${set.percentage ? ` (${set.percentage}% ${this.translate.instant('of work weight')})` : ''}\n\n${set.plates}`
-        );
+        const title = `${set.reps} ${this.translate.instant('reps at')} ${set.weight}${this.selectedValues().units}${set.percentage ? ` (${set.percentage}% ${this.translate.instant('of work weight')})` : ''}`;
+        const content = `<pre style="white-space: pre-wrap; font-family: inherit;">${set.plates}</pre>`;
+        
+        this.dialog.open(DisplayInformationComponent, {
+            data: {
+                title: title,
+                content: content,
+                actions: []
+            }
+        });
     }
 
     openColorSettings(): void {
         const dialogRef = this.dialog.open(PlateColorSettingsComponent, {
-            width: '600px',
+            width: '400px',
             maxWidth: '95vw',
             data: { units: this.selectedValues().units }
         });

@@ -65,6 +65,13 @@ export class ProgramComponent implements OnInit {
   public program = signal<any>({});
   public tabs = signal<string[]>(['Week 1']);
   public account = signal<any>({});
+  public descriptionExpanded = signal<boolean>(false);
+  
+  // Computed signal to check if description needs truncation
+  public shouldTruncateDescription = computed(() => {
+    const description = this.program().description;
+    return description && description.length > 200;
+  });
   
   // Computed signal to check if current user is the program creator
   public isCreator = computed(() => {
@@ -354,5 +361,20 @@ export class ProgramComponent implements OnInit {
   
   public setActiveTab(tab: string): void {
     this.properties.update(props => ({ ...props, activeTab: tab }));
+  }
+  
+  public toggleDescription(): void {
+    this.descriptionExpanded.update(expanded => !expanded);
+  }
+  
+  public getTruncatedDescription(): string {
+    const description = this.program().description;
+    if (!description) return '';
+    
+    if (this.descriptionExpanded() || description.length <= 180) {
+      return description;
+    }
+    
+    return description.substring(0, 180) + '...';
   }
 }

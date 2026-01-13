@@ -1,7 +1,7 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -15,6 +15,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ProgramService } from '../../services/program/program.service';
 import { AccountService } from '../../services/account/account.service';
 import { DiaryService } from '../../services/diary/diary.service';
+import { OnermCalculatorComponent } from '../tools/onerm-calculator/onerm-calculator.component';
 import moment from 'moment';
 
 @Component({
@@ -34,8 +35,7 @@ import moment from 'moment';
     MatDatepickerModule,
     MatExpansionModule,
     MatTooltipModule,
-    TranslateModule,
-    DecimalPipe
+    TranslateModule
   ],
   providers: [provideNativeDateAdapter()]
 })
@@ -43,6 +43,7 @@ export class AddProgramComponent {
     
     public dialogRef = inject(MatDialogRef<AddProgramComponent>);
     public data = inject(MAT_DIALOG_DATA);
+    private dialog = inject(MatDialog);
     private programService = inject(ProgramService);
     private accountService = inject(AccountService);
     private diaryService = inject(DiaryService);
@@ -51,20 +52,17 @@ export class AddProgramComponent {
     public startDate: Date;
     public details: any;
     public account: any;
-    public calculator: any;
     public options: any;
     public exercises: Array<any>;
     public maxCount: number = 0;
     public maxes: any;
     
-    public showCalculator: boolean = false;
     public showMoreProgEx: boolean = false;
     
     constructor() {
         this.program = this.data.program ? this.data.program : {};
 
         this.startDate = new Date();
-        this.calculator = {reps:"", weight:""}
         this.options = {
             progressiontype:"", 
             progressionamount: "", 
@@ -149,15 +147,12 @@ export class AddProgramComponent {
         return moment(this.startDate).add(this.program.duration, "days").format('MMMM Do YYYY');
     }
     
-    public getMax(): number {
-        let max = 0;
-        if (this.calculator.reps < 10){
-            max = Math.round((this.calculator.weight/(1.0278-0.0278*this.calculator.reps))*100) / 100;
-        } else {
-            max = Math.round((this.calculator.weight/0.75)*100) / 100;
-        }                       
-        return max;         
-    }    
+    public openCalculator(): void {
+        this.dialog.open(OnermCalculatorComponent, {
+            width: '350px',
+            maxWidth: '95vw'
+        });
+    }
     
     public updateFrequency(): void {
         if (this.options.frequencySelect === "every"){

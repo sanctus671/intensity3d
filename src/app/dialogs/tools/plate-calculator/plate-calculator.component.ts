@@ -139,7 +139,7 @@ export class PlateCalculatorComponent implements OnInit {
 
     openColorSettings(): void {
         const dialogRef = this.dialog.open(PlateColorSettingsComponent, {
-            width: '600px',
+            width: '400px',
             maxWidth: '95vw',
             data: { units: this.selectedValues().units }
         });

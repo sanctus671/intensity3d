@@ -6,19 +6,27 @@
     margin: 0 auto;
     
     .settings__title {
-        border-bottom: 1px solid var(--divider-color, rgba(213, 216, 222, 0.3));
+        border-bottom: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.08));
         margin: 0 auto;
         margin-bottom: 30px;
         padding-bottom: 15px;
-        width: 50%;
+        width: 300px;
+        max-width:100%;
         text-align: center;
-        color: var(--text-primary);
+        font-size: 1.75rem;
+        font-weight: 500;
+        
+        .dark-theme & {
+          border-bottom-color: var(--mat-divider-color, rgba(255, 255, 255, 0.08));
+        }
     }
     
     // Subheader styling
     .mat-mdc-subheader {
         color: var(--primary-color, #d44735);
         font-weight: 500;
+        margin-left:0px;
+        margin-right:0px;
     }
     
     // List item styling
@@ -69,32 +77,35 @@
     }
     
     // Inline select styling
-    .settings__inline-select {
-        margin-left: auto;
-        width: 150px;
-        
-        .mat-mdc-form-field-subscript-wrapper {
-            display: none;
-        }
+    .settings__settings-list__appearance{
+        mat-form-field,
+        .mat-mdc-form-field {
+            width: 100%;
+            display: block;
+            margin-bottom: 0px;
+        }        
+    }
+
+    .settings__settings-list__appearance__theme{
+        margin-top:20px;
     }
     
     // Form elements styling
     .settings__form-elements {
-        padding: 0 16px;
         margin-bottom: 10px;
         
         mat-form-field,
         .mat-mdc-form-field {
             width: 100%;
             display: block;
-            margin-bottom: 16px;
+            margin-bottom: 0px;
         }
         
         .settings__form-elements__units {
             margin-top: 5px;
         }
         
-        .mat-mdc-checkbox {
+        ::ng-deep .mat-mdc-checkbox {
             width: 100%;
             display: block;
             padding: 10px 0;
@@ -107,6 +118,10 @@
                     flex: 1;
                     order: -1;
                 }
+            }
+
+            .mdc-label {
+                font-size: 16px;
             }
         }
     }

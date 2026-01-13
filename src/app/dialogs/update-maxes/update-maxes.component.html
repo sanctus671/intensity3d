@@ -12,13 +12,13 @@
     
     @if (!loading) {
         <div>
-            @for (exercise of exercises; track exercise.exerciseid) {
+            @for (exerciseId of exercises; track exerciseId) {
                 <mat-form-field class="update-maxes__maxes__exercise">
-                    <mat-label>{{ maxes[exercise.exerciseid].name }}</mat-label>
+                    <mat-label>{{ maxes[exerciseId].name }}</mat-label>
                     <input 
                         matInput 
                         type="number" 
-                        [(ngModel)]="maxes[exercise.exerciseid].max" 
+                        [(ngModel)]="maxes[exerciseId].max" 
                         (ngModelChange)="calculateMaxes()">
                 </mat-form-field>
             }

@@ -6,19 +6,20 @@
                 {{ 'New Conversation' | translate }}
             </button>
         </div>   
-        <mat-nav-list class='messages__conversation-list'>
-            @for (conversation of conversations(); track conversation.friendid; let i = $index) {
+        <mat-list class='messages__conversation-list'>
+            @for (conversation of conversations(); track trackConversation($index, conversation); let i = $index) {
                 <mat-list-item 
                     (click)="openConversation(i)"
                     [class.selected]="i === selectedConversation()"
                     [class.requires-reply]="conversation.userid !== account().id">
                     <img matListItemAvatar [src]="getDp(conversation.profile.dp)" [alt]="conversation.profile.display || conversation.profile.username">
-                    <span matListItemTitle>{{ conversation.profile.display || conversation.profile.username }}</span>
+                    <span matListItemTitle>{{ conversation.profile.display || conversation.profile.username }}                        
+                        <span class="messages__conversation-list__conversation-date">{{ getMessageTime(conversation.created) }}</span>
+                    </span>
                     <span matListItemLine>{{ conversation.message }}</span>
-                    <span class="messages__conversation-list__conversation-date">{{ getMessageTime(conversation.created) }}</span>
                 </mat-list-item>
             }
-        </mat-nav-list>
+        </mat-list>
     </div>
     
     <div class="messages__sent-messages">
@@ -30,14 +31,14 @@
         
         @if (!properties().messagesLoading && messages().length < 1) {
             <div class="messages__sent-messages__empty">
-                <mat-icon>message</mat-icon>
+                <mat-icon fontSet="material-icons-outlined">message</mat-icon>
                 <h2>{{ 'No Messages' | translate }}</h2>
             </div>
         }
 
         @if (!properties().messagesLoading && messages().length > 0) {
             <mat-list id="message-list" class='messages__sent-messages__message-list message-list' #scrollBottom>
-                @for (message of messages(); track message.id || $index; let i = $index) {
+                @for (message of messages(); track trackMessage($index, message); let i = $index) {
                     <mat-list-item 
                         (click)="message.showTime = !message.showTime"
                         [class.to-message]="message.userid === account().id"
@@ -48,7 +49,7 @@
                         @if (message.userid !== account().id) {
                             <img matListItemAvatar [src]="getDp(selectedProfile().dp)" [alt]="selectedProfile().display || selectedProfile().username">
                         }
-                        <p matListItemLine
+                        <p matListItemTitle
                             [matTooltip]="getExactMessageTime(message.created)"
                             [matTooltipPosition]="message.userid !== account().id ? 'right' : 'left'">
                             {{ message.message }}

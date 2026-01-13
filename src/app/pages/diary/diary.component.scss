@@ -225,7 +225,7 @@
                 background-color: var(--primary-color);
                 max-width: 400px;
                 display: block;
-                border-radius: 4px;
+                border-radius: 12px;
                 margin: 0 auto;
                 color: var(--mat-sys-on-primary);
                 padding: 0px 20px;
@@ -242,6 +242,7 @@
                     padding: 0px 12px;
                     height: 32px; 
                     border-color: var(--mat-sys-on-primary);
+                    color: var(--mat-sys-on-primary);
                 }
                 
                 > span{
@@ -260,7 +261,7 @@
                 
                 max-width: 440px;
                 display: block;
-                border-radius: 4px;
+                border-radius: 12px;
                 margin: 0 auto;
                 font-size: 12px;
                 margin-top: 5px; 
@@ -274,13 +275,18 @@
                     padding: 0px 20px;   
                     height:32px;
                     line-height: 32px;
+
+                    button{
+                        
+                        color: var(--mat-sys-on-primary);
+                    }
                 }
                 
                 .workout-pool__workout-name{
                     background-color: var(--surface-color);
                     padding: 0px 20px;
                     border: 1px solid var(--divider-color);
-                    border-radius: 4px;
+                    border-radius: 12px;
                     border-top: none;
                     border-top-left-radius: 0px;
                     border-top-right-radius: 0px;    

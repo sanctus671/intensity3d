@@ -25,12 +25,12 @@
             @if (cycle.show) {
                 <div class="manage-program__program__workouts workouts">  
                     <div class="workouts__actions">
-                        <button mat-flat-button color="primary" (click)="removeProgram($event, cycle.addid, i)">
-                            {{ 'Remove Program' | translate }}
-                        </button> 
                         <button mat-stroked-button color="primary" (click)="updateMaxes(cycle.addid, i)">
                             {{ 'Update Maxes' | translate }}
                         </button>
+                        <button mat-flat-button color="primary" (click)="removeProgram($event, cycle.addid, i)">
+                            {{ 'Remove Program' | translate }}
+                        </button> 
                     </div>
 
                     <h5>{{ 'Workouts' | translate }}</h5>
@@ -44,17 +44,20 @@
                                     </mat-panel-title>
                                 </mat-expansion-panel-header>   
                                 
-                                <mat-nav-list class="workouts__workout__exercises">
+                                <mat-list class="workouts__workout__exercises">
                                     @for (exercise of workout.sets; track exercise.id; let i2 = $index) {
                                         <mat-list-item (click)="openSet(workout.sets, exercise, i2)">
-                                            <h2 matLine>{{ exercise.name }}</h2>
-                                            <p matLine>
+                                            <h2 matListItemTitle>{{ exercise.name }}</h2>
+                                            <p matListItemLine>
                                                 {{ exercise.weight }}{{ exercise.unit }}@if (exercise.reps && exercise.reps > 0) {<span>, {{ exercise.reps }} {{ 'rep' | translate }}@if (exercise.reps !== '1') {<span>s</span>}</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}
                                             </p>
-                                            <mat-icon matListIcon>chevron_right</mat-icon>
+                                            <div matListItemMeta>
+
+                                                <mat-icon >chevron_right</mat-icon>
+                                            </div>
                                         </mat-list-item>
                                     }
-                                </mat-nav-list>
+                                </mat-list>
                             </mat-expansion-panel>                              
                         </mat-accordion>
                     }

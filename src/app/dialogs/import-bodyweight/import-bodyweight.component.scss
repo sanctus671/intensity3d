@@ -1,3 +1,15 @@
+
+.dialog-title{
+    position:relative;
+    padding-right:40px;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
 .import-bodyweight {
   min-width: 600px;
   max-width: 800px;
@@ -18,20 +30,14 @@
       margin: 0 0 16px;
       font-size: 24px;
       font-weight: 500;
-      color: var(--mat-app-on-background, #000);
 
-      .dark-theme & {
-        color: var(--mat-app-on-background, #fff);
-      }
+
     }
 
     p {
       margin: 0 0 24px;
-      color: var(--mat-app-on-background-variant, rgba(0, 0, 0, 0.7));
 
-      .dark-theme & {
-        color: var(--mat-app-on-background-variant, rgba(255, 255, 255, 0.7));
-      }
+
     }
 
     h4 {
@@ -41,11 +47,8 @@
       margin: 16px 0 8px;
       font-size: 18px;
       font-weight: 500;
-      color: var(--mat-app-on-background, #000);
 
-      .dark-theme & {
-        color: var(--mat-app-on-background, #fff);
-      }
+  
 
       mat-icon {
         font-size: 20px;
@@ -63,7 +66,7 @@
     padding: 32px;
     border: 2px dashed var(--mat-divider-color, rgba(0, 0, 0, 0.12));
     border-radius: 8px;
-    background-color: var(--mat-app-surface, #fafafa);
+    background-color: var(--mat-divider-color, rgba(0, 0, 0, 0.12));
     margin-bottom: 24px;
 
     .dark-theme & {
@@ -194,11 +197,7 @@
     margin: 24px 0;
 
     mat-card {
-      background-color: var(--mat-app-surface, #fff);
-
-      .dark-theme & {
-        background-color: var(--mat-app-surface, #1e1e1e);
-      }
+  
 
       mat-card-content {
         padding: 16px;
@@ -284,15 +283,7 @@
   }
 
   .mat-step-header {
-    .mat-step-icon {
-      background-color: var(--mat-app-surface-variant, rgba(0, 0, 0, 0.12));
-      color: var(--mat-app-on-surface-variant, rgba(0, 0, 0, 0.6));
-
-      .dark-theme & {
-        background-color: var(--mat-app-surface-variant, rgba(255, 255, 255, 0.12));
-        color: var(--mat-app-on-surface-variant, rgba(255, 255, 255, 0.6));
-      }
-    }
+  
 
     .mat-step-icon-selected,
     .mat-step-icon-state-done {
@@ -300,13 +291,6 @@
       color: white;
     }
 
-    .mat-step-label {
-      color: var(--mat-app-on-background, #000);
-
-      .dark-theme & {
-        color: var(--mat-app-on-background, #fff);
-      }
-    }
 
     .mat-step-label-selected {
       color: var(--mat-primary-color, #D44735);
@@ -322,9 +306,28 @@
 mat-dialog-actions {
   padding: 16px 24px;
   border-top: 1px solid var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
 
   .dark-theme & {
     border-top-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
+  }
+
+  button {
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column-reverse;
+    
+    button {
+      width: 100%;
+    }
   }
 }
 

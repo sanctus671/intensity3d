@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,10 +8,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { StripeService } from 'ngx-stripe';
+import { register } from 'swiper/element/bundle';
 
 import { AccountService } from '../../services/account/account.service';
 import { DisplayInformationComponent } from '../../dialogs/display-information/display-information.component';
 import { PurchasePremiumComponent } from '../../dialogs/purchase-premium/purchase-premium.component';
+
+// Register Swiper custom elements
+register();
 
 interface Account {
   id?: number;
@@ -24,6 +28,7 @@ interface Account {
   templateUrl: './premium.component.html',
   styleUrls: ['./premium.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     NgOptimizedImage,

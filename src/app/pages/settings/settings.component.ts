@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -54,16 +54,45 @@ export class SettingsComponent implements OnInit {
     private diaryService = inject(DiaryService);
     public themeService = inject(ThemeService);
     private translationService = inject(TranslationService);
+    private cdr = inject(ChangeDetectorRef);
     
     public account = signal<any>({});
     public exportLoading = signal<boolean>(false);
     public units = signal<any>({});
-    public selectedTheme = signal<Theme>('system');
-    public selectedLanguage = signal<string>('en');
     public supportedLanguages = SUPPORTED_LANGUAGES;
     public version = '3.0.0';
     
+    // Getter/setter for theme to work with ngModel
+    get selectedTheme(): Theme {
+        return this.themeService.currentTheme();
+    }
+    
+    set selectedTheme(value: Theme) {
+        this.themeService.setTheme(value);
+    }
+    
+    // Getter/setter for language to work with ngModel
+    get selectedLanguage(): string {
+        return this.translationService.currentLanguage();
+    }
+    
+    set selectedLanguage(value: string) {
+        this.translationService.setLanguage(value);
+    }
+    
     constructor() {
+        // Watch for theme changes and trigger change detection
+        effect(() => {
+            this.themeService.currentTheme();
+            this.cdr.markForCheck();
+        });
+        
+        // Watch for language changes and trigger change detection
+        effect(() => {
+            this.translationService.currentLanguage();
+            this.cdr.markForCheck();
+        });
+        
         // Load account data
         this.accountService.getAccountLocal().then((account: any) => {
             if (account) {
@@ -85,12 +114,6 @@ export class SettingsComponent implements OnInit {
                 });
             }
         });
-        
-        // Initialize theme
-        this.selectedTheme.set(this.themeService.currentTheme());
-        
-        // Initialize language
-        this.selectedLanguage.set(this.translationService.currentLanguage());
     }
     
     public updateSettings(): void {
@@ -112,19 +135,19 @@ export class SettingsComponent implements OnInit {
     }
     
     public onThemeChange(): void {
-        this.themeService.setTheme(this.selectedTheme());
+        // Theme is already set via the setter
         this.snackBar.open(this.translationService.instant('Theme updated'), '', {
             duration: 2000
         });
     }
     
     public onLanguageChange(): void {
-        this.translationService.setLanguage(this.selectedLanguage());
+        // Language is already set via the setter
         const currentAccount = this.account();
         
         // Update account locale
         this.accountService.updateSettings({
-            locale: this.selectedLanguage()
+            locale: this.selectedLanguage
         }).then(() => {
             this.snackBar.open(this.translationService.instant('Language updated'), '', {
                 duration: 2000
@@ -321,11 +344,26 @@ export class SettingsComponent implements OnInit {
     }
     
     public logout(): void {
-        this.authenticationService.logout().then(() => {
-            this.snackBar.open(this.translationService.instant('Logged out'), '', {
-                duration: 2000
-            });
-            this.router.navigate(['/login']);
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '300px',
+            data: {
+                title: this.translationService.instant('Logout'),
+                content: this.translationService.instant('Are you sure you want to logout?')
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.confirm) {
+                this.authenticationService.logout().then(() => {
+                    this.snackBar.open(this.translationService.instant('Logged out'), '', {
+                        duration: 2000
+                    });
+                    this.router.navigate(['/login']);
+                }).catch(() => {
+                    // Even if logout fails, navigate to login
+                    this.router.navigate(['/login']);
+                });
+            }
         });
     }
     

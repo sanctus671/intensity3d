@@ -77,6 +77,14 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private domSanitizer = inject(DomSanitizer);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+
+  constructor(){
+    
+    this.matIconRegistry.addSvgIcon(
+        'plates',
+        this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/icon/platesicon.svg')
+      );
+  }
   
   timerStatus = signal<{
     stopwatchStarted: boolean;
@@ -168,14 +176,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.subscriptions.push(diarySub);
 
     // Register custom SVG icons
-    this.matIconRegistry.addSvgIcon(
-      'trophy',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/md-trophy.svg')
-    );
-    this.matIconRegistry.addSvgIcon(
-      'plates',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/icon/platesicon.svg')
-    );
+
 
     // Subscribe to timer status
     const timerSub = this.timerService.timerStatusObservable.subscribe((data: any) => {

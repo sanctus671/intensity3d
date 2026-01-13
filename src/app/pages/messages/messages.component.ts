@@ -33,6 +33,7 @@ interface Conversation {
   };
   userid: number;
   groupuserid: number;
+  uniqueId?: string;
 }
 
 interface Message {
@@ -44,6 +45,7 @@ interface Message {
   isBefore?: boolean;
   isAfter?: boolean;
   showTime?: boolean;
+  tempId?: string;
 }
 
 interface Properties {
@@ -103,13 +105,14 @@ export class MessagesComponent implements OnInit {
       this.account.set(account);
       
       const conversations = await this.messageService.getConversations();
-      this.conversations.set(conversations || []);
+      const conversationsWithIds = this.ensureConversationsHaveUniqueIds(conversations || []);
+      this.conversations.set(conversationsWithIds);
       this.properties.update(p => ({ ...p, conversationsLoading: false }));
       
       const userId = this.route.snapshot.params['userid'];
       if (userId) {
         await this.openConversationByUser(userId);
-      } else if (conversations && conversations.length > 0) {
+      } else if (conversationsWithIds && conversationsWithIds.length > 0) {
         this.openConversation(0);
       } else {
         this.properties.update(p => ({ ...p, messagesLoading: false }));
@@ -185,7 +188,8 @@ export class MessagesComponent implements OnInit {
           userid: Number(userId)
         },
         userid: this.account().id,
-        groupuserid: Number(userId)
+        groupuserid: Number(userId),
+        uniqueId: `conv-${userId}-${Date.now()}`
       };
       
       // Add conversation and select it immediately
@@ -253,7 +257,8 @@ export class MessagesComponent implements OnInit {
             userid: userId
           },
           userid: this.account().id,
-          groupuserid: userId
+          groupuserid: userId,
+          uniqueId: `conv-${userId}-${Date.now()}`
         };
         
         this.conversations.update(convs => [newConversation, ...convs]);
@@ -264,24 +269,55 @@ export class MessagesComponent implements OnInit {
   
   async refreshConversations(): Promise<void> {
     const selectedIndex = this.selectedConversation();
+    console.log('[refreshConversations] START - selectedIndex:', selectedIndex);
+    
     if (selectedIndex === null) return;
     
-    const currentUserId = this.conversations()[selectedIndex].friendid;
+    const currentConversation = this.conversations()[selectedIndex];
+    const currentFriendId = currentConversation.friendid;
+    const currentGroupUserId = currentConversation.groupuserid;
+    const currentUsername = currentConversation.profile?.username;
+    
+    console.log('[refreshConversations] Trying to maintain selection for friendId:', currentFriendId, 
+                'groupuserid:', currentGroupUserId, 'username:', currentUsername);
     
     try {
       const data = await this.messageService.getConversations();
-      this.conversations.set(data);
+      const conversationsWithIds = this.ensureConversationsHaveUniqueIds(data);
+      
+      console.log('[refreshConversations] Got', conversationsWithIds.length, 'conversations from API');
+      
+      this.conversations.set(conversationsWithIds);
       
       const conversations = this.conversations();
+      let foundIndex = -1;
+      
+      // Match by both friendid AND groupuserid to ensure we get the exact same conversation
       for (let index = 0; index < conversations.length; index++) {
         const conversation = conversations[index];
-        if (currentUserId === conversation.friendid) {
+        if (currentFriendId === conversation.friendid && currentGroupUserId === conversation.groupuserid) {
+          foundIndex = index;
+          console.log('[refreshConversations] Found matching conversation at index:', index, 
+                      'friendId:', conversation.friendid, 'groupuserid:', conversation.groupuserid,
+                      'username:', conversation.profile?.username);
           this.selectedConversation.set(index);
+          this.selectedProfile.set(conversation.profile);
+          console.log('[refreshConversations] Updated selectedProfile to:', conversation.profile?.username);
           break;
         }
       }
+      
+      if (foundIndex === -1) {
+        console.warn('[refreshConversations] Could not find conversation with friendId:', currentFriendId, 
+                     'groupuserid:', currentGroupUserId,
+                     'Available conversations:', conversations.map(c => ({ 
+                       friendid: c.friendid, 
+                       groupuserid: c.groupuserid,
+                       username: c.profile?.username 
+                     })));
+      }
     } catch (error) {
-      console.error('Error refreshing conversations:', error);
+      console.error('[refreshConversations] Error:', error);
     }
   }
   
@@ -331,21 +367,57 @@ export class MessagesComponent implements OnInit {
     const conversations = this.conversations();
     const selectedIndex = this.selectedConversation();
     
+
     if (conversations.length < 1 || selectedIndex === null) return;
     
+    const selectedConversation = conversations[selectedIndex];
+    const friendId = selectedConversation.friendid;
+    const groupUserId = selectedConversation.groupuserid;
+    const friendUsername = selectedConversation.profile?.username;
+
     try {
-      const data = await this.messageService.getMessages(conversations[selectedIndex].friendid);
-      const currentMessages = this.messages();
+      // Use groupuserid to fetch messages, not friendid (matches openConversation behavior)
+      const data = await this.messageService.getMessages(groupUserId);
+
       
+      // Verify we're still on the same conversation after the async call
+      const currentSelectedIndex = this.selectedConversation();
+      const currentConversations = this.conversations();
+      
+    
+ 
+      
+      if (currentSelectedIndex === null) {
+        return;
+      }
+      
+      const currentConversation = currentConversations[currentSelectedIndex];
+      
+      // Check both friendid AND groupuserid to ensure we're still on the exact same conversation
+      if (!currentConversation ||
+          currentConversation.friendid !== friendId ||
+          currentConversation.groupuserid !== groupUserId) {
+
+        return;
+      }
+      
+      const currentMessages = this.messages();
+
+   
       if (data && data.length > currentMessages.length) {
+     
         this.messages.set(data);
         this.calculateMessages();
         this.scrollToBottom();
         await this.refreshConversations();
+        const finalIndex = this.selectedConversation();
+        const finalConversations = this.conversations();
+  
+     
       }
     } catch (error) {
-      // Silently fail - this is a background polling operation
-    }
+      console.error('[pingMessages] Error:', error);
+    } 
   }
   
   async sendMessage(): Promise<void> {
@@ -357,12 +429,14 @@ export class MessagesComponent implements OnInit {
     
     if (selectedIndex === null || !conversations[selectedIndex]) return;
     
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
     const newMessage: Message = {
       id: null,
       message: messageText,
       created: new Date(),
       userid: this.account().id,
-      friendid: conversations[selectedIndex].friendid
+      friendid: conversations[selectedIndex].friendid,
+      tempId
     };
     
     this.messages.update(msgs => [...msgs, newMessage]);
@@ -376,7 +450,7 @@ export class MessagesComponent implements OnInit {
       // Update the message with the actual ID from the server
       this.messages.update(msgs => 
         msgs.map(msg => 
-          msg === newMessage ? { ...msg, id: data["id"] } : msg
+          msg.tempId === tempId ? { ...msg, id: data["id"] } : msg
         )
       );
     } catch (error) {
@@ -401,5 +475,20 @@ export class MessagesComponent implements OnInit {
   
   getExactMessageTime(date: Date | string): string {
     return moment(date).format("MMMM Do YYYY, HH:mm");
+  }
+  
+  trackMessage(index: number, message: Message): number | string {
+    return message.id ?? message.tempId ?? index;
+  }
+  
+  trackConversation(index: number, conversation: Conversation): string | number {
+    return conversation.uniqueId ?? `${conversation.friendid}-${conversation.groupuserid}-${index}`;
+  }
+  
+  private ensureConversationsHaveUniqueIds(conversations: Conversation[]): Conversation[] {
+    return conversations.map((conv, index) => ({
+      ...conv,
+      uniqueId: conv.uniqueId ?? `conv-${conv.friendid}-${conv.groupuserid}-${index}-${Date.now()}`
+    }));
   }
 }

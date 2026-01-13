@@ -9,9 +9,15 @@
 
 <mat-dialog-actions>
     <button mat-button mat-dialog-close>{{ 'Dismiss' | translate }}</button>
-    @for (action of actions; track action.link) {
-        <a mat-button color="primary" [routerLink]="[action.link]" (click)="dismiss()">
-            {{ action.name }}
-        </a>
+    @for (action of actions; track action.name) {
+        @if (action.link) {
+            <a mat-button color="primary" [routerLink]="[action.link]" (click)="dismiss()">
+                {{ action.name }}
+            </a>
+        } @else if (action.handler) {
+            <button mat-button color="primary" (click)="action.handler()">
+                {{ action.name }}
+            </button>
+        }
     }
 </mat-dialog-actions>

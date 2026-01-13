@@ -6,42 +6,51 @@
     
     <div class="settings__settings-list">
 
-        <mat-nav-list>            
+        <mat-list class="settings__settings-list__appearance">            
             <h3 matSubheader>{{ "Appearance" | translate }}</h3>
-            
-            <mat-list-item>
-                <mat-icon matListItemIcon>color_lens</mat-icon>
-                <div matListItemTitle>{{ "Theme" | translate }}</div>
-                <mat-form-field appearance="fill" class="settings__inline-select">
+
+            <div class="settings__settings-list__appearance__theme">
+                <mat-form-field appearance="fill">
+                    <mat-icon matPrefix fontSet="material-icons-outlined">color_lens</mat-icon>
+                    <mat-label>{{ "Theme" | translate }}</mat-label>
                     <mat-select [(ngModel)]="selectedTheme" (ngModelChange)="onThemeChange()">
                         <mat-option value="system">{{ "System default" | translate }}</mat-option>
                         <mat-option value="light">{{ "Light" | translate }}</mat-option>
                         <mat-option value="dark">{{ "Dark" | translate }}</mat-option>
                     </mat-select>
                 </mat-form-field>
-            </mat-list-item>
-            
-            <mat-list-item>
-                <mat-icon matListItemIcon>language</mat-icon>
-                <div matListItemTitle>{{ "Language" | translate }}</div>
-                <mat-form-field appearance="fill" class="settings__inline-select">
-                    <mat-select [(ngModel)]="selectedLanguage" (ngModelChange)="onLanguageChange()">
-                        @for (lang of supportedLanguages; track lang.code) {
-                            <mat-option [value]="lang.code">{{ lang.name }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-            </mat-list-item>
-        </mat-nav-list>
+            </div>
 
-        <mat-nav-list>            
+            <div>
+            <mat-form-field appearance="fill">
+                <mat-icon matPrefix fontSet="material-symbols-outlined">globe</mat-icon>
+                <mat-label>{{ "Language" | translate }}</mat-label>
+                <mat-select
+                    
+                    [(ngModel)]="selectedLanguage"
+                    (ngModelChange)="onLanguageChange()"
+                >
+                    @for (lang of supportedLanguages; track lang.code) {
+                    <mat-option [value]="lang.code">
+                        {{ lang.name }}
+                    </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            </div>
+        </mat-list>
+
+        <mat-list>            
             <h3 matSubheader>{{ "Diary Settings" | translate }}</h3>           
             <mat-list-item (click)="openGoalSettings()">
-                <mat-icon matListItemIcon>flag</mat-icon>
+                <mat-icon matListItemIcon>event_available</mat-icon>
                 <div matListItemTitle>{{ "Goal Settings" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
             </mat-list-item>
-        </mat-nav-list>
+        </mat-list>
         
         
         <div class="settings__form-elements">
@@ -84,67 +93,91 @@
 
         </div>
         
-        <mat-nav-list>            
+        <mat-list>            
             <h3 matSubheader>{{ "Data" | translate }}</h3>           
             <mat-list-item (click)="importData()">
-                <mat-icon matListItemIcon>upload</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">upload</mat-icon>
                 <div matListItemTitle>{{ "Import Data" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
             </mat-list-item>         
             <mat-list-item (click)="exportData()" [class.loading]="exportLoading()">
-                <mat-icon matListItemIcon>download</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">download</mat-icon>
                 <div matListItemTitle>{{ "Export Data" | translate }}</div>
-                @if (exportLoading()) {
-                    <mat-spinner diameter="15" mode="indeterminate" color="primary"></mat-spinner>
-                } @else {
-                    <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
-                }
+                <div matListItemMeta>
+
+                    @if (exportLoading()) {
+                        <mat-spinner diameter="15" mode="indeterminate" color="primary"></mat-spinner>
+                    } @else {
+                        <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                    }
+                </div>
             </mat-list-item>
-        </mat-nav-list>        
+        </mat-list>        
         
         
-        <mat-nav-list>            
+        <mat-list>            
             <h3 matSubheader>{{ "Support" | translate }}</h3>           
             <a href="https://www.facebook.com/intensityapp/" target="_blank" mat-list-item>
-                <mat-icon matListItemIcon>thumb_up</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">thumb_up</mat-icon>
                 <div matListItemTitle>{{ "Follow Us" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+
+                </div>
             </a>         
             <a href="mailto:support@intensityapp.com" target="_blank" mat-list-item>
-                <mat-icon matListItemIcon>email</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">email</mat-icon>
                 <div matListItemTitle>{{ "Contact Support" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
             </a>
-        </mat-nav-list>        
+        </mat-list>        
         
         
-        <mat-nav-list>            
+        <mat-list>            
             <h3 matSubheader>{{ "Account Settings" | translate }}</h3>             
             <mat-list-item (click)="changePassword()">
-                <mat-icon matListItemIcon>lock</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">lock</mat-icon>
                 <div matListItemTitle>{{ "Change Password" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
             </mat-list-item>          
             <mat-list-item [routerLink]="['/premium']" class="premium-link" [class.purchased]="account().premium">
-                <mat-icon matListItemIcon>star</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-symbols-outlined">crown</mat-icon>
                 <div matListItemTitle>{{ "Premium" | translate }}</div>
-                @if (account().premium) {
-                    <span class="settings__premium-badge">{{ "Purchased" | translate }}</span>
-                } @else {
-                    <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
-                }
-            </mat-list-item>         
-            <mat-list-item (click)="deleteAccount()" class="settings__delete-account">
-                <mat-icon matListItemIcon color="warn">delete</mat-icon>
-                <div matListItemTitle class="settings__delete-text">{{ "Delete Account" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+                    @if (account().premium) {
+                        <span class="settings__premium-badge">{{ "Purchased" | translate }}</span>
+                    } @else {
+                        <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                    }
+                </div>
+
             </mat-list-item>
             <mat-list-item (click)="logout()">
-                <mat-icon matListItemIcon>logout</mat-icon>
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">logout</mat-icon>
                 <div matListItemTitle>{{ "Logout" | translate }}</div>
-                <mat-icon matListItemIcon class="settings__chevron">chevron_right</mat-icon>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
+            </mat-list-item>         
+            <mat-list-item (click)="deleteAccount()" class="settings__delete-account">
+                <mat-icon matListItemIcon color="warn" fontSet="material-icons-outlined">delete</mat-icon>
+                <div matListItemTitle class="settings__delete-text">{{ "Delete Account" | translate }}</div>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
             </mat-list-item>
-        </mat-nav-list>           
+        </mat-list>           
         
         
         

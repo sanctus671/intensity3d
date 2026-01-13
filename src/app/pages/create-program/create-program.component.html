@@ -1,5 +1,20 @@
+         
+
+@if (!properties().loading) {
+    <div class="create-program-extra-actions">
+        <button mat-button 
+            color="warn" 
+            (click)="clearDraft()"
+            [attr.aria-label]="'Reset' | translate">
+            {{ 'Reset' | translate }}
+        </button>
+    </div>
+}
+
 <div class="create-program" [class.program--is-dialog]="properties().isDialog">
+
     
+
     @if (properties().loading) {
         <div class="create-program__loading">
             <mat-spinner diameter="50" mode="indeterminate" color="primary"></mat-spinner>
@@ -8,6 +23,9 @@
     
     @if (!properties().loading) {
         <div>
+
+   
+
     
             <div class="create-program__header">
                 <mat-form-field>
@@ -15,20 +33,23 @@
                            [placeholder]="'Program Name' | translate" 
                            type="text" 
                            name="name" 
-                           [(ngModel)]="program().name"
+                           [ngModel]="program().name"
+                           (ngModelChange)="updateProgramName($event)"
                            [attr.aria-label]="'Program Name' | translate">
                 </mat-form-field>
                 
                 <mat-form-field>
                     <textarea matInput 
                               [placeholder]="'Description' | translate" 
-                              [(ngModel)]="program().description" 
+                              [ngModel]="program().description"
+                              (ngModelChange)="updateProgramDescription($event)" 
                               cdkTextareaAutosize 
                               cdkAutosizeMinRows="2"
                               [attr.aria-label]="'Description' | translate"></textarea>
                 </mat-form-field>
                 
-                <mat-checkbox [(ngModel)]="program().public" 
+                <mat-checkbox [ngModel]="program().public"
+                              (ngModelChange)="updateProgramPublic($event)" 
                               labelPosition="before" 
                               color="primary">
                     {{ 'Public' | translate }}
@@ -38,14 +59,23 @@
             <div class="create-program__tabs" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropTab($event)">
                 @for (tab of tabs(); track tab; let i = $index) {
                     <div class="create-program__tabs__tab tab" cdkDrag>
-                        <button (click)="setActiveTab(tab)" 
-                                mat-button 
-                                [class.mat-flat-button]="properties().activeTab === tab"
-                                [class.mat-stroked-button]="properties().activeTab !== tab"
+                        @if (properties().activeTab === tab) {
+                            <button 
+                                mat-flat-button
                                 color="primary"
+                                (click)="setActiveTab(tab)"
                                 [attr.aria-label]="tab">
-                            {{ tab }}
-                        </button>
+                                {{ tab }}
+                            </button>
+                        } @else {
+                            <button 
+                                mat-stroked-button
+                                color="primary"
+                                (click)="setActiveTab(tab)"
+                                [attr.aria-label]="tab">
+                                {{ tab }}
+                            </button>
+                        }
                         
                         <div class="tab__actions">
                             <button mat-icon-button 
@@ -56,7 +86,7 @@
                             </button>
                             <button mat-icon-button 
                                     color="primary" 
-                                    (click)="removeTab(tab, i)"
+                                    (click)="confirmRemoveTab(tab, i)"
                                     [attr.aria-label]="'Remove ' + tab | translate">
                                 <mat-icon>delete_outline</mat-icon>
                             </button>
@@ -81,12 +111,11 @@
             </div>            
             
             <div class="create-program__program-workouts" id="program-workouts" cdkDropList (cdkDropListDropped)="dropWorkout($event)">
-                @for (workout of program().workouts; track workout.day; let i = $index) {
-                    @if (isInTab(workout)) {
-                        <div class="create-program__program-workouts__workout-list workout-list" cdkDrag>
-                            <mat-list cdkDropList (cdkDropListDropped)="dropExercise($event, workout)">
-                                <h3 matSubheader>
-                                    <span cdkDragHandle>{{ workout.name }}</span>
+                @for (workout of getWorkoutsInTab(); track workout.day; let i = $index) {
+                    <div class="create-program__program-workouts__workout-list workout-list" cdkDrag [cdkDragData]="workout">
+                        <mat-list cdkDropList (cdkDropListDropped)="dropExercise($event, workout)" [cdkDropListDisabled]="false">
+                            <h3 matSubheader>
+                                <span cdkDragHandle>{{ workout.name }}</span>
                                     <div class="workout-list__actions">
                                         <button mat-button 
                                                 (click)="copyWorkout(workout)"
@@ -99,7 +128,7 @@
                                             {{ 'Edit' | translate }}
                                         </button>
                                         <button mat-button 
-                                                (click)="deleteWorkout(i, workout)"
+                                                (click)="confirmDeleteWorkout(i, workout)"
                                                 [attr.aria-label]="'Delete workout' | translate">
                                             {{ 'Delete' | translate }}
                                         </button>
@@ -107,24 +136,42 @@
                                 </h3>
                                 
                                 <div class="workout-list__notes">
-                                    <mat-form-field appearance="outline">
-                                        <mat-label>{{ 'Add notes...' | translate }}</mat-label>
-                                        <textarea matInput 
-                                                  [(ngModel)]="workout.workoutnotes"
-                                                  cdkTextareaAutosize
-                                                  cdkAutosizeMinRows="1"
-                                                  [attr.aria-label]="'Workout notes' | translate"></textarea>
-                                    </mat-form-field>
+                                    @if (!isWorkoutNotesVisible(workout)) {
+                                        <button mat-button 
+                                                (click)="toggleWorkoutNotes(workout)"
+                                                [attr.aria-label]="'Add Notes' | translate"
+                                                [matBadge]="workout.workoutnotes ? '1' : ''"
+                                                [matBadgeHidden]="!workout.workoutnotes"
+                                                matBadgeColor="primary"
+                                                matBadgeSize="small">
+                                            <mat-icon>note_add</mat-icon>
+                                            {{ 'Add Notes' | translate }}
+                                        </button>
+                                    } @else {
+                                        <mat-form-field subscriptSizing="dynamic">
+                                            <mat-label>{{ 'Add notes...' | translate }}</mat-label>
+                                            <textarea matInput 
+                                                      [ngModel]="workout.workoutnotes"
+                                                      (ngModelChange)="updateWorkoutNotes(workout, $event)"
+                                                      cdkTextareaAutosize
+                                                      cdkAutosizeMinRows="1"
+                                                      [attr.aria-label]="'Workout notes' | translate"></textarea>
+                                        </mat-form-field>
+                                        <button mat-icon-button 
+                                                (click)="toggleWorkoutNotes(workout)"
+                                                [attr.aria-label]="'Hide Notes' | translate">
+                                            <mat-icon>close</mat-icon>
+                                        </button>
+                                    }
                                 </div>
                                 
                                 @for (exercise of workout.exercises; track exercise.exerciseid; let i2 = $index) {
                                     <div class="mat-list-base" cdkDrag cdkDragHandle>
                                         <mat-list-item class="workout-list__exercise">
-                                            <h2 matLine>{{ exercise.name }}</h2>
-                                            <p matLine>
-                                                {{ exercise.sets ? exercise.sets : 0 }} {{ 'set' | translate }}@if (exercise.sets !== '1') {<span>s</span>} {{ 'of' | translate }} {{ exercise.reps ? exercise.reps : 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ 'rep' | translate }}@if (exercise.maxreps || exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
+                                            <h2 matListItemTitle>{{ exercise.name }}</h2>
+                                            <p matListItemLine>{{ exercise.sets ? exercise.sets : 0 }} {{ 'set' | translate }}@if (exercise.sets !== '1' && exercise.sets !== 1) {<span>s</span>} {{ 'of' | translate }} {{ exercise.reps ? exercise.reps : 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ 'rep' | translate }}@if (exercise.maxreps || exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
                                             </p>
-                                            <div class="workout-list__exercise__actions">
+                                            <div matListItemMeta class="workout-list__exercise__actions">
                                                 <button mat-button 
                                                         (click)="copyExercise(workout, exercise)"
                                                         [attr.aria-label]="'Copy exercise' | translate">
@@ -155,7 +202,6 @@
                                 </button>
                             </mat-list>
                         </div>
-                    }
                 }
             </div>            
             
@@ -170,11 +216,26 @@
             
             <div class='create-program__actions'>
                 <div class='create-program__actions__inner'>
+                    <button mat-stroked-button 
+                            color="primary" 
+                            (click)="saveDraft()" 
+                            [disabled]="properties().savingDraft"
+                            [attr.aria-label]="'Save Draft' | translate">
+                        {{ 'Save Draft' | translate }}
+                        @if (properties().savingDraft) {
+                            <mat-spinner class='button-spinner' diameter="14" mode="indeterminate"></mat-spinner>
+                        }
+                    </button>
+            
+                    
                     <button mat-flat-button 
                             color="primary" 
                             (click)="createProgram()" 
                             [disabled]="!program().name || properties().creating"
                             [attr.aria-label]="'Create Program' | translate">
+                            @if (!account().premium) {
+                                <mat-icon matListItemIcon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
+                            }                            
                         {{ 'Create Program' | translate }}
                         @if (properties().creating) {
                             <mat-spinner class='button-spinner' diameter="14" mode="indeterminate"></mat-spinner>

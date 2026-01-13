@@ -57,11 +57,7 @@
         opacity: 0.7;
       }
 
-      &:focus {
-        outline: 2px solid var(--mat-sys-primary);
-        outline-offset: 2px;
-        border-radius: 4px;
-      }
+ 
 
       &:not(:last-child) {
         border-bottom: 1px solid var(--divider-color);

@@ -80,8 +80,7 @@ export class WorkoutPoolComponent {
         dialogRef.afterClosed().subscribe(data => {
             if (data){
                 this.loading = true;
-                this.diaryService.removeWorkout(addId.toString(), addId, null).then(() => {
-                    
+                this.diaryService.removeWorkoutPool(addId.toString(), addId, null).then(() => {
                     this.poolCleared = true;
                     this.diaryService.getWorkoutPool().then((data) => {
                         this.workoutPool = this.groupWorkoutPool(data);
@@ -114,12 +113,28 @@ export class WorkoutPoolComponent {
     
     public updateMaxes(program: any): void {
         this.programService.getProgram(program.programid).then((data) => {
-            let programWorkouts = data;
+     
+            
+            // Extract the program object from the array
+            const programData = Array.isArray(data) ? data[0] : data;
             
             let exerciseIds: any[] = [];
             let exercises: any[] = [];            
                    
-            for (let workout of programWorkouts["workouts"]){
+            // Check if workouts property exists and is an array
+            const workouts = programData?.workouts || [];
+            if (!Array.isArray(workouts)) {
+                console.error('Invalid program data structure:', programData);
+                this.snackBar.open('Unable to load program workouts', 'Close', {
+                    duration: 3000
+                });
+                return;
+            }
+            
+            for (let workout of workouts){
+                if (!workout["exercises"] || !Array.isArray(workout["exercises"])) {
+                    continue;
+                }
                 for (let set of workout["exercises"]){
                     let exerciseId = set.exerciseid;
                     if (exerciseIds.indexOf(exerciseId) < 0){

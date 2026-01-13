@@ -14,7 +14,20 @@
             }
         </h2>
         @if (program().description) {
-            <p>{{ program().description }}</p>
+            <div class="program__description">
+                <p>{{ getTruncatedDescription() }}</p>
+                @if (shouldTruncateDescription()) {
+                    <button 
+                        class="program__description__toggle"
+                        mat-button
+                        (click)="toggleDescription()"
+                        [attr.aria-label]="(descriptionExpanded() ? 'Show less' : 'Read more') | translate"
+                        [attr.aria-expanded]="descriptionExpanded()">
+                        {{ (descriptionExpanded() ? 'Show less' : 'Read more') | translate }}
+                        <mat-icon>{{ descriptionExpanded() ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </button>
+                }
+            </div>
         }
     </div>
 
@@ -50,7 +63,7 @@
         @for (workout of program().workouts; track workout.workoutid || workout.id) {
             @if (isInTab(workout)) {
                 <div class="program__program-workouts__workout-list workout-list">
-                    <mat-nav-list>
+                    <mat-list>
                         <h3 mat-subheader>
                             <span (click)="viewWorkoutDetails(workout)">{{ workout.name }}</span>
                             <button 
@@ -61,10 +74,16 @@
                             </button>
                         </h3>
                         
-                        @for (exercise of workout.exercises; track exercise.exerciseid || $index) {
+                        @if (workout.workoutnotes) {
+                            <div class="program__program-workouts__workout-list__workout-notes">
+                                {{ workout.workoutnotes }}
+                            </div>
+                        }
+                        
+                        @for (exercise of workout.exercises; track $index) {
                             <mat-list-item (click)="openExercise(exercise, workout)">
-                                <h2 matLine>{{ exercise.name }}</h2>
-                                <p matLine>
+                                <h2 matListItemTitle>{{ exercise.name }}</h2>
+                                <p matListItemLine>
                                     {{ exercise.sets || 0 }} {{ (exercise.sets === 1 ? 'set' : 'sets') | translate }}
                                     {{ 'of' | translate }}
                                     {{ exercise.reps || 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ (exercise.maxreps || exercise.reps !== 1 ? 'reps' : 'rep') | translate }}
@@ -78,10 +97,13 @@
                                         <span>, {{ formatExerciseType(exercise.type) | translate }}</span>
                                     }
                                 </p>
-                                <mat-icon matListIcon>chevron_right</mat-icon>
+                                <div matListItemMeta>
+
+                                    <mat-icon>chevron_right</mat-icon>
+                                </div>
                             </mat-list-item>
                         }
-                    </mat-nav-list>
+                    </mat-list>
                 </div>
             }
         }

@@ -1,14 +1,16 @@
 <div class="view-program">
-    <h2 mat-dialog-title>
-        <button mat-icon-button 
-                mat-dialog-close 
-                class="view-program__close"
-                [attr.aria-label]="'Close dialog' | translate">
-            <mat-icon>close</mat-icon>
-        </button>
-    </h2>
+
 
     <mat-dialog-content>
+
+        <button mat-icon-button 
+        mat-dialog-close 
+        class="view-program__close"
+        [attr.aria-label]="'Close dialog' | translate">
+    <mat-icon>close</mat-icon>
+    </button>
+
+
         @if (program().id) {
             <div class="view-program__info">
        
@@ -28,7 +30,7 @@
         }
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
+    <mat-dialog-actions align="center">
         <button mat-flat-button 
                 color="primary" 
                 (click)="addProgram()"

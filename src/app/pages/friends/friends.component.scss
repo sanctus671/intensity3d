@@ -243,6 +243,45 @@
                 background-color:White;
                 border: 1px solid var(--divider-color);
             }
+
+
+            a {
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                
+                &:hover {
+                    background-color: var(--mat-app-surface-container, rgba(0, 0, 0, 0.04));
+                    
+                    .dark-theme & {
+                        background-color: var(--mat-app-surface-container, rgba(255, 255, 255, 0.04));
+                    }
+                }
+                
+                &:focus-visible {
+                    outline: 2px solid var(--mat-primary-color, #d44735);
+                    outline-offset: 2px;
+                }
+    
+                .mat-mdc-list-item-meta{
+                    align-self:center;
+                }
+    
+                .mat-mdc-list-item-avatar{
+                    background-color:White;
+                    border: 1px solid var(--divider-color);
+                }            
+    
+                mat-icon {
+                    opacity: 0.4;
+                    transition: opacity 0.2s ease;
+                    
+                    mat-list-item:hover & {
+                        opacity: 0.7;
+                    }
+                }
+            }
+
+
         }
         
         .friend-requests__empty {

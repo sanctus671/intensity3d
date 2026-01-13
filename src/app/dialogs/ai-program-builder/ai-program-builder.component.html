@@ -1,10 +1,11 @@
 <div class="ai-program-builder">
-    <h2 mat-dialog-title>
-        {{ 'AI Program Builder' | translate }}
-        <button mat-icon-button mat-dialog-close class="ai-program-builder__close">
-            <mat-icon>close</mat-icon>
-        </button>
-    </h2>
+
+
+    <div class="dialog-title">
+        <h2 mat-dialog-title>{{ 'AI Program Builder' | translate }}</h2>
+        <mat-icon mat-icon-button mat-dialog-close [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+    </div>
+
 
     <mat-dialog-content>
         <p class="ai-program-builder__intro-text">
@@ -261,7 +262,7 @@
             {{ 'Cancel' | translate }}
         </button>
         <button 
-            mat-raised-button 
+            mat-flat-button 
             color="primary" 
             (click)="generateProgram()"
             [disabled]="!canGenerate() || isLoading()">

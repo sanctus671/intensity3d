@@ -134,7 +134,7 @@
                 @if (friendRequests().length > 0) {
                     <mat-list class='friend-requests__requests requests'>
                     @for (friend of friendRequests(); track friend.userid; let i = $index) {
-                        <a mat-list-item [routerLink]="['/friends/' + friend.userid]">
+                        <a mat-list-item (click)="viewProfile({userid: friend.userid, friendid: friend.userid, display:friend.display, username: friend.username, dp: friend.dp})">
                             <img matListItemAvatar [src]="getDp(friend.dp)" [attr.alt]="formatName(friend)">
                             <span matListItemTitle>{{ formatName(friend) }}</span>
                             <div  matListItemMeta>

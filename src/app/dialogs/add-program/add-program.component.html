@@ -35,22 +35,7 @@
                 </mat-form-field>
             }
             
-            <a (click)="showCalculator = !showCalculator">{{ '1RM Calculator' | translate }}</a>
-            
-            @if (showCalculator) {
-                <div class="add_program__maxes__calculator">
-                    <mat-form-field>
-                        <mat-label>{{ 'Reps' | translate }}</mat-label>
-                        <input matInput name="reps" type="number" [(ngModel)]="calculator.reps">
-                    </mat-form-field>            
-                    <mat-form-field>
-                        <mat-label>{{ 'Weight' | translate }}</mat-label>
-                        <input matInput name="weight" type="number" [(ngModel)]="calculator.weight">
-                    </mat-form-field> 
-                    
-                    <p>{{ 'Estimated Max' | translate }}: {{ getMax() | number:'1.0-2' }}{{ account.units }}</p>          
-                </div>
-            }
+            <a (click)="openCalculator()">{{ '1RM Calculator' | translate }}</a>
         </mat-expansion-panel>
     </mat-accordion>    
     

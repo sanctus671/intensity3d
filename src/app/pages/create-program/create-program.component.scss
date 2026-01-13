@@ -1,9 +1,22 @@
+.create-program-extra-actions{
+    position:absolute;
+    top:20px;
+    right:40px;
+}
+
+@media only screen and (max-width:999px){
+    .create-program-extra-actions{
+        display:none;
+    }
+}
+
 .create-program{
-        max-width:820px;
-        padding:40px 10px;
-        margin:0 auto;
-        padding-bottom:60px;
-        position:relative;
+    max-width: 820px;
+    position: relative;
+    margin-top: 20px;
+    padding: 50px 40px;
+    margin: 0 auto;
+    padding-bottom: 60px;
         
         .create-program__loading{
             margin-top:60px;
@@ -13,9 +26,13 @@
         }         
         
         .create-program__header{
-            max-width:400px;
+            max-width:600px;
             margin:0 auto;
             margin-bottom:40px;
+ 
+            
+   
+            
             mat-form-field{
                 width:100%;
             }
@@ -29,6 +46,7 @@
                 display:inline-block;
                 position:relative;
                 .tab__actions{
+                    
                     display:none;
                     position: absolute;
                     bottom: -25px;
@@ -38,12 +56,13 @@
                     text-align: center;
                     background-color: var(--surface-color);
                     z-index: 1;
-                    border-radius: 4px;  
+                    border-radius: 4px;
+                    align-items:center;
+                    justify-content: center;
+                    gap:3px;
                     
                     button{
-                        width: 30px;
-                        height: 30px;
-                        line-height: 30px;
+                        --mat-icon-button-state-layer-size: 30px;
                         mat-icon{
                             font-size:14px;
                             width:14px;
@@ -54,8 +73,9 @@
                     
                 }
                 
-                &:hover .tab__actions{
-                    display:block;
+                &:hover .tab__actions{ 
+                    display:flex;
+                    pointer-events:all;
                 }
       
             }
@@ -65,7 +85,8 @@
                 font-size: 12px;
                 line-height: 30px;
                 padding: 0px 12px;
-                height: 32px;            
+                height: 32px;   
+                white-space:nowrap;         
             }            
             
         }   
@@ -88,15 +109,19 @@
             color: var(--primary-color);
             text-align: center;
             padding: 40px 10px;
-            padding-top: 30px;
-            border-radius: 4px;
+            border-radius: 14px;
             opacity: 0.5;
             cursor: pointer;
             font-size: 20px;
             margin-top: 50px;
             margin-bottom: 50px;
-            transition: opacity .2s cubic-bezier(.35,0,.25,1);
-            
+            transition: opacity 0.2s cubic-bezier(0.35, 0, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+
             &:hover{
                 opacity: 1;
             }
@@ -106,23 +131,23 @@
         
         
         .create-program__actions{
-
-            
             position: fixed;
-            bottom: 0px;
+            bottom: 0;
             width: 100%;
-            left: 0px;
-            text-align: center;  
+            left: 0;
+            text-align: center;
+            z-index: 10;
             
             .create-program__actions__inner{
                 width: 100%;
                 max-width: 820px;
                 margin: 0 auto;
-                background-color: var(--surface-color);
-                padding: 10px 0px;
-                border-top-right-radius: 4px;
-                border-top-left-radius: 4px;
-                box-shadow: var(--elevation-2);
+                background-color: var(--surface-color, #ffffff);
+                padding: 15px 0;
+                border-top-right-radius: 14px;
+                border-top-left-radius: 14px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07), 0 0 0 1px 
+                color-mix(in srgb, var(--mat-sidenav-content-text-color) 4%, transparent);
                 
                 button{
                     margin:0 3px;
@@ -138,6 +163,12 @@
             }
             
         }
+
+
+
+
+
+
         
         &.program--is-dialog{
             .program__actions{
@@ -161,29 +192,78 @@
         padding-top: 0px;
     }
 
-    .mat-subheader{
-        background-color: var(--primary-color);
-        color: var(--mat-sys-on-primary) !important;
-        margin-top: 5px;
-
-        > span{
-            cursor:grab;
+    mat-list-item {
+        cursor: pointer;
+        transition: background-color 0.2s cubic-bezier(0.35, 0, 0.25, 1);
+        
+        &:hover {
+            background-color: var(--hover-color, rgba(0, 0, 0, 0.04));
         }
 
-        .workout-list__actions{
+        .mat-mdc-list-item-meta{
+            align-self:center !important;
+        }
+
+    }
+
+
+    .mat-mdc-subheader,
+    h3[mat-subheader] {
+        background-color: var(--primary-color, #d44735);
+        color: white;
+        margin: 0px;
+        padding: 5px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 0px;
+        font-weight:500;
+        font-size:16px;
+        line-height:1.2;
+        white-space:nowrap;
+        
+        span {
+            flex: 1;
+            transition: opacity 0.2s cubic-bezier(0.35, 0, 0.25, 1);
+            
+            &:hover {
+                opacity: 0.9;
+            }
+        }
+
+        .cdk-drag-handle{
+            cursor:grab;
+        }
+        
+        button {
             margin-left: auto;
-            button{
-                margin: 0px 3px;
+            color: white;
+            
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1);
             }
         }
     }
     
     .workout-list__notes {
-        padding: 8px 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top:8px;
+        
+        > button {
+            margin: 0;
+        }
         
         mat-form-field {
-            width: 100%;
+            flex: 1;
             margin-bottom: 8px;
+
+
+        }
+        
+        button[mat-icon-button] {
+            margin-top: 8px;
         }
     }
 
@@ -239,4 +319,17 @@ mat-list-item.workout-list__exercise{
 
 .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.create-program__tabs__tab{
+    overflow:visible;
+}
+            
+.create-program__tabs__tab > button{
+    margin: 5px 3px;
+    font-size: 12px;
+    line-height: 30px;
+    padding: 0px 12px;
+    height: 32px; 
+    white-space:nowrap;    
 }

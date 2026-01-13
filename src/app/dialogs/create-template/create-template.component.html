@@ -1,10 +1,11 @@
 <div class="create-template">
-    <h2 mat-dialog-title>
-        {{ 'Create Template' | translate }}
-        <button mat-icon-button mat-dialog-close class="create-template__close">
-            <mat-icon>close</mat-icon>
-        </button>
-    </h2>
+
+
+    <div class="dialog-title">
+        <h2 mat-dialog-title>{{ 'Create Template' | translate }}</h2>
+        <mat-icon mat-icon-button mat-dialog-close [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+    </div>
+
 
     <mat-dialog-content>
         <p class="create-template__intro-text">
@@ -64,7 +65,7 @@
                 </div>
             </div>
 
-            <mat-accordion class="create-template__options">
+            <mat-accordion class="create-template__options" displayMode="flat">
                 <!-- Exercises Accordion -->
                 <mat-expansion-panel>
                     <mat-expansion-panel-header>

@@ -44,8 +44,8 @@
                 color: var(--mat-sys-on-primary);
             }
             
-            .mat-expansion-indicator::after{
-                color: var(--mat-sys-on-primary);
+            .mat-expansion-indicator{
+                --mat-expansion-header-indicator-color: var(--mat-sys-on-primary);
             }
         }
         
@@ -57,13 +57,7 @@
             margin-top:10px;
         }
 
-        .mat-expansion-indicator{
-            height: 8px;
-            margin-top: -3px;
-            &:after{
-                vertical-align: top;
-            }
-        }
+ 
 
         div.mat-expansion-panel-content {
             height: 0px;

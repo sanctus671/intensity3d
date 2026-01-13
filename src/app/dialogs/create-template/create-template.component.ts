@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -60,6 +60,7 @@ interface Option {
     MatDividerModule,
     TranslateModule
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './create-template.component.html',
   styleUrls: ['./create-template.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,8 +1,6 @@
 <div class="programs">
     
-    <div class="programs__header">
-        <h2>{{ 'Programs' | translate }}</h2>
-    </div>
+    <h2 class="programs__title">{{ 'Programs' | translate }}</h2>
     
     <mat-tab-group class="programs__nav" mat-align-tabs="center" [(selectedIndex)]="properties().selectedTab">
         <mat-tab [label]="'Recommended' | translate">   
@@ -178,13 +176,13 @@
                 </div>     
                 
             </div>
-            
+<!--             
             <button mat-flat-button color="primary" (click)="changeTab(3)">
                 {{ 'Browse All Programs' | translate }}
-            </button>
+            </button> -->
             
             <div class="programs__action-buttons">
-                <button mat-stroked-button color="primary" [routerLink]="['/programs/create']">
+                <button mat-flat-button color="primary" [routerLink]="['/programs/create']">
                     <mat-icon>add</mat-icon>
                     {{ 'Create Program' | translate }}
                 </button>
@@ -238,14 +236,33 @@
                     }
                 </mat-form-field>
 
-                <mat-nav-list class="programs__programs-list">
-                    @for (program of filteredRecentPrograms(); track program.id || program.programid) {
-                        <mat-list-item (click)="viewProgram(program)" class="programs__programs-list__program program">
-                            <h3 matLine>{{program.name}}</h3>                      
-                            <mat-icon matListIcon>chevron_right</mat-icon>
-                        </mat-list-item>
-                    }
-                </mat-nav-list>
+                @if (properties().search && filteredRecentPrograms().length < 1) {
+                    <div class="programs__empty">
+                        <mat-icon>search_off</mat-icon>
+                        <h2>{{ 'No Search Results' | translate }}</h2>
+                        <p>{{ 'Try searching in all programs' | translate }}</p>
+                    </div>
+                    
+                    <div class="programs__empty-actions">
+                        <button mat-flat-button color="primary" (click)="changeTab(3)">
+                            {{ 'Search All Programs' | translate }}
+                        </button>                 
+                    </div>
+                }
+
+                @if (!properties().search || filteredRecentPrograms().length > 0) {
+                    <mat-list class="programs__programs-list">
+                        @for (program of filteredRecentPrograms(); track program.id || program.programid) {
+                            <mat-list-item (click)="viewProgram(program)" class="programs__programs-list__program program">
+                                <h3 matListItemTitle>{{program.name}}</h3>  
+                                <div matListItemMeta>
+
+                                    <mat-icon>chevron_right</mat-icon>
+                                </div>                    
+                            </mat-list-item>
+                        }
+                    </mat-list>
+                }
             }
 
             
@@ -289,15 +306,34 @@
                     }
                 </mat-form-field>
                 
-                <mat-nav-list class="programs__programs-list">
-                    @for (program of filteredCreatedPrograms(); track program.id || program.programid) {
-                        <mat-list-item (click)="viewProgram(program)" class="programs__programs-list__program program">
-                            <h3 matLine>{{program.name}}</h3>
-                            <p matLine>{{formatDuration(program.duration || 0)}}</p>                        
-                            <mat-icon matListIcon>chevron_right</mat-icon>
-                        </mat-list-item>
-                    }
-                </mat-nav-list>
+                @if (properties().search && filteredCreatedPrograms().length < 1) {
+                    <div class="programs__empty">
+                        <mat-icon>search_off</mat-icon>
+                        <h2>{{ 'No Search Results' | translate }}</h2>
+                        <p>{{ 'Try searching in all programs' | translate }}</p>
+                    </div>
+                    
+                    <div class="programs__empty-actions">
+                        <button mat-flat-button color="primary" (click)="changeTab(3)">
+                            {{ 'Search All Programs' | translate }}
+                        </button>                 
+                    </div>
+                }
+
+                @if (!properties().search || filteredCreatedPrograms().length > 0) {
+                    <mat-list class="programs__programs-list">
+                        @for (program of filteredCreatedPrograms(); track program.id || program.programid) {
+                            <mat-list-item (click)="viewProgram(program)" class="programs__programs-list__program program">
+                                <h3 matListItemTitle>{{program.name}}</h3>
+                                <p matListItemLine>{{formatDuration(program.duration || 0)}}</p>     
+                                <div matListItemMeta>
+
+                                    <mat-icon>chevron_right</mat-icon>
+                                </div>                   
+                            </mat-list-item>
+                        }
+                    </mat-list>
+                }
             }            
             
             
@@ -327,6 +363,15 @@
             }
             
             @if (!properties().programsLoading && programs().length > 0) {
+
+                <div class="programs__create-section">
+                    <button mat-flat-button color="primary" [routerLink]="['/programs/create']">
+                        {{ 'Create A Program' | translate }}
+                    </button> 
+
+                </div>    
+
+
                 <mat-form-field class="programs__search">
                     <input matInput 
                            type="text" 
@@ -341,26 +386,44 @@
                     }
                 </mat-form-field>
 
-                <mat-nav-list class="programs__programs-list">
-                    @for (program of filteredPrograms(); track program.id || program.programid; let i = $index) {
-                        <mat-list-item 
-                            (click)="viewProgram(program)"
-                            class="programs__programs-list__program program">
-                            <h3 matLine>
-                                {{program.name}} 
-                                @if (program.userid === '5') {
-                                    <mat-icon class="program__verified" [matTooltip]="'Program verified' | translate" matTooltipPosition="right">check_circle</mat-icon>
-                                }
-                            </h3>
-                            <p matLine>{{formatDuration(program.duration || 0)}}</p>                        
-                            <mat-icon matListIcon>chevron_right</mat-icon>
-                        </mat-list-item>
-                    }
+                @if (properties().search && filteredPrograms().length < 1) {
+                    <div class="programs__empty">
+                        <mat-icon>search_off</mat-icon>
+                        <h2>{{ 'No Search Results' | translate }}</h2>
+                        <p>{{ 'No programs found matching your search' | translate }}</p>
+                    </div>
                     
-                    @if (canLoadMorePrograms()) {
-                        <a mat-list-item (click)="loadMorePrograms()">{{ 'Load More Programs' | translate }}</a>
-                    }
-                </mat-nav-list>
+                    <div class="programs__empty-actions">
+                        <button mat-flat-button color="primary" (click)="clearSearch()">
+                            {{ 'Clear Search' | translate }}
+                        </button>                 
+                    </div>
+                }
+
+                @if (!properties().search || filteredPrograms().length > 0) {
+                    <mat-list class="programs__programs-list">
+                        @for (program of filteredPrograms(); track program.id || program.programid; let i = $index) {
+                            <mat-list-item 
+                                (click)="viewProgram(program)"
+                                class="programs__programs-list__program program">
+                                <h3 matListItemTitle>{{program.name}} 
+                                    @if (program.userid === '5') {
+                                        <mat-icon class="program__verified" [matTooltip]="'Program verified' | translate" matTooltipPosition="right">check_circle</mat-icon>
+                                    }
+                                </h3>
+                                <p matListItemLine>{{formatDuration(program.duration || 0)}}</p>           
+                                <div matListItemMeta>
+
+                                    <mat-icon>chevron_right</mat-icon>
+                                </div>             
+                            </mat-list-item>
+                        }
+                        
+                        @if (canLoadMorePrograms()) {
+                            <a mat-list-item (click)="loadMorePrograms()">{{ 'Load More Programs' | translate }}</a>
+                        }
+                    </mat-list>
+                }
             }            
 
 

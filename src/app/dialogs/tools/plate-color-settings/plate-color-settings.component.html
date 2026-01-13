@@ -7,9 +7,9 @@
   <mat-dialog-content>
     <p class="plate-color-settings__description">{{ "Customize the colors of your weight plates. Changes will apply to both the plate calculator and warmup calculator." | translate }}</p>
 
-    <mat-list>
+    <div class="plate-color-settings__list">
       @for (plate of plateColors(); track trackByPlateId($index, plate); let i = $index) {
-        <mat-list-item class="plate-color-settings__item">
+        <div class="plate-color-settings__item">
           <div class="plate-color-settings__item-content">
             <span class="plate-color-settings__label">
               {{ units() === 'lbs' ? plate.lbsLabel : plate.kgLabel }}
@@ -28,9 +28,9 @@
               {{ units() === 'lbs' ? plate.lbsValue : plate.kgValue }}
             </div>
           </div>
-        </mat-list-item>
+        </div>
       }
-    </mat-list>
+    </div>
 
     <div class="plate-color-settings__actions">
       <button mat-stroked-button (click)="resetToDefaults()">
@@ -41,7 +41,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="cancel()">{{ "Cancel" | translate }}</button>
-    <button mat-raised-button color="primary" (click)="save()">{{ "Save" | translate }}</button>
+    <button mat-flat-button color="primary" (click)="save()">{{ "Save" | translate }}</button>
   </mat-dialog-actions>
 </div>
 

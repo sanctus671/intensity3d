@@ -1,9 +1,9 @@
-<h2 mat-dialog-title>
-    {{ 'Auto Extend Program' | translate }}
-    <button mat-icon-button mat-dialog-close class="auto-extend__close" [attr.aria-label]="'Close dialog' | translate">
-        <mat-icon>close</mat-icon>
-    </button>
-</h2>
+
+
+<div class="dialog-title">
+    <h2 mat-dialog-title>{{ 'Auto Extend Program' | translate }}</h2>
+    <mat-icon mat-icon-button mat-dialog-close [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
+</div>
 
 <mat-dialog-content class="auto-extend">
     <p class="auto-extend__intro-text">
@@ -11,7 +11,7 @@
     </p>
 
     <!-- Number of Weeks -->
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>{{ 'Number of Weeks' | translate }}</mat-label>
         <input matInput 
                type="number" 
@@ -108,7 +108,7 @@
 
     <!-- Exercise-specific settings -->
     @if (exercises().length > 0) {
-        <mat-expansion-panel>
+        <mat-expansion-panel displayMode="flat" >
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     {{ 'Adjust Per Exercise' | translate }}
@@ -119,7 +119,7 @@
             </mat-expansion-panel-header>
 
             @for (exercise of exercises(); track exercise.exerciseid) {
-                <mat-expansion-panel class="auto-extend__exercise-panel">
+                <mat-expansion-panel class="auto-extend__exercise-panel" displayMode="flat">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
                             <mat-checkbox 

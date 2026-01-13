@@ -160,7 +160,7 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
     console.log(program)
     
     const dialogRef = this.dialog.open(ViewProgramComponent, {
-      width: '600px',
+      width: '700px',
       maxWidth: '95vw',
       data: { program: { ...program, id: programId } }
     });

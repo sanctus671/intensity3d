@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { RequestService } from '../request/request.service';
 import { StorageService } from '../storage/storage.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import moment from 'moment';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +13,7 @@ export class DiaryService {
   private diaryObservable: BehaviorSubject<any>;
   private diaryDataObservable: BehaviorSubject<any>;
   private selectedDate: BehaviorSubject<any>;
+  private readonly http = inject(HttpClient);
 
   constructor(
     private request: RequestService,
@@ -220,6 +223,14 @@ export class DiaryService {
     return this.request.modify('edit', 'removeresults', { addid: addId });
   }
 
+  removeWorkoutPool(date: string, addId: number, updatedDiary: any): Promise<any> {
+    return this.request.modify('edit', 'removeworkoutpool', { addid: addId });
+  }
+
+  removePoolWorkout(workoutId: number): Promise<any> {
+    return this.request.modify('edit', 'removeworkoutpool', { workoutid: workoutId });
+  }
+
   removeWorkout(date: string, workoutId: number, updatedDiary: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.request.modify('edit', 'removeresults', { workoutid: workoutId, assigneddate: date }).then(async (responseData: any) => {
@@ -320,15 +331,36 @@ export class DiaryService {
   }
 
   // Advanced import methods for CSV import workflow
-  uploadImport(csvFile: File, userId: number): Promise<string> {
-    const formData = new FormData();
-    formData.append('fileToUpload', csvFile, csvFile.name);
-    formData.set('userid', userId.toString());
-    return this.request.upload('uploadimportfile', formData).then((response: any) => {
-      // Return the full URL to the uploaded CSV file
-      return response;
+
+
+  public uploadImport(csvFile: File, userId: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.storage.get("intensity__session").then((session) => {
+        const formData: FormData = new FormData();
+        formData.append('fileToUpload', csvFile, csvFile.name);
+        formData.set("key", environment.apiKey);
+        formData.set("controller", "edit");
+        formData.set("action", "uploadimportfile");
+        formData.set("userid", userId + "");
+        formData.set("session", session);
+
+        this.http.post(environment.apiUrl, formData).subscribe(
+          (res: any) => {
+            if (res["success"] === true) {
+              let importUrl = environment.apiUrl.replace("index.php", "") + res.data;
+              resolve(importUrl);
+            } else {
+              reject(res);
+            }
+          },
+          (e) => {
+            reject(e);
+          }
+        );
+      });
     });
   }
+
 
   getCSVData(url: string): Promise<string> {
     return new Promise((resolve, reject) => {

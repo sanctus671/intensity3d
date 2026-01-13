@@ -6,6 +6,11 @@
 // Include the common styles for Angular Material
 @include mat.core();
 
+:root {
+    --swiper-navigation-color: #d44735;
+    --swiper-pagination-color: #d44735;
+  }
+
 // Apply the light theme by default
 .light-theme {
   @include mat.all-component-themes(light.$intensity-light-theme);
@@ -49,6 +54,7 @@
   --mat-menu-container-color: #fafafa;
 
   --empty-color: #fafafa;
+  
 }
 
 // Apply the dark theme

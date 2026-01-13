@@ -40,7 +40,7 @@ export class CopyProgramExerciseComponent {
         if (this.data.program){
             for (var index in this.data.program.workouts){
                 let workout = this.data.program.workouts[index];
-                this.workouts.push({name:workout.name, value:false, index: index, type:"checkbox"});
+                this.workouts.push({name:workout.name, value:false, index: parseInt(index), type:"checkbox"});
             }    
         }
     }

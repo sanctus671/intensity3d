@@ -20,7 +20,6 @@
         justify-content: space-between;
         margin-bottom: 20px;
         padding: 12px;
-        background-color: var(--surface-color);
         border-radius: 4px;
         
         span {
@@ -30,6 +29,7 @@
         
         button {
             margin-left: 12px;
+            white-space:nowrap;
         }
     }
     

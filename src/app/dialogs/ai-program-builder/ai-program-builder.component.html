@@ -271,7 +271,7 @@
                 {{ 'Generating...' | translate }}
             } @else {
                 @if (!user().premium) {
-                    <mat-icon>workspace_premium</mat-icon>
+                    <mat-icon matListItemIcon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
                 }
                 @if (user().premium) {
                     <mat-icon>auto_awesome</mat-icon>

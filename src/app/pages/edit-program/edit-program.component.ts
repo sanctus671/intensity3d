@@ -12,6 +12,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { ProgramService } from '../../services/program/program.service';
@@ -80,6 +82,8 @@ interface Program {
         MatCheckboxModule,
         MatListModule,
         MatProgressSpinnerModule,
+        MatBadgeModule,
+        MatButtonToggleModule,
         TranslateModule
     ],
     templateUrl: './edit-program.component.html',
@@ -116,6 +120,8 @@ export class EditProgramComponent implements OnInit {
     
     public tabs = signal<string[]>([]);
     public account = signal<any>({});
+    public workoutNotesVisible = signal<Set<number>>(new Set());
+    public displayMode = signal<'stacked' | 'grid'>('stacked');
 
     constructor() {
         // Load account data
@@ -143,11 +149,18 @@ export class EditProgramComponent implements OnInit {
                 // The API might return an array with a single program object
                 const programData = Array.isArray(data) ? data[0] : data;
                 
-                programData.public = parseInt(programData.public);
-                programData.duration = parseInt(programData.duration);
+                programData.public = parseInt(programData.public) || 0;
+                programData.duration = parseInt(programData.duration) || 7;
                 
                 if (programData.workouts) {
+                    // Ensure workout.day is a number (API may return strings)
+                    programData.workouts = programData.workouts.map((w: Workout) => ({
+                        ...w,
+                        day: parseInt(w.day.toString(), 10)
+                    }));
                     programData.workouts.sort((a: Workout, b: Workout) => a.day - b.day);
+                } else {
+                    programData.workouts = [];
                 }
                 
                 this.program.set(programData);
@@ -218,15 +231,30 @@ export class EditProgramComponent implements OnInit {
 
 
     public dropExercise(event: CdkDragDrop<Exercise[]>, workout: Workout): void {
-        moveItemInArray(workout.exercises, event.previousIndex, event.currentIndex);
-        
-        for (let index = 0; index < workout.exercises.length; index++) {
-            workout.exercises[index].ordering = index;
-        }
+        this.program.update(currentProgram => {
+            const newExercises = [...workout.exercises];
+            moveItemInArray(newExercises, event.previousIndex, event.currentIndex);
+            
+            return {
+                ...currentProgram,
+                workouts: currentProgram.workouts.map(w => 
+                    w === workout 
+                        ? { ...w, exercises: newExercises.map((ex, idx) => ({ ...ex, ordering: idx })) }
+                        : w
+                )
+            };
+        });
     }
 
     public deleteExercise(index: number, workout: Workout): void {
-        workout.exercises.splice(index, 1);
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.map(w => 
+                w === workout 
+                    ? { ...w, exercises: w.exercises.filter((_, i) => i !== index) }
+                    : w
+            )
+        }));
     }
     
     public editExercise(exercise: Exercise): void {
@@ -238,20 +266,21 @@ export class EditProgramComponent implements OnInit {
         dialogRef.afterClosed().subscribe(updatedExercise => {
             if (updatedExercise) {
                 const oldExerciseId = exercise.exerciseid;
-                Object.assign(exercise, updatedExercise);
+                const switchAll = updatedExercise.switchAll;
+                delete updatedExercise.switchAll;
                 
-                if (updatedExercise.switchAll) {
-                    const currentProgram = this.program();
-                    for (const workout of currentProgram.workouts) {
-                        for (const workoutExercise of workout.exercises) {
-                            if (workoutExercise.exerciseid === oldExerciseId) {
-                                workoutExercise.exerciseid = updatedExercise.exerciseid;
-                                workoutExercise.name = updatedExercise.name;
+                this.program.update(currentProgram => ({
+                    ...currentProgram,
+                    workouts: currentProgram.workouts.map(workout => ({
+                        ...workout,
+                        exercises: workout.exercises.map(ex => {
+                            if (ex === exercise || (switchAll && ex.exerciseid === oldExerciseId)) {
+                                return { ...ex, ...updatedExercise };
                             }
-                        }
-                    }
-                    delete (exercise as any).switchAll;
-                }
+                            return ex;
+                        })
+                    }))
+                }));
             }
         });
     }    
@@ -264,57 +293,164 @@ export class EditProgramComponent implements OnInit {
         
         dialogRef.afterClosed().subscribe(data => {
             if (data) {
-                const currentProgram = this.program();
-                for (const copyToWorkout of data) {
-                    if (copyToWorkout.value) {
-                        const copy = this.deepCopy(exercise);
-                        copy.id = null;
-                        currentProgram.workouts[copyToWorkout.index].exercises.push(copy);
-                        
-                        // Update ordering property for each exercise based on new array position
-                        currentProgram.workouts[copyToWorkout.index].exercises.forEach((workoutExercise: Exercise, index: number) => {
-                            workoutExercise.ordering = index;
-                        });
-                    }
-                }
-                this.program.set(currentProgram);
+                this.program.update(currentProgram => ({
+                    ...currentProgram,
+                    workouts: currentProgram.workouts.map((w, index) => {
+                        const copyToWorkout = data.find((ctw: any) => ctw.index === index);
+                        if (copyToWorkout?.value) {
+                            const copy = this.deepCopy(exercise);
+                            copy.id = null;
+                            const newExercises = [...w.exercises, copy];
+                            return { 
+                                ...w, 
+                                exercises: newExercises.map((ex, idx) => ({ ...ex, ordering: idx }))
+                            };
+                        }
+                        return w;
+                    })
+                }));
             }
         });
     }    
     
     public dropWorkout(event: CdkDragDrop<Workout[]>): void {
-        const currentProgram = this.program();
-        moveItemInArray(currentProgram.workouts, event.previousIndex, event.currentIndex);
-        
         if (event.currentIndex === event.previousIndex) {
             return;
         }
         
-        const weekStart = (Math.floor(currentProgram.workouts[event.previousIndex].day / 7) * 7) + 1;
+        const currentProgram = this.program();
+        const workoutsInTab = this.getWorkoutsInTab();
+        
+        // Get the actual workout being moved and the target workout
+        const movedWorkout = workoutsInTab[event.previousIndex];
+        const targetWorkout = workoutsInTab[event.currentIndex];
+        
+        if (!movedWorkout || !targetWorkout) {
+            return;
+        }
+        
+        // Find actual indices in the full workouts array
+        const actualPreviousIndex = currentProgram.workouts.indexOf(movedWorkout);
+        const actualCurrentIndex = currentProgram.workouts.indexOf(targetWorkout);
+        
+        if (actualPreviousIndex === -1 || actualCurrentIndex === -1) {
+            return;
+        }
+        
+        // Calculate new day based on position in the week
+        const currentTabs = this.tabs();
+        const currentProperties = this.properties();
+        const weekIndex = currentTabs.indexOf(currentProperties.activeTab);
+        const weekStart = (weekIndex * 7) + 1;
         const weekEnd = weekStart + 6;
-        const daysChanged = event.currentIndex - event.previousIndex;
-        let newDay = currentProgram.workouts[event.currentIndex].day + daysChanged;
-        const replacedDay = currentProgram.workouts[event.previousIndex].day;
         
-        if ((event.currentIndex < event.previousIndex && newDay > replacedDay) || 
-            (event.currentIndex > event.previousIndex && newDay < replacedDay)) {
-            newDay = replacedDay;
+        // Create a temporary reordered array to calculate the new day
+        const reorderedWorkouts = [...workoutsInTab];
+        moveItemInArray(reorderedWorkouts, event.previousIndex, event.currentIndex);
+        
+        // Calculate the new day based on the reordered array
+        const newDay = this.calculateNewDayForWorkout(reorderedWorkouts, event.currentIndex, weekStart, weekEnd);
+        
+        // Update the name if it follows the "Day X" pattern
+        const regex = /^Day \d+$/;
+        const updatedName = regex.test(movedWorkout.name) ? "Day " + newDay : movedWorkout.name;
+        
+        this.program.update(prog => {
+            const newWorkouts = [...prog.workouts];
+            moveItemInArray(newWorkouts, actualPreviousIndex, actualCurrentIndex);
+            
+            // Update the moved workout with new day and name
+            return {
+                ...prog,
+                workouts: newWorkouts.map(w => 
+                    w === movedWorkout 
+                        ? { ...w, day: newDay, name: updatedName }
+                        : w
+                )
+            };
+        });
+    }
+    
+    private calculateNewDayForWorkout(workoutsInTab: Workout[], position: number, weekStart: number, weekEnd: number): number {
+        // Get the items before and after the current position
+        const itemBefore = position > 0 ? workoutsInTab[position - 1] : null;
+        const itemAfter = position < workoutsInTab.length - 1 ? workoutsInTab[position + 1] : null;
+        
+        // Case 1: First position in the week
+        if (!itemBefore) {
+            return weekStart;
         }
         
-        if (newDay < weekStart) {
-            newDay = weekStart;
-        } else if (newDay > weekEnd) {
-            newDay = weekEnd;
+        // Case 2: Item before exists
+        if (itemBefore) {
+            const beforeDay = itemBefore.day;
+            
+            // Case 2a: Last position in the week (no item after)
+            if (!itemAfter) {
+                return Math.min(beforeDay + 1, weekEnd);
+            }
+            
+            // Case 2b: Item after also exists
+            if (itemAfter) {
+                const afterDay = itemAfter.day;
+                
+                // If there's space between the workouts, place it between them
+                if (afterDay > beforeDay + 1) {
+                    return beforeDay + 1;
+                } else {
+                    return Math.min(beforeDay, weekEnd);
+                }
+            }
         }
         
-        currentProgram.workouts[event.currentIndex].day = newDay;
-        this.program.set(currentProgram);
+        // Fallback: place at the start of the week
+        return weekStart;
     }    
     
+    public confirmDeleteWorkout(index: number, workout: Workout): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Confirm Delete'),
+                content: this.translate.instant('Are you sure you want to delete this workout? All exercises in this workout will be removed.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.deleteWorkout(index, workout);
+            }
+        });
+    }
+    
     public deleteWorkout(index: number, workout: Workout): void {
-        const currentProgram = this.program();
-        currentProgram.workouts.splice(index, 1);
-        this.program.set(currentProgram);
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.filter((_, i) => i !== index)
+        }));
+    }
+    
+    public confirmDeleteWorkoutByRef(workout: Workout): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Confirm Delete'),
+                content: this.translate.instant('Are you sure you want to delete this workout? All exercises in this workout will be removed.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.deleteWorkoutByRef(workout);
+            }
+        });
+    }
+    
+    public deleteWorkoutByRef(workout: Workout): void {
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.filter(w => w !== workout)
+        }));
     }
     
     public editWorkout(workout: Workout): void {
@@ -325,21 +461,38 @@ export class EditProgramComponent implements OnInit {
         
         dialogRef.afterClosed().subscribe(data => {
             if (data) {
-                workout.name = data.name;
+                const newDay = parseInt(data.day);
+                const dayChanged = newDay && workout.day !== newDay;
                 
-                if (parseInt(data.day) && workout.day !== data.day) {
-                    workout.day = data.day;
-                    const currentProgram = this.program();
-                    currentProgram.workouts.sort((a, b) => a.day - b.day);
+                // Update the name if it follows the "Day X" pattern and day changed
+                const regex = /^Day \d+$/;
+                const updatedName = (dayChanged && regex.test(workout.name)) ? "Day " + newDay : data.name;
+                
+                this.program.update(currentProgram => {
+                    let updatedWorkouts = currentProgram.workouts.map(w => 
+                        w === workout 
+                            ? { ...w, name: updatedName, day: dayChanged ? newDay : w.day }
+                            : w
+                    );
                     
-                    if (workout.day > currentProgram.duration) {
-                        const newDuration = (Math.floor(workout.day / 7) + 1) * 7;
-                        currentProgram.duration = newDuration;
-                        this.program.set(currentProgram);
-                        this.calculateTabs();
-                    } else {
-                        this.program.set(currentProgram);
+                    // Sort workouts by day
+                    updatedWorkouts = [...updatedWorkouts].sort((a, b) => a.day - b.day);
+                    
+                    // Check if duration needs to be updated
+                    let newDuration = currentProgram.duration;
+                    if (dayChanged && newDay > currentProgram.duration) {
+                        newDuration = (Math.floor(newDay / 7) + 1) * 7;
                     }
+                    
+                    return {
+                        ...currentProgram,
+                        workouts: updatedWorkouts,
+                        duration: newDuration
+                    };
+                });
+                
+                if (dayChanged) {
+                    this.calculateTabs();
                 }
             }
         });
@@ -353,28 +506,26 @@ export class EditProgramComponent implements OnInit {
         
         dialogRef.afterClosed().subscribe(data => {
             if (data) {
-                const currentProgram = this.program();
-                const exerciseCount = workout.exercises.length;
-                
-                for (const copyToWorkout of data) {
-                    if (copyToWorkout.value) {
-                        for (let x = 0; x < exerciseCount; x++) {
-                            const exercise = workout.exercises[x];
-                            const copy = this.deepCopy(exercise);
-                            copy.id = null;
-                            currentProgram.workouts[copyToWorkout.index].exercises.push(copy);
+                this.program.update(currentProgram => ({
+                    ...currentProgram,
+                    workouts: currentProgram.workouts.map((w, index) => {
+                        const copyToWorkout = data.find((ctw: any) => ctw.index === index);
+                        if (copyToWorkout?.value) {
+                            const copiedExercises = workout.exercises.map(ex => {
+                                const copy = this.deepCopy(ex);
+                                copy.id = null;
+                                return copy;
+                            });
+                            return { ...w, exercises: [...w.exercises, ...copiedExercises] };
                         }
-                    }
-                }
-                this.program.set(currentProgram);
+                        return w;
+                    })
+                }));
             }
         });
     }
     
     public dropTab(event: CdkDragDrop<string[]>): void {
-        const currentTabs = this.tabs();
-        moveItemInArray(currentTabs, event.previousIndex, event.currentIndex);
-        
         if (event.currentIndex === event.previousIndex) {
             return;
         }
@@ -385,25 +536,39 @@ export class EditProgramComponent implements OnInit {
         const newWeekStartDay = moveWeekStartDay + daysChange;
         const newWeekEndDay = moveWeekEndDay + daysChange;
         
-        const currentProgram = this.program();
-        for (const workout of currentProgram.workouts) {
-            workout.day = parseInt(workout.day.toString());
-            
-            if (workout.day >= moveWeekStartDay && workout.day <= moveWeekEndDay) {
-                workout.day += daysChange;
-            } else if (daysChange > 0 && (workout.day >= moveWeekStartDay && workout.day <= newWeekEndDay)) {
-                workout.day -= 7;
-            } else if (daysChange < 0 && (workout.day >= newWeekStartDay && workout.day <= moveWeekEndDay)) {
-                workout.day += 7;
-            }
-        }
+        // Update tabs
+        const currentTabs = [...this.tabs()];
+        moveItemInArray(currentTabs, event.previousIndex, event.currentIndex);
+        const updatedTabs = currentTabs.map((_, index) => 'Week ' + (index + 1));
+        this.tabs.set(updatedTabs);
         
-        for (let index = 0; index < currentTabs.length; index++) {
-            currentTabs[index] = 'Week ' + (index + 1);
-        }
+        // Update program with new workout days
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.map(workout => {
+                const day = parseInt(workout.day.toString());
+                let newDay = day;
+                
+                if (day >= moveWeekStartDay && day <= moveWeekEndDay) {
+                    newDay = day + daysChange;
+                } else if (daysChange > 0 && (day >= moveWeekStartDay && day <= newWeekEndDay)) {
+                    newDay = day - 7;
+                } else if (daysChange < 0 && (day >= newWeekStartDay && day <= moveWeekEndDay)) {
+                    newDay = day + 7;
+                }
+                
+                if (newDay !== day) {
+                    const regex = /^Day \d+$/;
+                    const updatedWorkout: any = { ...workout, day: newDay };
+                    if (regex.test(workout.name)) {
+                        updatedWorkout.name = "Day " + newDay;
+                    }
+                    return updatedWorkout;
+                }
+                return workout;
+            })
+        }));
         
-        this.tabs.set(currentTabs);
-        this.program.set(currentProgram);
         this.properties.update(p => ({ ...p, activeTab: 'Week ' + (event.currentIndex + 1) }));
     }
     
@@ -414,43 +579,73 @@ export class EditProgramComponent implements OnInit {
         const copyWeekStartDay = (index * 7) + 1;
         const copyWeekEndDay = copyWeekStartDay + 6;
         
-        const currentProgram = this.program();
-        for (const workout of currentProgram.workouts) {
-            if (workout.day >= copyWeekStartDay && workout.day <= copyWeekEndDay) {
-                const copy = this.deepCopy(workout);
-                copy.day -= (copyWeekStartDay - 1);
-                copy.day += newWeekStartDay;
-                copy.name = 'Day ' + copy.day;
-                copy.workoutid = null;
-                copy.added = true;
-                currentProgram.workouts.push(copy);
+        this.program.update(currentProgram => {
+            const newWorkouts: Workout[] = [];
+            
+            for (const workout of currentProgram.workouts) {
+                if (workout.day >= copyWeekStartDay && workout.day <= copyWeekEndDay) {
+                    const copy = this.deepCopy(workout);
+                    copy.day = copy.day - (copyWeekStartDay - 1) + newWeekStartDay;
+                    copy.name = 'Day ' + copy.day;
+                    copy.workoutid = null;
+                    copy.added = true;
+                    newWorkouts.push(copy);
+                }
             }
-        }
-        this.program.set(currentProgram);
+            
+            return {
+                ...currentProgram,
+                workouts: [...currentProgram.workouts, ...newWorkouts]
+            };
+        });
+    }
+    
+    public confirmRemoveTab(week: string, index: number): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Confirm Delete'),
+                content: this.translate.instant('Are you sure you want to delete this week? All workouts in this week will be removed.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.removeTab(week, index);
+            }
+        });
     }
     
     public removeTab(week: string, index: number): void {
         const weekStartDay = (index * 7) + 1;
         const weekEndDay = weekStartDay + 6;
-        const currentProgram = this.program();
         
-        for (let x = currentProgram.workouts.length - 1; x >= 0; x--) {
-            const workout = currentProgram.workouts[x];
-            if (workout.day >= weekStartDay && workout.day <= weekEndDay) {
-                currentProgram.workouts.splice(x, 1);
-            } else if (workout.day > weekEndDay) {
-                workout.day -= 7;
+        this.program.update(currentProgram => {
+            const filteredWorkouts = currentProgram.workouts
+                .filter(workout => workout.day < weekStartDay || workout.day > weekEndDay)
+                .map(workout => 
+                    workout.day > weekEndDay 
+                        ? { ...workout, day: workout.day - 7 }
+                        : workout
+                );
+            
+            const newDuration = currentProgram.duration - 7;
+            
+            if (newDuration < 7) {
+                return {
+                    ...currentProgram,
+                    duration: 7,
+                    workouts: [{ day: 1, name: 'Day 1', exercises: [] }]
+                };
             }
-        }
+            
+            return {
+                ...currentProgram,
+                duration: newDuration,
+                workouts: filteredWorkouts
+            };
+        });
         
-        currentProgram.duration -= 7;
-        
-        if (currentProgram.duration < 7) {
-            currentProgram.duration = 7;
-            currentProgram.workouts = [{ day: 1, name: 'Day 1', exercises: [] }];
-        }
-        
-        this.program.set(currentProgram);
         this.calculateTabs();
         
         let weekNumber = parseInt(week.split(' ')[1]) - 1;
@@ -478,6 +673,89 @@ export class EditProgramComponent implements OnInit {
         return index === tab;
     }
     
+    public getWorkoutsInTab(): Workout[] {
+        return this.program().workouts.filter(workout => this.isInTab(workout));
+    }
+    
+    public setDisplayMode(mode: 'stacked' | 'grid'): void {
+        this.displayMode.set(mode);
+    }
+    
+    public getGridData(): { weeks: string[], days: string[], workoutsByWeekAndDay: Map<string, Workout | null> } {
+        const weeks = this.tabs();
+        const daysOfWeek = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+        const workoutsByWeekAndDay = new Map<string, Workout | null>();
+        
+        // Initialize all cells as null
+        weeks.forEach((week, weekIndex) => {
+            daysOfWeek.forEach((_, dayIndex) => {
+                const key = `${weekIndex}-${dayIndex}`;
+                workoutsByWeekAndDay.set(key, null);
+            });
+        });
+        
+        // Fill in workouts
+        const currentProgram = this.program();
+        currentProgram.workouts.forEach(workout => {
+            const weekIndex = Math.ceil(workout.day / 7) - 1;
+            const dayIndex = ((workout.day - 1) % 7);
+            const key = `${weekIndex}-${dayIndex}`;
+            workoutsByWeekAndDay.set(key, workout);
+        });
+        
+        return { weeks, days: daysOfWeek, workoutsByWeekAndDay };
+    }
+    
+    public getWorkoutForCell(weekIndex: number, dayIndex: number): Workout | null {
+        const gridData = this.getGridData();
+        const key = `${weekIndex}-${dayIndex}`;
+        return gridData.workoutsByWeekAndDay.get(key) || null;
+    }
+    
+    public getWorkoutsForDayInWeek(weekIndex: number, dayIndex: number): Workout[] {
+        const currentProgram = this.program();
+        const dayNumber = (weekIndex * 7) + dayIndex + 1;
+        return currentProgram.workouts.filter(workout => workout.day === dayNumber);
+    }
+    
+    public dropWorkoutInGrid(event: CdkDragDrop<{ weekIndex: number; dayIndex: number }>, targetWeekIndex: number, targetDayIndex: number): void {
+        const workout = event.item.data as Workout;
+        
+        if (!workout) {
+            return;
+        }
+        
+        // Calculate the new day based on target cell
+        const newDay = (targetWeekIndex * 7) + targetDayIndex + 1;
+        
+        // Check if workout is moving to a different day
+        if (workout.day === newDay) {
+            return;
+        }
+        
+        // Update workout day
+        const regex = /^Day \d+$/;
+        const updatedName = regex.test(workout.name) ? "Day " + newDay : workout.name;
+        
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.map(w => 
+                w === workout 
+                    ? { ...w, day: newDay, name: updatedName }
+                    : w
+            )
+        }));
+    }
+    
+    public addWorkoutToCell(weekIndex: number, dayIndex: number): void {
+        const newDay = (weekIndex * 7) + dayIndex + 1;
+        
+        this.program.update(prog => ({
+            ...prog,
+            workouts: [...prog.workouts, { name: 'Day ' + newDay, day: newDay, added: true, exercises: [] }]
+        }));
+    }
+    
     public formatExerciseType(setType: string): string {
         const types: { [key: string]: string } = {
             amrap: 'AMRAP',
@@ -496,10 +774,69 @@ export class EditProgramComponent implements OnInit {
     }
     
     public addWeek(): void {
-        const currentProgram = this.program();
-        currentProgram.duration = currentProgram.duration + 7;
-        this.program.set(currentProgram);
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            duration: currentProgram.duration + 7
+        }));
         this.calculateTabs();
+        
+        // Scroll grid container to the right to show newly added week
+        if (this.displayMode() === 'grid') {
+            this.scrollGridToEnd();
+        }
+    }
+    
+    private scrollGridToEnd(): void {
+        setTimeout(() => {
+            const gridContainer = document.querySelector('.edit-program__grid-container');
+            if (gridContainer) {
+                gridContainer.scrollTo({
+                    left: gridContainer.scrollWidth,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+    }
+    
+    public updateProgramName(name: string): void {
+        this.program.update(p => ({ ...p, name }));
+    }
+    
+    public updateProgramDescription(description: string): void {
+        this.program.update(p => ({ ...p, description }));
+    }
+    
+    public updateProgramPublic(isPublic: boolean | number): void {
+        this.program.update(p => ({ ...p, public: isPublic }));
+    }
+    
+    public updateWorkoutNotes(workout: Workout, notes: string): void {
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.map(w => 
+                w === workout 
+                    ? { ...w, workoutnotes: notes }
+                    : w
+            )
+        }));
+    }
+    
+    public toggleWorkoutNotes(workout: Workout): void {
+        const currentVisible = this.workoutNotesVisible();
+        const newVisible = new Set(currentVisible);
+        
+        if (newVisible.has(workout.day)) {
+            newVisible.delete(workout.day);
+        } else {
+            newVisible.add(workout.day);
+        }
+        
+        this.workoutNotesVisible.set(newVisible);
+    }
+    
+    public isWorkoutNotesVisible(workout: Workout): boolean {
+        // Show notes if explicitly toggled visible or if workout has notes content
+        return this.workoutNotesVisible().has(workout.day);
     }
     
     public openAutoExtend(): void {
@@ -553,6 +890,9 @@ export class EditProgramComponent implements OnInit {
         
         // Get target week range
         const targetWeekStartDay = (targetWeek - 1) * 7 + 1;
+        
+        // Create new workouts for the target week
+        const newWorkouts: Workout[] = [];
         
         // Copy workouts from source week to target week
         for (const workout of currentProgram.workouts) {
@@ -615,11 +955,14 @@ export class EditProgramComponent implements OnInit {
                     }
                 }
                 
-                currentProgram.workouts.push(copy);
+                newWorkouts.push(copy);
             }
         }
         
-        this.program.set(currentProgram);
+        this.program.update(prog => ({
+            ...prog,
+            workouts: [...prog.workouts, ...newWorkouts]
+        }));
     }
     
     public scrollToBottom(): void {
@@ -642,9 +985,9 @@ export class EditProgramComponent implements OnInit {
         let newDay = weekStartDay;
         
         for (const workout of currentProgram.workouts) {
-            workout.day = parseInt(workout.day.toString());
-            if (workout.day >= weekStartDay && workout.day <= weekEndDay) {
-                newDay = workout.day + 1;
+            const day = parseInt(workout.day.toString());
+            if (day >= weekStartDay && day <= weekEndDay) {
+                newDay = day + 1;
             }
         }
         
@@ -652,8 +995,10 @@ export class EditProgramComponent implements OnInit {
             newDay = weekEndDay;
         }
         
-        currentProgram.workouts.push({ name: 'Day ' + newDay, day: newDay, added: true, exercises: [] });
-        this.program.set(currentProgram);
+        this.program.update(prog => ({
+            ...prog,
+            workouts: [...prog.workouts, { name: 'Day ' + newDay, day: newDay, added: true, exercises: [] }]
+        }));
         this.scrollToBottom();
     }
     
@@ -667,10 +1012,20 @@ export class EditProgramComponent implements OnInit {
             if (exercise) {
                 exercise.type = '';
                 exercise.id = null;
-                workout.exercises.push(exercise);
-                workout.exercises.forEach((ex: Exercise, index: number) => {
-                    ex.ordering = index;
-                });
+                
+                this.program.update(currentProgram => ({
+                    ...currentProgram,
+                    workouts: currentProgram.workouts.map(w => {
+                        if (w === workout) {
+                            const newExercises = [...w.exercises, exercise];
+                            return { 
+                                ...w, 
+                                exercises: newExercises.map((ex, idx) => ({ ...ex, ordering: idx }))
+                            };
+                        }
+                        return w;
+                    })
+                }));
             }
         });
     }

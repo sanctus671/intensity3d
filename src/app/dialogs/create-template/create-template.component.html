@@ -147,7 +147,7 @@
             {{ 'Cancel' | translate }}
         </button>
         <button 
-            mat-raised-button 
+            mat-flat-button 
             color="primary" 
             (click)="generate()"
             [disabled]="isLoadingExercises() || isGenerating()">
@@ -156,7 +156,7 @@
                 {{ 'Creating...' | translate }}
             } @else {
                 @if (!account().premium) {
-                    <mat-icon>workspace_premium</mat-icon>
+                    <mat-icon matListItemIcon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
                 }
                 {{ 'Create Template' | translate }}
             }

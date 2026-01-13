@@ -120,9 +120,32 @@ export class CreateTemplateComponent implements OnInit {
       this.account.set(account);
     }
 
+    this.setWeekFromDate(new Date());
+
     await this.getWorkouts();
     await this.setMarkedDates();
   }
+
+  private setWeekFromDate(selected: Date): void {
+    const day = selected.getDay(); // 0 = Sunday
+  
+    const start = new Date(selected);
+    const end = new Date(selected);
+  
+    // Monday on/before
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    start.setDate(start.getDate() + diffToMonday);
+    start.setHours(0, 0, 0, 0);
+  
+    // Sunday on/after
+    const diffToSunday = day === 0 ? 0 : 7 - day;
+    end.setDate(end.getDate() + diffToSunday);
+    end.setHours(23, 59, 59, 999);
+  
+    this.startDate.set(start);
+    this.endDate.set(end);
+  }
+
 
   async setMarkedDates(): Promise<void> {
     try {

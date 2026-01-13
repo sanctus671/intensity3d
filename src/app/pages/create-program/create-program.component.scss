@@ -195,8 +195,9 @@
     margin-bottom: 20px;
     background-color: var(--surface-color);
     
-    .mat-list-base .mat-list-base{
+    .mat-mdc-list-base{
         padding-top: 0px;
+        margin-top:8px;
     }
 
     mat-list-item {
@@ -495,7 +496,7 @@ mat-list-item.workout-list__exercise{
         transition: background-color 0.2s ease;
         
         &:hover {
-            background-color: var(--hover-color, rgba(0, 0, 0, 0.02));
+/*             background-color: var(--hover-color, rgba(0, 0, 0, 0.02)); */
         }
         
         &.cdk-drop-list-dragging {

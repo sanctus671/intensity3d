@@ -2,6 +2,19 @@
 
 @if (!properties().loading) {
     <div class="create-program-extra-actions">
+        <mat-button-toggle-group 
+            [value]="displayMode()" 
+            (change)="setDisplayMode($event.value)"
+            aria-label="Display mode toggle"
+            class="display-mode-toggle">
+            <mat-button-toggle value="stacked" aria-label="Stacked view">
+                <mat-icon>view_agenda</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="grid" aria-label="Grid view">
+                <mat-icon>grid_view</mat-icon>
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+        
         <button mat-button 
             color="warn" 
             (click)="clearDraft()"
@@ -56,163 +69,328 @@
                 </mat-checkbox>
             </div>
             
-            <div class="create-program__tabs" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropTab($event)">
-                @for (tab of tabs(); track tab; let i = $index) {
-                    <div class="create-program__tabs__tab tab" cdkDrag>
-                        @if (properties().activeTab === tab) {
-                            <button 
-                                mat-flat-button
-                                color="primary"
-                                (click)="setActiveTab(tab)"
-                                [attr.aria-label]="tab">
-                                {{ tab }}
-                            </button>
-                        } @else {
-                            <button 
-                                mat-stroked-button
-                                color="primary"
-                                (click)="setActiveTab(tab)"
-                                [attr.aria-label]="tab">
-                                {{ tab }}
-                            </button>
-                        }
-                        
-                        <div class="tab__actions">
-                            <button mat-icon-button 
-                                    color="primary" 
-                                    (click)="copyTab(tab, i)"
-                                    [attr.aria-label]="'Copy ' + tab | translate">
-                                <mat-icon>file_copy</mat-icon>
-                            </button>
-                            <button mat-icon-button 
-                                    color="primary" 
-                                    (click)="confirmRemoveTab(tab, i)"
-                                    [attr.aria-label]="'Remove ' + tab | translate">
-                                <mat-icon>delete_outline</mat-icon>
-                            </button>
+            <!-- STACKED VIEW -->
+            @if (displayMode() === 'stacked') {
+                <div class="create-program__tabs" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropTab($event)">
+                    @for (tab of tabs(); track tab; let i = $index) {
+                        <div class="create-program__tabs__tab tab" cdkDrag>
+                            @if (properties().activeTab === tab) {
+                                <button 
+                                    mat-flat-button
+                                    color="primary"
+                                    (click)="setActiveTab(tab)"
+                                    [attr.aria-label]="tab">
+                                    {{ tab }}
+                                </button>
+                            } @else {
+                                <button 
+                                    mat-stroked-button
+                                    color="primary"
+                                    (click)="setActiveTab(tab)"
+                                    [attr.aria-label]="tab">
+                                    {{ tab }}
+                                </button>
+                            }
+                            
+                            <div class="tab__actions">
+                                <button mat-icon-button 
+                                        color="primary" 
+                                        (click)="copyTab(tab, i)"
+                                        [attr.aria-label]="'Copy ' + tab | translate">
+                                    <mat-icon>file_copy</mat-icon>
+                                </button>
+                                <button mat-icon-button 
+                                        color="primary" 
+                                        (click)="confirmRemoveTab(tab, i)"
+                                        [attr.aria-label]="'Remove ' + tab | translate">
+                                    <mat-icon>delete_outline</mat-icon>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
+                    
+                    <button mat-button 
+                            color="primary" 
+                            (click)="addWeek()"
+                            [attr.aria-label]="'Add Week' | translate">
+                        <mat-icon>add</mat-icon>
+                        {{ 'Add Week' | translate }}
+                    </button>
+                    
+                    <button mat-button 
+                            (click)="openAutoExtend()"
+                            [attr.aria-label]="'Auto Extend' | translate">
+                        <mat-icon>sync</mat-icon>
+                        {{ 'Auto Extend' | translate }}
+                    </button>
+                </div>            
                 
-                <button mat-button 
-                        color="primary" 
-                        (click)="addWeek()"
-                        [attr.aria-label]="'Add Week' | translate">
+                <div class="create-program__program-workouts" id="program-workouts" cdkDropList (cdkDropListDropped)="dropWorkout($event)">
+                    @for (workout of getWorkoutsInTab(); track workout.day; let i = $index) {
+                        <div class="create-program__program-workouts__workout-list workout-list" cdkDrag [cdkDragData]="workout">
+                            <mat-list cdkDropList (cdkDropListDropped)="dropExercise($event, workout)" [cdkDropListDisabled]="false">
+                                <h3 matSubheader>
+                                    <span cdkDragHandle>{{ workout.name }}</span>
+                                        <div class="workout-list__actions">
+                                            <button mat-button 
+                                                    (click)="copyWorkout(workout)"
+                                                    [attr.aria-label]="'Copy workout' | translate">
+                                                {{ 'Copy' | translate }}
+                                            </button>
+                                            <button mat-button 
+                                                    (click)="editWorkout(workout)"
+                                                    [attr.aria-label]="'Edit workout' | translate">
+                                                {{ 'Edit' | translate }}
+                                            </button>
+                                            <button mat-button 
+                                                    (click)="confirmDeleteWorkout(i, workout)"
+                                                    [attr.aria-label]="'Delete workout' | translate">
+                                                {{ 'Delete' | translate }}
+                                            </button>
+                                        </div>
+                                    </h3>
+                                    
+                                    <div class="workout-list__notes">
+                                        @if (!isWorkoutNotesVisible(workout)) {
+                                            <button mat-button 
+                                                    (click)="toggleWorkoutNotes(workout)"
+                                                    [attr.aria-label]="'Add Notes' | translate"
+                                                    [matBadge]="workout.workoutnotes ? '1' : ''"
+                                                    [matBadgeHidden]="!workout.workoutnotes"
+                                                    matBadgeColor="primary"
+                                                    matBadgeSize="small">
+                                                <mat-icon>note_add</mat-icon>
+                                                {{ 'Add Notes' | translate }}
+                                            </button>
+                                        } @else {
+                                            <mat-form-field subscriptSizing="dynamic">
+                                                <mat-label>{{ 'Add notes...' | translate }}</mat-label>
+                                                <textarea matInput 
+                                                          [ngModel]="workout.workoutnotes"
+                                                          (ngModelChange)="updateWorkoutNotes(workout, $event)"
+                                                          cdkTextareaAutosize
+                                                          cdkAutosizeMinRows="1"
+                                                          [attr.aria-label]="'Workout notes' | translate"></textarea>
+                                            </mat-form-field>
+                                            <button mat-icon-button 
+                                                    (click)="toggleWorkoutNotes(workout)"
+                                                    [attr.aria-label]="'Hide Notes' | translate">
+                                                <mat-icon>close</mat-icon>
+                                            </button>
+                                        }
+                                    </div>
+                                    
+                                    @for (exercise of workout.exercises; track exercise.exerciseid; let i2 = $index) {
+                                        <div class="mat-list-base" cdkDrag cdkDragHandle>
+                                            <mat-list-item class="workout-list__exercise">
+                                                <h2 matListItemTitle>{{ exercise.name }}</h2>
+                                                <p matListItemLine>{{ exercise.sets ? exercise.sets : 0 }} {{ 'set' | translate }}@if (exercise.sets !== '1' && exercise.sets !== 1) {<span>s</span>} {{ 'of' | translate }} {{ exercise.reps ? exercise.reps : 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ 'rep' | translate }}@if (exercise.maxreps || exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
+                                                </p>
+                                                <div matListItemMeta class="workout-list__exercise__actions">
+                                                    <button mat-button 
+                                                            (click)="copyExercise(workout, exercise)"
+                                                            [attr.aria-label]="'Copy exercise' | translate">
+                                                        {{ 'Copy' | translate }}
+                                                    </button>
+                                                    <button mat-button 
+                                                            (click)="editExercise(exercise)"
+                                                            [attr.aria-label]="'Edit exercise' | translate">
+                                                        {{ 'Edit' | translate }}
+                                                    </button>
+                                                    <button mat-button 
+                                                            (click)="deleteExercise(i2, workout)"
+                                                            [attr.aria-label]="'Delete exercise' | translate">
+                                                        {{ 'Delete' | translate }}
+                                                    </button>
+                                                </div>
+                                            </mat-list-item>
+                                        </div>
+                                    }
+                                    
+                                    <button mat-stroked-button 
+                                            color="primary" 
+                                            (click)="addExercise(workout)" 
+                                            class="workout-list__add-exercise"
+                                            [attr.aria-label]="'Add Exercise' | translate">
+                                        <mat-icon>add</mat-icon>
+                                        {{ 'Add Exercise' | translate }}
+                                    </button>
+                                </mat-list>
+                            </div>
+                    }
+                </div>            
+                
+                <div class="create-program__add-workout" 
+                     (click)="addWorkout()"
+                     role="button"
+                     tabindex="0"
+                     [attr.aria-label]="'Add Workout' | translate">
                     <mat-icon>add</mat-icon>
-                    {{ 'Add Week' | translate }}
-                </button>
-                
-                <button mat-button 
-                        (click)="openAutoExtend()"
-                        [attr.aria-label]="'Auto Extend' | translate">
-                    <mat-icon>sync</mat-icon>
-                    {{ 'Auto Extend' | translate }}
-                </button>
-            </div>            
+                    {{ 'Add Workout' | translate }}
+                </div>
+            }
             
-            <div class="create-program__program-workouts" id="program-workouts" cdkDropList (cdkDropListDropped)="dropWorkout($event)">
-                @for (workout of getWorkoutsInTab(); track workout.day; let i = $index) {
-                    <div class="create-program__program-workouts__workout-list workout-list" cdkDrag [cdkDragData]="workout">
-                        <mat-list cdkDropList (cdkDropListDropped)="dropExercise($event, workout)" [cdkDropListDisabled]="false">
-                            <h3 matSubheader>
-                                <span cdkDragHandle>{{ workout.name }}</span>
-                                    <div class="workout-list__actions">
-                                        <button mat-button 
-                                                (click)="copyWorkout(workout)"
-                                                [attr.aria-label]="'Copy workout' | translate">
-                                            {{ 'Copy' | translate }}
+            <!-- GRID VIEW -->
+            @if (displayMode() === 'grid') {
+                <div class="create-program__grid-actions">
+                    <button mat-button 
+                            color="primary" 
+                            (click)="addWeek()"
+                            [attr.aria-label]="'Add Week' | translate">
+                        <mat-icon>add</mat-icon>
+                        {{ 'Add Week' | translate }}
+                    </button>
+                    
+                    <button mat-button 
+                            (click)="openAutoExtend()"
+                            [attr.aria-label]="'Auto Extend' | translate">
+                        <mat-icon>sync</mat-icon>
+                        {{ 'Auto Extend' | translate }}
+                    </button>
+                </div>
+                
+                <div class="create-program__grid-container" cdkDropListGroup>
+                    <div class="grid__inner">
+                    <!-- Week Headers Row (draggable) -->
+                    <div class="grid__header-row" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropTab($event)">
+                        <div class="grid__header-cell grid__header-cell--corner"></div>
+                        @for (week of tabs(); track week; let weekIndex = $index) {
+                            <div class="grid__header-cell grid__week-header" cdkDrag [cdkDragData]="{ week: week, index: weekIndex }">
+                                <div class="grid__week-header-content"  cdkDragHandle>
+                                    <span class="grid__week-title">{{ week }}</span>
+                                    <div class="grid__week-actions">
+                                        <button mat-icon-button 
+                                                (click)="copyTab(week, weekIndex)"
+                                                [attr.aria-label]="'Copy ' + week | translate">
+                                            <mat-icon>file_copy</mat-icon>
                                         </button>
-                                        <button mat-button 
-                                                (click)="editWorkout(workout)"
-                                                [attr.aria-label]="'Edit workout' | translate">
-                                            {{ 'Edit' | translate }}
-                                        </button>
-                                        <button mat-button 
-                                                (click)="confirmDeleteWorkout(i, workout)"
-                                                [attr.aria-label]="'Delete workout' | translate">
-                                            {{ 'Delete' | translate }}
+                                        <button mat-icon-button 
+                                                (click)="confirmRemoveTab(week, weekIndex)"
+                                                [attr.aria-label]="'Remove ' + week | translate">
+                                            <mat-icon>delete_outline</mat-icon>
                                         </button>
                                     </div>
-                                </h3>
-                                
-                                <div class="workout-list__notes">
-                                    @if (!isWorkoutNotesVisible(workout)) {
-                                        <button mat-button 
-                                                (click)="toggleWorkoutNotes(workout)"
-                                                [attr.aria-label]="'Add Notes' | translate"
-                                                [matBadge]="workout.workoutnotes ? '1' : ''"
-                                                [matBadgeHidden]="!workout.workoutnotes"
-                                                matBadgeColor="primary"
-                                                matBadgeSize="small">
-                                            <mat-icon>note_add</mat-icon>
-                                            {{ 'Add Notes' | translate }}
-                                        </button>
-                                    } @else {
-                                        <mat-form-field subscriptSizing="dynamic">
-                                            <mat-label>{{ 'Add notes...' | translate }}</mat-label>
-                                            <textarea matInput 
-                                                      [ngModel]="workout.workoutnotes"
-                                                      (ngModelChange)="updateWorkoutNotes(workout, $event)"
-                                                      cdkTextareaAutosize
-                                                      cdkAutosizeMinRows="1"
-                                                      [attr.aria-label]="'Workout notes' | translate"></textarea>
-                                        </mat-form-field>
-                                        <button mat-icon-button 
-                                                (click)="toggleWorkoutNotes(workout)"
-                                                [attr.aria-label]="'Hide Notes' | translate">
-                                            <mat-icon>close</mat-icon>
-                                        </button>
-                                    }
                                 </div>
                                 
-                                @for (exercise of workout.exercises; track exercise.exerciseid; let i2 = $index) {
-                                    <div class="mat-list-base" cdkDrag cdkDragHandle>
-                                        <mat-list-item class="workout-list__exercise">
-                                            <h2 matListItemTitle>{{ exercise.name }}</h2>
-                                            <p matListItemLine>{{ exercise.sets ? exercise.sets : 0 }} {{ 'set' | translate }}@if (exercise.sets !== '1' && exercise.sets !== 1) {<span>s</span>} {{ 'of' | translate }} {{ exercise.reps ? exercise.reps : 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>} {{ 'rep' | translate }}@if (exercise.maxreps || exercise.reps !== '1') {<span>s</span>}@if (exercise.percentage && exercise.percentage > 0) {<span>, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span>, @{{ exercise.rpe }}RPE</span>}@if (exercise.type && exercise.type !== '') {<span>, {{ formatExerciseType(exercise.type) }}</span>}
-                                            </p>
-                                            <div matListItemMeta class="workout-list__exercise__actions">
-                                                <button mat-button 
-                                                        (click)="copyExercise(workout, exercise)"
-                                                        [attr.aria-label]="'Copy exercise' | translate">
-                                                    {{ 'Copy' | translate }}
-                                                </button>
-                                                <button mat-button 
-                                                        (click)="editExercise(exercise)"
-                                                        [attr.aria-label]="'Edit exercise' | translate">
-                                                    {{ 'Edit' | translate }}
-                                                </button>
-                                                <button mat-button 
-                                                        (click)="deleteExercise(i2, workout)"
-                                                        [attr.aria-label]="'Delete exercise' | translate">
-                                                    {{ 'Delete' | translate }}
-                                                </button>
+                                <!-- Drag preview for entire week column -->
+                                <div *cdkDragPreview class="grid__week-drag-preview">
+                                    <div class="grid__week-preview-header">{{ week }}</div>
+                                    @for (dayIdx of [0, 1, 2, 3, 4, 5, 6]; track dayIdx) {
+                                        @if (getWorkoutsForDayInWeek(weekIndex, dayIdx); as workoutsInCell) {
+                                            <div class="grid__week-preview-cell">
+                                                @if (workoutsInCell.length > 0) {
+                                                    @for (w of workoutsInCell; track w.day) {
+                                                        <div class="grid__week-preview-workout">{{ w.name }}</div>
+                                                    }
+                                                } @else {
+                                                    <div class="grid__week-preview-empty">-</div>
+                                                }
                                             </div>
-                                        </mat-list-item>
-                                    </div>
-                                }
-                                
-                                <button mat-stroked-button 
-                                        color="primary" 
-                                        (click)="addExercise(workout)" 
-                                        class="workout-list__add-exercise"
-                                        [attr.aria-label]="'Add Exercise' | translate">
-                                    <mat-icon>add</mat-icon>
-                                    {{ 'Add Exercise' | translate }}
-                                </button>
-                            </mat-list>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <!-- Day Rows -->
+                    @for (dayLabel of ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7']; track dayLabel; let dayIndex = $index) {
+                        <div class="grid__row">
+                            <div class="grid__row-header">{{ dayLabel }}</div>
+                            @for (week of tabs(); track week; let weekIndex = $index) {
+                                <div class="grid__cell" 
+                                     cdkDropList 
+                                     [cdkDropListData]="{ weekIndex: weekIndex, dayIndex: dayIndex }"
+                                     (cdkDropListDropped)="dropWorkoutInGrid($event, weekIndex, dayIndex)"
+                                     [id]="'grid-cell-' + weekIndex + '-' + dayIndex">
+                                    @for (workout of getWorkoutsForDayInWeek(weekIndex, dayIndex); track $index) {
+                                        <div class="grid__workout-card" 
+                                             cdkDrag 
+                                             [cdkDragData]="workout">
+                                            <div class="grid__workout-header" cdkDragHandle>
+                                                <span class="grid__workout-name">{{ workout.name }}</span>
+                                                <div class="grid__workout-actions">
+                                                    <button mat-icon-button 
+                                                            (click)="copyWorkout(workout)"
+                                                            [attr.aria-label]="'Copy workout' | translate">
+                                                        <mat-icon>file_copy</mat-icon>
+                                                    </button>
+                                                    <button mat-icon-button 
+                                                            (click)="editWorkout(workout)"
+                                                            [attr.aria-label]="'Edit workout' | translate">
+                                                        <mat-icon>edit</mat-icon>
+                                                    </button>
+                                                    <button mat-icon-button 
+                                                            (click)="confirmDeleteWorkoutByRef(workout)"
+                                                            [attr.aria-label]="'Delete workout' | translate">
+                                                        <mat-icon>delete_outline</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            @if (workout.workoutnotes) {
+                                                <div class="grid__workout-notes">
+                                                    <mat-icon>note</mat-icon>
+                                                    <span>{{ workout.workoutnotes }}</span>
+                                                </div>
+                                            }
+                                            
+                                            <div class="grid__exercises" cdkDropList (cdkDropListDropped)="dropExercise($event, workout)">
+                                                @for (exercise of workout.exercises; track $index; let exIndex = $index) {
+                                                    <div class="grid__exercise" cdkDrag>
+                                                        <div class="grid__exercise-content" cdkDragHandle>
+                                                            <div class="grid__exercise-name">{{ exercise.name }}</div>
+                                                            <div class="grid__exercise-details">
+                                                                {{ exercise.sets ? exercise.sets : 0 }} × {{ exercise.reps ? exercise.reps : 0 }}@if (exercise.maxreps) {<span>-{{ exercise.maxreps }}</span>}@if (exercise.percentage && exercise.percentage > 0) {<span class="grid__exercise-intensity">, {{ exercise.percentage }}%</span>}@if (exercise.rpe && exercise.rpe > 0) {<span class="grid__exercise-intensity">, @{{ exercise.rpe }}</span>}
+                                                            </div>
+                                                        </div>
+                                                        <div class="grid__exercise-actions">
+                                                            <button mat-icon-button 
+                                                                    (click)="copyExercise(workout, exercise)"
+                                                                    [attr.aria-label]="'Copy exercise' | translate">
+                                                                <mat-icon>file_copy</mat-icon>
+                                                            </button>
+                                                            <button mat-icon-button 
+                                                                    (click)="editExercise(exercise)"
+                                                                    [attr.aria-label]="'Edit exercise' | translate">
+                                                                <mat-icon>edit</mat-icon>
+                                                            </button>
+                                                            <button mat-icon-button 
+                                                                    (click)="deleteExercise(exIndex, workout)"
+                                                                    [attr.aria-label]="'Delete exercise' | translate">
+                                                                <mat-icon>delete_outline</mat-icon>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            
+                                            <button mat-stroked-button 
+                                                    color="primary" 
+                                                    (click)="addExercise(workout)" 
+                                                    class="grid__add-exercise"
+                                                    [attr.aria-label]="'Add Exercise' | translate">
+                                                <mat-icon>add</mat-icon>
+                                                {{ 'Add Exercise' | translate }}
+                                            </button>
+                                        </div>
+                                    }
+                                    
+                                    <!-- Add workout button when cell is empty or add another -->
+                                    <button mat-button 
+                                            color="primary"
+                                            class="grid__add-workout-btn"
+                                            (click)="addWorkoutToCell(weekIndex, dayIndex)"
+                                            [attr.aria-label]="'Add Workout' | translate">
+                                        <mat-icon>add</mat-icon>
+                                    </button>
+                                </div>
+                            }
                         </div>
-                }
-            </div>            
-            
-            <div class="create-program__add-workout" 
-                 (click)="addWorkout()"
-                 role="button"
-                 tabindex="0"
-                 [attr.aria-label]="'Add Workout' | translate">
-                <mat-icon>add</mat-icon>
-                {{ 'Add Workout' | translate }}
-            </div>
+                    }
+                    </div>
+                </div>
+            }
             
             <div class='create-program__actions'>
                 <div class='create-program__actions__inner'>

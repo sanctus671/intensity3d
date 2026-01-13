@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation, signal, inject, input, ChangeDete
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
@@ -776,6 +776,77 @@ export class CreateProgramComponent implements OnInit {
         return gridData.workoutsByWeekAndDay.get(key) || null;
     }
     
+    public getWorkoutsForDayInWeek(weekIndex: number, dayIndex: number): Workout[] {
+        const currentProgram = this.program();
+        const dayNumber = (weekIndex * 7) + dayIndex + 1;
+        return currentProgram.workouts.filter(workout => workout.day === dayNumber);
+    }
+    
+    public dropWorkoutInGrid(event: CdkDragDrop<{ weekIndex: number; dayIndex: number }>, targetWeekIndex: number, targetDayIndex: number): void {
+        const workout = event.item.data as Workout;
+        
+        if (!workout) {
+            return;
+        }
+        
+        // Calculate the new day based on target cell
+        const newDay = (targetWeekIndex * 7) + targetDayIndex + 1;
+        
+        // Check if workout is moving to a different day
+        if (workout.day === newDay) {
+            return;
+        }
+        
+        // Update workout day
+        const regex = /^Day \d+$/;
+        const updatedName = regex.test(workout.name) ? "Day " + newDay : workout.name;
+        
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.map(w => 
+                w === workout 
+                    ? { ...w, day: newDay, name: updatedName }
+                    : w
+            )
+        }));
+        
+        this.doSaveDraft();
+    }
+    
+    public addWorkoutToCell(weekIndex: number, dayIndex: number): void {
+        const newDay = (weekIndex * 7) + dayIndex + 1;
+        
+        this.program.update(prog => ({
+            ...prog,
+            workouts: [...prog.workouts, { name: 'Day ' + newDay, day: newDay, added: true, exercises: [] }]
+        }));
+        this.doSaveDraft();
+    }
+    
+    public confirmDeleteWorkoutByRef(workout: Workout): void {
+        const dialogRef = this.dialog.open(ConfirmationComponent, {
+            width: '400px',
+            data: {
+                title: this.translate.instant('Confirm Delete'),
+                content: this.translate.instant('Are you sure you want to delete this workout? All exercises in this workout will be removed.')
+            }
+        });
+        
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.confirm) {
+                this.deleteWorkoutByRef(workout);
+            }
+        });
+    }
+    
+    public deleteWorkoutByRef(workout: Workout): void {
+        this.program.update(currentProgram => ({
+            ...currentProgram,
+            workouts: currentProgram.workouts.filter(w => w !== workout)
+        }));
+        this.doSaveDraft();
+    }
+    
     public formatExerciseType(setType: string): string {
         const types: { [key: string]: string } = {
             amrap: 'AMRAP',
@@ -800,6 +871,23 @@ export class CreateProgramComponent implements OnInit {
         }));
         this.calculateTabs();
         this.doSaveDraft();
+        
+        // Scroll grid container to the right to show newly added week
+        if (this.displayMode() === 'grid') {
+            this.scrollGridToEnd();
+        }
+    }
+    
+    private scrollGridToEnd(): void {
+        setTimeout(() => {
+            const gridContainer = document.querySelector('.create-program__grid-container');
+            if (gridContainer) {
+                gridContainer.scrollTo({
+                    left: gridContainer.scrollWidth,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
     }
     
     public updateProgramName(name: string): void {

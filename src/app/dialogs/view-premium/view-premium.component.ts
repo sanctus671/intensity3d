@@ -1,8 +1,9 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { AccountService } from '../../services/account/account.service';
 import { PremiumComponent } from '../../pages/premium/premium.component';
 
@@ -19,18 +20,23 @@ import { PremiumComponent } from '../../pages/premium/premium.component';
     PremiumComponent
   ]
 })
-export class ViewPremiumComponent {
+export class ViewPremiumComponent implements OnDestroy {
     
     public dialogRef = inject(MatDialogRef<ViewPremiumComponent>);
     public data = inject(MAT_DIALOG_DATA);
     private accountService = inject(AccountService);
+    private accountSubscription: Subscription;
 
     constructor() {
-        this.accountService.getPremiumStatus().then(value => {
-            if (value){
+        this.accountSubscription = this.accountService.getAccountObservable().subscribe(account => {
+            if (account?.premium) {
                 this.dialogRef.close(true);
             }
         });         
+    }
+
+    ngOnDestroy(): void {
+        this.accountSubscription?.unsubscribe();
     }
 
     public dismiss(): void { 

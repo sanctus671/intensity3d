@@ -64,7 +64,7 @@ export class GoalSettingsComponent {
             groupinggoal:this.account.goals.grouping
         };
         
-        this.accountService.updateSettings(formatted).then(() => {
+        this.accountService.updateSettings(formatted, this.account.id).then(() => {
             this.accountService.setAccountObservable(this.account);
         });
     }

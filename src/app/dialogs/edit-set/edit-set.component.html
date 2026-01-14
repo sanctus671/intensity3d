@@ -90,6 +90,11 @@
     <mat-form-field class="edit-set__extra-action">
         <mat-label>{{ 'Video' | translate }}</mat-label>
         <input matInput type="text" [(ngModel)]="set.video">
+        @if (set.video) {
+            <button mat-button matSuffix color="primary" (click)="viewVideo()">          
+                {{ 'View' | translate }}
+            </button>    
+        }     
         <button mat-button matSuffix color="primary" (click)="uploadVideo()">
             @if (!account.premium) {
                 <mat-icon matListItemIcon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>

@@ -16,6 +16,7 @@ import { AuthenticationService } from '../../services/authentication/authenticat
 import { AccountService } from '../../services/account/account.service';
 import { DiaryService } from '../../services/diary/diary.service';
 import { ThemeService } from '../../services/theme/theme.service';
+import { TranslationService } from '../../services/translation/translation.service';
 import { TimerService } from '../../services/timer/timer.service';
 import { ConfirmationComponent } from '../../dialogs/confirmation/confirmation.component';
 import { TimerComponent } from '../../dialogs/timer/timer.component';
@@ -27,6 +28,7 @@ import { WeightConverterComponent } from '../../dialogs/tools/weight-converter/w
 import { ViewPremiumComponent } from '../../dialogs/view-premium/view-premium.component';
 import { Subscription } from 'rxjs';
 import moment from 'moment';
+import { environment } from '../../../environments/environment';
 
 interface Account {
   id?: number;
@@ -72,6 +74,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private diaryService = inject(DiaryService);
   public themeService = inject(ThemeService);
   public timerService = inject(TimerService);
+  // Injected to ensure saved language is applied on app boot (including hard refresh on /diary)
+  private translationService = inject(TranslationService);
   private router = inject(Router);
   private matIconRegistry = inject(MatIconRegistry);
   private domSanitizer = inject(DomSanitizer);
@@ -158,6 +162,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
     const accountSub = this.accountService.getAccountObservable().subscribe((user) => {
       if (user) {
         this.account.set(user);
+        // If the account has a locale, ensure the app uses it (survives reloads)
+        if (user?.locale && user.locale !== this.translationService.currentLanguage()) {
+          this.translationService.setLanguage(user.locale);
+        }
         this.cdr.markForCheck();
       }
     });
@@ -390,7 +398,11 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   getDp(): string {
     const user = this.account();
-    return user?.dp || 'https://api.intensityapp.com/uploads/default.png';
+    if (!user || !user.dp){
+        return 'https://api.intensityapp.com/uploads/default.png';
+    }
+    if (user?.dp.startsWith('http')) return user?.dp;
+    return environment.apiUrl.replace('index.php', '') + user?.dp; 
   }
 
   openUpgrade(): void {

@@ -122,7 +122,7 @@ export class SettingsComponent implements OnInit {
             autocomplete: currentAccount.autocomplete,
             leaderboard: currentAccount.leaderboard,
             intensity_scale: currentAccount.intensity_scale
-        }).then(() => {
+        }, currentAccount.id).then(() => {
             this.accountService.setAccountObservable(currentAccount);
             this.snackBar.open(this.translationService.instant('Settings updated'), '', {
                 duration: 3000
@@ -142,13 +142,19 @@ export class SettingsComponent implements OnInit {
     }
     
     public onLanguageChange(): void {
+        console.log("here");
         // Language is already set via the setter
         const currentAccount = this.account();
         
         // Update account locale
         this.accountService.updateSettings({
             locale: this.selectedLanguage
-        }).then(() => {
+        }, currentAccount.id).then(() => {
+            // Persist locally so it survives refresh/offline and can be applied at boot
+            const nextAccount = { ...currentAccount, locale: this.selectedLanguage };
+            this.account.set(nextAccount);
+            this.accountService.setLocale(this.selectedLanguage);
+            this.accountService.setAccountObservable(nextAccount);
             this.snackBar.open(this.translationService.instant('Language updated'), '', {
                 duration: 2000
             });
@@ -231,7 +237,7 @@ export class SettingsComponent implements OnInit {
                     units: currentAccount.units,
                     applytoall: data.applytoall,
                     applyconvert: data.applyconvert
-                }).then(() => {
+                }, currentAccount.id).then(() => {
                     this.accountService.setAccountObservable(currentAccount);
                     this.snackBar.open(this.translationService.instant('Units updated'), '', {
                         duration: 5000
@@ -265,7 +271,7 @@ export class SettingsComponent implements OnInit {
                 this.accountService.updateSettings({
                     distanceunits: currentAccount.distanceunits,
                     applytoall: data.applytoall
-                }).then(() => {
+                }, currentAccount.id).then(() => {
                     this.accountService.setAccountObservable(currentAccount);
                     this.snackBar.open(this.translationService.instant('Distance units updated'), '', {
                         duration: 5000

@@ -35,12 +35,15 @@ export class TranslationService {
     private translate: TranslateService,
     private storage: StorageService
   ) {
+    this.translate.setDefaultLang('en');
     this.initializeLanguage();
 
     // Effect to persist language changes
     effect(() => {
       const lang = this.currentLanguage();
       this.storage.set('intensity__language', lang);
+      // Keep backwards/other-code compatibility (AccountService uses intensity__locale)
+      this.storage.set('intensity__locale', lang);
       this.translate.use(lang);
     });
   }
@@ -48,9 +51,13 @@ export class TranslationService {
   private async initializeLanguage(): Promise<void> {
     // Load saved language preference
     const savedLanguage = await this.storage.get('intensity__language');
+    const savedLocale = savedLanguage ? null : await this.storage.get('intensity__locale');
     
     if (savedLanguage) {
       this.currentLanguage.set(savedLanguage);
+    } else if (savedLocale) {
+      // Prefer previously-stored account locale if present
+      this.currentLanguage.set(savedLocale);
     } else {
       // Auto-detect browser language
       const browserLang = this.translate.getBrowserLang();

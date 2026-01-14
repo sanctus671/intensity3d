@@ -168,6 +168,12 @@ export class EditSetComponent {
         }
         
         document.getElementById('videoFile')?.click();
+    }
+
+    viewVideo(): void {
+        if (this.set.video) {
+            window.open(this.set.video, '_blank');
+        }
     }  
     
     public getRpeExplanation(): string {

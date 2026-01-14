@@ -276,7 +276,7 @@ export class DiaryService {
     
     return this.request.upload('uploadvideo', formData).then((response: any) => {
       // Construct video URL from response
-      const videoUrl = response.replace('index.php', '') + response;
+      const videoUrl = environment.apiUrl.replace("index.php", "") + response;
       return videoUrl;
     });
   }

@@ -21,7 +21,7 @@ import { AccountService } from '../../services/account/account.service';
 
 import { DisplayInformationComponent } from '../../dialogs/display-information/display-information.component';
 import { ConfirmationComponent } from '../../dialogs/confirmation/confirmation.component';
-import { SelectExerciseComponent } from '../../dialogs/select-exercise/select-exercise.component';
+import { AddExerciseComponent } from '../../dialogs/add-exercise/add-exercise.component';
 import { CopyProgramWorkoutComponent } from '../../dialogs/copy-program-workout/copy-program-workout.component';
 import { EditProgramWorkoutComponent } from '../../dialogs/edit-program-workout/edit-program-workout.component';
 import { CopyProgramExerciseComponent } from '../../dialogs/copy-program-exercise/copy-program-exercise.component';
@@ -383,7 +383,7 @@ export class EditProgramComponent implements OnInit {
         
         // Case 2: Item before exists
         if (itemBefore) {
-            const beforeDay = itemBefore.day;
+            const beforeDay = parseInt(itemBefore.day.toString(), 10);
             
             // Case 2a: Last position in the week (no item after)
             if (!itemAfter) {
@@ -392,7 +392,7 @@ export class EditProgramComponent implements OnInit {
             
             // Case 2b: Item after also exists
             if (itemAfter) {
-                const afterDay = itemAfter.day;
+                const afterDay = parseInt(itemAfter.day.toString(), 10);
                 
                 // If there's space between the workouts, place it between them
                 if (afterDay > beforeDay + 1) {
@@ -461,8 +461,9 @@ export class EditProgramComponent implements OnInit {
         
         dialogRef.afterClosed().subscribe(data => {
             if (data) {
-                const newDay = parseInt(data.day);
-                const dayChanged = newDay && workout.day !== newDay;
+                const newDay = parseInt(data.day, 10);
+                const currentDay = parseInt(workout.day.toString(), 10);
+                const dayChanged = newDay && currentDay !== newDay;
                 
                 // Update the name if it follows the "Day X" pattern and day changed
                 const regex = /^Day \d+$/;
@@ -471,12 +472,14 @@ export class EditProgramComponent implements OnInit {
                 this.program.update(currentProgram => {
                     let updatedWorkouts = currentProgram.workouts.map(w => 
                         w === workout 
-                            ? { ...w, name: updatedName, day: dayChanged ? newDay : w.day }
+                            ? { ...w, name: updatedName, day: dayChanged ? newDay : parseInt(w.day.toString(), 10) }
                             : w
                     );
                     
                     // Sort workouts by day
-                    updatedWorkouts = [...updatedWorkouts].sort((a, b) => a.day - b.day);
+                    updatedWorkouts = [...updatedWorkouts].sort((a, b) => 
+                        parseInt(a.day.toString(), 10) - parseInt(b.day.toString(), 10)
+                    );
                     
                     // Check if duration needs to be updated
                     let newDuration = currentProgram.duration;
@@ -583,9 +586,10 @@ export class EditProgramComponent implements OnInit {
             const newWorkouts: Workout[] = [];
             
             for (const workout of currentProgram.workouts) {
-                if (workout.day >= copyWeekStartDay && workout.day <= copyWeekEndDay) {
+                const workoutDay = parseInt(workout.day.toString(), 10);
+                if (workoutDay >= copyWeekStartDay && workoutDay <= copyWeekEndDay) {
                     const copy = this.deepCopy(workout);
-                    copy.day = copy.day - (copyWeekStartDay - 1) + newWeekStartDay;
+                    copy.day = workoutDay - (copyWeekStartDay - 1) + newWeekStartDay;
                     copy.name = 'Day ' + copy.day;
                     copy.workoutid = null;
                     copy.added = true;
@@ -622,12 +626,16 @@ export class EditProgramComponent implements OnInit {
         
         this.program.update(currentProgram => {
             const filteredWorkouts = currentProgram.workouts
-                .filter(workout => workout.day < weekStartDay || workout.day > weekEndDay)
-                .map(workout => 
-                    workout.day > weekEndDay 
-                        ? { ...workout, day: workout.day - 7 }
-                        : workout
-                );
+                .filter(workout => {
+                    const day = parseInt(workout.day.toString(), 10);
+                    return day < weekStartDay || day > weekEndDay;
+                })
+                .map(workout => {
+                    const day = parseInt(workout.day.toString(), 10);
+                    return day > weekEndDay 
+                        ? { ...workout, day: day - 7 }
+                        : workout;
+                });
             
             const newDuration = currentProgram.duration - 7;
             
@@ -668,7 +676,8 @@ export class EditProgramComponent implements OnInit {
         const currentTabs = this.tabs();
         const currentProperties = this.properties();
         const index = currentTabs.indexOf(currentProperties.activeTab) + 1;
-        const tab = Math.ceil(workout.day / 7);
+        const day = parseInt(workout.day.toString(), 10);
+        const tab = Math.ceil(day / 7);
         
         return index === tab;
     }
@@ -697,8 +706,9 @@ export class EditProgramComponent implements OnInit {
         // Fill in workouts
         const currentProgram = this.program();
         currentProgram.workouts.forEach(workout => {
-            const weekIndex = Math.ceil(workout.day / 7) - 1;
-            const dayIndex = ((workout.day - 1) % 7);
+            const day = parseInt(workout.day.toString(), 10);
+            const weekIndex = Math.ceil(day / 7) - 1;
+            const dayIndex = ((day - 1) % 7);
             const key = `${weekIndex}-${dayIndex}`;
             workoutsByWeekAndDay.set(key, workout);
         });
@@ -715,7 +725,7 @@ export class EditProgramComponent implements OnInit {
     public getWorkoutsForDayInWeek(weekIndex: number, dayIndex: number): Workout[] {
         const currentProgram = this.program();
         const dayNumber = (weekIndex * 7) + dayIndex + 1;
-        return currentProgram.workouts.filter(workout => workout.day === dayNumber);
+        return currentProgram.workouts.filter(workout => parseInt(workout.day.toString(), 10) === dayNumber);
     }
     
     public dropWorkoutInGrid(event: CdkDragDrop<{ weekIndex: number; dayIndex: number }>, targetWeekIndex: number, targetDayIndex: number): void {
@@ -727,9 +737,10 @@ export class EditProgramComponent implements OnInit {
         
         // Calculate the new day based on target cell
         const newDay = (targetWeekIndex * 7) + targetDayIndex + 1;
+        const currentDay = parseInt(workout.day.toString(), 10);
         
         // Check if workout is moving to a different day
-        if (workout.day === newDay) {
+        if (currentDay === newDay) {
             return;
         }
         
@@ -896,11 +907,12 @@ export class EditProgramComponent implements OnInit {
         
         // Copy workouts from source week to target week
         for (const workout of currentProgram.workouts) {
-            if (workout.day >= sourceWeekStartDay && workout.day <= sourceWeekEndDay) {
+            const workoutDay = parseInt(workout.day.toString(), 10);
+            if (workoutDay >= sourceWeekStartDay && workoutDay <= sourceWeekEndDay) {
                 const copy = this.deepCopy(workout);
                 
                 // Adjust day for target week
-                copy.day = copy.day - sourceWeekStartDay + targetWeekStartDay;
+                copy.day = workoutDay - sourceWeekStartDay + targetWeekStartDay;
                 copy.name = 'Day ' + copy.day;
                 copy.workoutid = null;
                 copy.added = true;
@@ -985,7 +997,7 @@ export class EditProgramComponent implements OnInit {
         let newDay = weekStartDay;
         
         for (const workout of currentProgram.workouts) {
-            const day = parseInt(workout.day.toString());
+            const day = parseInt(workout.day.toString(), 10);
             if (day >= weekStartDay && day <= weekEndDay) {
                 newDay = day + 1;
             }
@@ -1003,21 +1015,26 @@ export class EditProgramComponent implements OnInit {
     }
     
     public addExercise(workout: Workout): void {
-        const dialogRef = this.dialog.open(SelectExerciseComponent, {
+        const dialogRef = this.dialog.open(AddExerciseComponent, {
             width: '600px',
             data: {}
         });
         
-        dialogRef.afterClosed().subscribe(exercise => {
-            if (exercise) {
-                exercise.type = '';
-                exercise.id = null;
-                
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.exercises && result.exercises.length > 0) {
                 this.program.update(currentProgram => ({
                     ...currentProgram,
                     workouts: currentProgram.workouts.map(w => {
                         if (w === workout) {
-                            const newExercises = [...w.exercises, exercise];
+                            const newExercises = [
+                                ...w.exercises,
+                                ...result.exercises.map((ex: any) => ({
+                                    ...ex,
+                                    type: '',
+                                    sets: 1
+                                }))
+                            ];
+                            // Update ordering for all exercises
                             return { 
                                 ...w, 
                                 exercises: newExercises.map((ex, idx) => ({ ...ex, ordering: idx }))

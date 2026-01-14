@@ -165,7 +165,7 @@
                                         }
                                     </div>
                                     
-                                    @for (exercise of workout.exercises; track exercise.exerciseid; let i2 = $index) {
+                                    @for (exercise of workout.exercises; track $index; let i2 = $index) {
                                         <div class="mat-list-base" cdkDrag cdkDragHandle>
                                             <mat-list-item class="workout-list__exercise">
                                                 <h2 matListItemTitle>{{ exercise.name }}</h2>

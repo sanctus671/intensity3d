@@ -311,7 +311,13 @@ export class StatsComponent implements OnInit {
       maxWidth: '95vw',
       data: { account: this.user() }
     });
-    await dialogRef.afterClosed().toPromise();
+    
+    
+    dialogRef.afterClosed().subscribe(data => {
+        if (data){
+            this.user.set({...this.user, premium:true});
+        }
+    }) 
   }
 
   async openMostTracked() {

@@ -19,6 +19,7 @@ import { PremiumComponent } from '../../pages/premium/premium.component';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ViewPremiumComponent } from '../view-premium/view-premium.component';
 
 /**
  * AI Program Builder Modal Component
@@ -191,23 +192,23 @@ export class AiProgramBuilderComponent implements OnInit {
     this.showExtraOptions.update(value => !value);
   }
 
-  private openPremium(): void {
-    const dialogRef = this.dialog.open(PremiumComponent, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: { account: this.user() }
-    });
-    
-    dialogRef.afterClosed().subscribe(() => {
-      // Refresh user data after premium dialog closes
-      this.accountService.getAccountLocal().then((account: any) => {
-        if (account) {
-          this.user.set(account);
-        }
-      });
-    });
-  }
   
+  public openPremium(): void {
+    let dialogRef = this.dialog.open(ViewPremiumComponent, {
+        width: '600px',
+        data: {},
+        autoFocus: false,
+        panelClass:"premium-dialog"
+    }); 
+    
+    dialogRef.afterClosed().subscribe(data => {
+        if (data){
+            this.user.set({...this.user, premium:true});
+        }
+    })         
+} 
+
+
 
   public generateProgram(): void {
     const currentUser = this.user();

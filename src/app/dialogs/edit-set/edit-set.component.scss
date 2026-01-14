@@ -59,11 +59,15 @@
     }
     
     .edit-set__extra-action{
+        .mat-mdc-form-field-icon-suffix{
+            display: flex;
+            align-items: center;
+        }
+        
         button{
             font-size: 12px;
             padding: 0 10px;
             line-height: 30px;
-            float: right;
             margin-left: 5px;
         }
     }

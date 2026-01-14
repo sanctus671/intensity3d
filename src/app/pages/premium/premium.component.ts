@@ -88,7 +88,7 @@ export class PremiumComponent implements OnInit {
         
         // Refresh account data and show success message
         await this.accountService.getAccount();
-        this.loadAccount();
+        this.loadAccount(false);
         
         setTimeout(() => {
           this.dialog.open(DisplayInformationComponent, {
@@ -106,13 +106,13 @@ export class PremiumComponent implements OnInit {
     });
   }
   
-  private async loadAccount(): Promise<void> {
+  private async loadAccount(showAlreadyPurchase:boolean = true): Promise<void> {
     try {
       const account = await this.accountService.getAccountLocal();
       if (account) {
         this.account.set(account);
         
-        if (account.premium) {
+        if (account.premium && showAlreadyPurchase) {
           this.dialog.open(DisplayInformationComponent, {
             width: '300px',
             data: {
@@ -139,7 +139,7 @@ export class PremiumComponent implements OnInit {
       if (result) {
         // Refresh account data
         this.accountService.getAccount().then(() => {
-          this.loadAccount();
+          this.loadAccount(false);
         });
         
         setTimeout(() => {

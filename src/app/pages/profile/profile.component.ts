@@ -348,15 +348,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
         // Update dp if it was changed
         if (data.dp) {
           this.profile.update(p => ({ ...p, dp: data.dp }));
-          
-          // Update account service with new dp
-          const account = this.account();
-          account.dp = data.dp;
-          this.account.set(account);
         }
         
         try {
           await this.accountService.updateProfile(data.profile);
+          
+          // Update account with new profile data and notify subscribers
+          const updatedAccount = { 
+            ...this.account(), 
+            ...data.profile,
+            ...(data.dp ? { dp: data.dp } : {})
+          };
+          this.account.set(updatedAccount);
+          this.accountService.setAccountObservable(updatedAccount);
+          
           this.snackBar.open(
             this.translate.instant('Profile updated successfully'),
             '',
@@ -388,10 +393,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
       const image = await this.accountService.uploadDp(mediaFile, this.account().id);
       this.profile.update(p => ({ ...p, dp: image }));
       
-      // Update account service with new dp
-      const account = this.account();
-      account.dp = image;
-      this.account.set(account);
+      // Update account with new dp and notify subscribers
+      const updatedAccount = { ...this.account(), dp: image };
+      this.account.set(updatedAccount);
+      this.accountService.setAccountObservable(updatedAccount);
       
       snackBarRef.dismiss();
       this.snackBar.open(

@@ -28,6 +28,10 @@ export class AccountService {
 
   setAccountObservable(user: any) {
     this.accountObservable.next(user);
+    // Also persist to local storage so changes survive page refresh
+    if (user) {
+      this.storage.set('intensity__account', user);
+    }
   }
 
   async getAccount(): Promise<any> {
@@ -94,15 +98,15 @@ export class AccountService {
   }
 
   purchasePremium(billingInfo: any): Promise<any> {
-    return this.request.modify('edit', 'purchasepremium', billingInfo);
+    return this.request.modify('edit', 'purchasepremiumpaymentintent', billingInfo);
   }
 
   getSettings(): Promise<any> {
     return this.request.get('view', 'getsettings', 'settings', {});
   }
 
-  updateSettings(settings: any): Promise<any> {
-    return this.request.modify('edit', 'updatesettings', settings);
+  updateSettings(settings: any, userId:number): Promise<any> {
+    return this.request.modify('edit', 'updatesettings', {...settings, userid: userId});
   }
 
   getPremiumStatus(): Promise<any> {

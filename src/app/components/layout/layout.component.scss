@@ -47,7 +47,13 @@
   background-color: var(--mat-app-background-color);
 
   .main-toolbar__menu-toggle {
-    cursor: pointer;
+    flex-shrink: 0;
+    
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
   }
 
   .main-toolbar__logo {
@@ -162,8 +168,8 @@
 }
 
 ::ng-deep .main-toolbar__dropdown.mat-mdc-menu-panel {
-  min-width: 320px;
-  max-width: 360px;
+  min-width: 280px;
+  max-width: min(360px, calc(100vw - 32px));
   border-radius: 16px;
   padding: 0;
   margin-top: 8px;
@@ -293,6 +299,51 @@
       padding-bottom: 4px;
     }
   }
+
+  // Mobile responsive dropdown styles
+  @media screen and (max-width: 400px) {
+    min-width: unset;
+    width: calc(100vw - 24px);
+    max-width: 320px;
+
+    .account-menu {
+      .account-menu__header {
+        padding: 16px 16px 12px;
+
+        .account-menu__avatar {
+          width: 56px;
+          height: 56px;
+          margin-bottom: 10px;
+        }
+
+        .account-menu__info {
+          .account-menu__name {
+            font-size: 16px;
+            margin-bottom: 6px;
+          }
+
+          .account-menu__stats {
+            font-size: 12px;
+          }
+        }
+      }
+
+      .account-menu__items,
+      .account-menu__footer {
+        padding: 6px 0;
+
+        button.mat-mdc-menu-item {
+          min-height: 44px;
+          padding: 0 16px;
+          font-size: 13px;
+
+          mat-icon {
+            margin-right: 10px;
+          }
+        }
+      }
+    }
+  }
 }
 
 @keyframes skeleton-loading {
@@ -351,21 +402,215 @@
 .content-container {
   min-height: 100vh;
   min-height: calc(100vh - 64px);
+  min-height: calc(100dvh - 64px);
   background-color: var(--container-bg-color);
 
   .content-container__content {
     min-height: 100vh;
     min-height: calc(100vh - 64px);
+    min-height: calc(100dvh - 64px);
     overflow: visible;
   }
 }
 
-@media screen and (max-width: 480px) {
-  .main-toolbar__diary-nav {
-    display: none;
+// Adjust for smaller toolbar height on mobile
+@media screen and (max-width: 600px) {
+  .content-container {
+    min-height: calc(100vh - 56px);
+    min-height: calc(100dvh - 56px);
+
+    .content-container__content {
+      min-height: calc(100vh - 56px);
+      min-height: calc(100dvh - 56px);
+    }
+  }
+}
+
+// Responsive styles for tablet
+@media screen and (max-width: 900px) {
+  .main-toolbar {
+    .main-toolbar__diary-nav {
+      padding: 0px 20px;
+      
+      .diary-nav__today {
+        font-size: 13px;
+        padding: 0 12px;
+        min-width: auto;
+      }
+    }
+
+    .main-toolbar__logo {
+      padding: 0px 10px;
+    }
+
+    .main-toolbar__programs {
+      margin-right: 10px;
+      margin-left: 10px;
+      font-size: 13px;
+      padding: 0 12px;
+    }
+  }
+}
+
+// Responsive styles for small tablets
+@media screen and (max-width: 768px) {
+  .main-toolbar {
+    .main-toolbar__diary-nav {
+      padding: 0px 10px;
+      
+      .diary-nav__arrows {
+        margin: 0px 5px;
+      }
+
+      .diary-nav__active-date {
+        display: none;
+      }
+    }
+
+    .main-toolbar__programs {
+      display: none;
+    }
+  }
+}
+
+// Responsive styles for mobile
+@media screen and (max-width: 600px) {
+  .main-toolbar {
+    padding: 0 4px;
+
+    .main-toolbar__menu-toggle {
+      margin-right: 0;
+    }
+
+    .main-toolbar__logo {
+      height: 26px;
+      padding: 0px 8px;
+    }
+
+    .main-toolbar__diary-nav {
+      padding: 0px 8px;
+      display:none;
+      
+      .diary-nav__today {
+        font-size: 12px;
+        padding: 0 10px;
+        height: 32px;
+        line-height: 32px;
+      }
+
+      .diary-nav__arrows {
+        margin: 0px 2px;
+        
+        button {
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+
+    .main-toolbar__timer {
+      margin-right: 0;
+      
+      .timer-text {
+        font-size: 12px;
+      }
+    }
+
+    .main-toolbar__tools {
+      margin-right: 4px;
+    }
   }
 
-  a.main-toolbar__programs {
-    display: none;
+  .content-container__sidemenu {
+    min-width: 100%;
+    max-width: 100%;
+
+    .mat-mdc-nav-list {
+      margin-left: 16px;
+      margin-right: 16px;
+      margin-top: 16px;
+    }
+  }
+}
+
+// Responsive styles for very small mobile screens
+@media screen and (max-width: 400px) {
+  .main-toolbar {
+    padding: 0 2px;
+
+    .main-toolbar__logo {
+      height: 22px;
+      padding: 0px 6px;
+    }
+
+    .main-toolbar__diary-nav {
+      padding: 0px 4px;
+      
+      .diary-nav__today {
+        font-size: 11px;
+        padding: 0 8px;
+        height: 28px;
+        line-height: 28px;
+      }
+
+      .diary-nav__arrows {
+        margin: 0;
+        
+        button {
+          width: 32px;
+          height: 32px;
+          
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+    }
+
+    .main-toolbar__timer {
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .main-toolbar__tools {
+      margin-right: 2px;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .main-toolbar__avatar {
+      height: 28px !important;
+      width: 28px !important;
+      min-width: 28px !important;
+      min-height: 28px !important;
+
+      .mat-mdc-button-touch-target {
+        height: 28px !important;
+        width: 28px !important;
+      }
+
+      span {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  }
+}
+
+// Hide diary nav on very small screens (keep other elements)
+@media screen and (max-width: 360px) {
+  .main-toolbar {
+    .main-toolbar__diary-nav {
+      display: none;
+    }
   }
 }

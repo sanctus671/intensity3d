@@ -10,6 +10,10 @@
         padding-right:25px;
         padding-bottom:25px;
         
+        .diary__sidebar__calendar-toggle{
+            display: none;
+        }
+        
         .diary__sidebar__calendar{
         
         
@@ -628,10 +632,42 @@
 @media screen and (max-width:480px){
     .diary{
         display:block;
+        background-color: var(--surface-color);
     
     
         .diary__sidebar{
             margin:0 auto;
+            padding: 20px 15px 10px 15px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--surface-color);
+            .diary__sidebar__calendar-toggle{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+
+                
+                mat-icon{
+                    margin-right: 8px;
+                }
+            }
+            
+            .diary__sidebar__calendar{
+                display: none;
+                max-width: 300px;
+                margin: 0 auto;
+
+                &--visible{
+                    display: block;
+                    margin-bottom:30px;
+
+                    
+                    mat-calendar{
+                        width: 100%;
+                    }
+                }
+            }
 
             .diary__sidebar__section{
                 display:none;
@@ -641,22 +677,34 @@
         
         .diary__diary-content{
             max-width: 100%;
+            padding-left: 0px;
+            border-top-right-radius: 0px;
+            border-top-left-radius: 0px;
         }
 
 
         .workout__exercise{
+            padding:20px 15px 0px 15px;
             .workout__exercise__info {
             display:block;
 
                 .workout__exercise__actions{
                     text-align:left;
+                    height:auto;
                     .workout__exercise__actions__primary{
                         float: none;
-                        display: inline;
+                        display: inline-block;
                         margin-left: 0px;
+
+                        button{
+                            padding-left:10px;
+                            padding-right:10px;
+                            margin-right:0px;
+                        }
+                        white-space:nowrap;
                     }
                     .workout__exercise__actions__secondary{
-                        display:inline;
+                        display:inline-block;
                     }
                 }
                 
@@ -678,8 +726,12 @@
             }
         }
 
-        .diary__diary-content .diary__diary-content__diary-workout .diary-workout__actions button{
-            margin-bottom:5px;
+       
+        .diary__diary-content .diary__diary-content__diary-workout .diary-workout__actions{
+            padding-top:40px;
+            button{
+                margin-bottom:5px;
+            }
         }
     }
     

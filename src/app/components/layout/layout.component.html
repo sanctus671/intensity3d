@@ -1,6 +1,8 @@
 <mat-toolbar color="primary" class="main-toolbar">
   
-  <mat-icon class="main-toolbar__menu-toggle" (click)="toggleMenu()">menu</mat-icon>
+  <button mat-icon-button class="main-toolbar__menu-toggle" (click)="toggleMenu()" aria-label="Toggle navigation menu">
+    <mat-icon>menu</mat-icon>
+  </button>
   
   <span class="main-toolbar__logo" [routerLink]="['/diary']">
     <img [src]="themeService.isDark() ? 'assets/logo-white-alt.png' : 'assets/logo.png'" alt="Intensity Logo" />

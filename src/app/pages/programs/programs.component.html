@@ -13,10 +13,11 @@
                     
                     <swiper-container
                         class="programs__swiper"
-                        slides-per-view="3"
+                        slides-per-view="1"
                         space-between="15"
                         loop="true"
-                        navigation="true">
+                        navigation="true"
+                        breakpoints='{"768": {"slidesPerView": 3}}'>
                         @for (program of popularPrograms(); track program.id) {
                             <swiper-slide>
                                 <div class="programs__slider__item" (click)="viewProgram(program)">
@@ -40,10 +41,11 @@
 
                     <swiper-container
                         class="programs__swiper"
-                        slides-per-view="3"
+                        slides-per-view="1"
                         space-between="15"
                         loop="true"
-                        navigation="true">
+                        navigation="true"
+                        breakpoints='{"768": {"slidesPerView": 3}}'>
                         @for (program of powerliftingPrograms(); track program.id) {
                             <swiper-slide>
                                 <div class="programs__slider__item">
@@ -69,10 +71,11 @@
 
                     <swiper-container
                         class="programs__swiper"
-                        slides-per-view="3"
+                        slides-per-view="1"
                         space-between="15"
                         loop="true"
-                        navigation="true">
+                        navigation="true"
+                        breakpoints='{"768": {"slidesPerView": 3}}'>
                         @for (program of bodybuildingPrograms(); track program.id) {
                             <swiper-slide>
                                 <div class="programs__slider__item">
@@ -97,10 +100,11 @@
 
                     <swiper-container
                         class="programs__swiper"
-                        slides-per-view="3"
+                        slides-per-view="1"
                         space-between="15"
                         loop="true"
-                        navigation="true">
+                        navigation="true"
+                        breakpoints='{"768": {"slidesPerView": 3}}'>
                         @for (program of powerbuildingPrograms(); track program.id) {
                             <swiper-slide>
                                 <div class="programs__slider__item">
@@ -125,10 +129,11 @@
 
                     <swiper-container
                         class="programs__swiper"
-                        slides-per-view="3"
+                        slides-per-view="1"
                         space-between="15"
                         loop="true"
-                        navigation="true">
+                        navigation="true"
+                        breakpoints='{"768": {"slidesPerView": 3}}'>
                         @for (program of weightliftingPrograms(); track program.id) {
                             <swiper-slide>
                                 <div class="programs__slider__item">
@@ -153,10 +158,11 @@
 
                     <swiper-container
                         class="programs__swiper"
-                        slides-per-view="3"
+                        slides-per-view="1"
                         space-between="15"
                         loop="true"
-                        navigation="true">
+                        navigation="true"
+                        breakpoints='{"768": {"slidesPerView": 3}}'>
                         @for (program of strongmanPrograms(); track program.id) {
                             <swiper-slide>
                                 <div class="programs__slider__item">

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, inject, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ElementRef, ViewChild, signal } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { ActivatedRoute } from '@angular/router';
@@ -89,7 +89,9 @@ export class DiaryComponent implements OnInit, AfterViewInit {
     public quickAddExercises: Array<any> = [];
     
     public workoutPool: Array<any> = [];
-    public activePrograms: Array<any> = [];    
+    public activePrograms: Array<any> = [];
+    
+    public isCalendarVisible = signal(false);    
 
     constructor() {   
         // Register Swiper web component

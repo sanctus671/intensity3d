@@ -1,6 +1,14 @@
 <div class="diary">
     <div class="diary__sidebar">
-        <div class="diary__sidebar__calendar">
+        <button 
+            mat-stroked-button 
+            class="diary__sidebar__calendar-toggle"
+            (click)="isCalendarVisible.set(!isCalendarVisible())">
+            <mat-icon>{{ isCalendarVisible() ? 'expand_less' : 'calendar_month' }}</mat-icon>
+            {{ isCalendarVisible() ? ('Hide Calendar' | translate) : ('Show Calendar' | translate) }}
+        </button>
+        
+        <div class="diary__sidebar__calendar" [class.diary__sidebar__calendar--visible]="isCalendarVisible()">
             <mat-calendar 
                 [selected]="selectedDateCalendar" 
                 (selectedChange)="onCalendarSelect($event)" 

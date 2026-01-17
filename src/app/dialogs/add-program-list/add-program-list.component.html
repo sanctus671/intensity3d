@@ -28,44 +28,60 @@
         </mat-tab>
         
         <mat-tab [label]="('Recent' | translate) + (recentPrograms.length > 0 ? ' (' + recentPrograms.length + ')' : '')">
-            <mat-list>
-                @for (recentProgram of recentPrograms | exerciseSearch:properties.search; track recentProgram['id']) {
-                    <mat-list-item (click)="selectProgram(recentProgram)">
-                        {{ recentProgram.name }}
-                        <div matListItemMeta>
-                            <mat-icon>chevron_right</mat-icon>
+            @if (properties.recentLoading) {
+                <div class="add-program-list__loading">
+                    <mat-spinner diameter="40" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            } @else {
+                <mat-list>
+                    @for (recentProgram of recentPrograms | exerciseSearch:properties.search; track recentProgram['id']) {
+                        <mat-list-item (click)="selectProgram(recentProgram)">
+                            {{ recentProgram.name }}
+                            <div matListItemMeta>
+                                <mat-icon>chevron_right</mat-icon>
+                            </div>
+                        </mat-list-item>
+                    } @empty {
+                        <div class="add-program-list__empty">
+                            {{ 'No recent programs' | translate }}
                         </div>
-                    </mat-list-item>
-                }
-            </mat-list>             
+                    }
+                </mat-list>
+            }
         </mat-tab>
         
         <mat-tab [label]="('All Programs' | translate) + (programs.length > 0 ? ' (' + numberWithCommas(programs.length) + ')' : '')">
-            <mat-list class="program-list">
-                @for (program of programs | exerciseSearch:properties.search | slice:0:properties.programLimit; track program['id']; let i = $index) {
-                    <mat-list-item (click)="selectProgram(program)">
-                        {{ program.name }}
-                        <div matListItemMeta>
-                            <mat-icon>chevron_right</mat-icon>
-                        </div>
-                    </mat-list-item>
-                }
+            @if (properties.programLoading) {
+                <div class="add-program-list__loading">
+                    <mat-spinner diameter="40" mode="indeterminate" color="primary"></mat-spinner>
+                </div>
+            } @else {
+                <mat-list class="program-list">
+                    @for (program of programs | exerciseSearch:properties.search | slice:0:properties.programLimit; track program['id']; let i = $index) {
+                        <mat-list-item (click)="selectProgram(program)">
+                            {{ program.name }}
+                            <div matListItemMeta>
+                                <mat-icon>chevron_right</mat-icon>
+                            </div>
+                        </mat-list-item>
+                    }
 
-                @if (canLoadMorePrograms()) {
-                    <a mat-list-item (click)="loadMorePrograms()">
-                        {{ 'Load More Programs' | translate }}
-                    </a>
-                }
-                
-                @if (properties.search) {
-                    <div mat-list-item class="program-list__add-program">
-                        {{ 'Can\'t find the right program?' | translate }}<br> 
-                        <button mat-flat-button color="primary" (click)="dismiss()" [routerLink]="['/programs/create']">
-                            {{ 'Create A Program' | translate }}
-                        </button>
-                    </div>
-                }
-            </mat-list>
+                    @if (canLoadMorePrograms()) {
+                        <a mat-list-item (click)="loadMorePrograms()">
+                            {{ 'Load More Programs' | translate }}
+                        </a>
+                    }
+                    
+                    @if (properties.search) {
+                        <div mat-list-item class="program-list__add-program">
+                            {{ 'Can\'t find the right program?' | translate }}<br> 
+                            <button mat-flat-button color="primary" (click)="dismiss()" [routerLink]="['/programs/create']">
+                                {{ 'Create A Program' | translate }}
+                            </button>
+                        </div>
+                    }
+                </mat-list>
+            }
         </mat-tab>
     </mat-tab-group>
 </mat-dialog-content>

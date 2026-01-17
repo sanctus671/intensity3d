@@ -8,9 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
 import { ProgramService } from '../../services/program/program.service';
 import { AccountService } from '../../services/account/account.service';
@@ -35,9 +35,9 @@ import moment from 'moment';
     MatDatepickerModule,
     MatExpansionModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
     TranslateModule
-  ],
-  providers: [provideNativeDateAdapter()]
+  ]
 })
 export class AddProgramComponent {
     
@@ -56,6 +56,7 @@ export class AddProgramComponent {
     public exercises: Array<any>;
     public maxCount: number = 0;
     public maxes: any;
+    public isLoadingMaxes: boolean = false;
     
     public showMoreProgEx: boolean = false;
     
@@ -70,7 +71,7 @@ export class AddProgramComponent {
             progressioncycles: 0, 
             progressionexercises:{}, 
             frequencySelect:"", 
-            autocomplete:"", 
+            autocomplete:"0", 
             rounding:"", 
             roundingcustom:"", 
             pool:"0"
@@ -118,6 +119,7 @@ export class AddProgramComponent {
         
         // Only fetch maxes if there are exercises with percentages
         if (this.exercises.length > 0) {
+            this.isLoadingMaxes = true;
             this.programService.getMaxes(this.exercises).then((data: Array<any>) => {
                 for (let exercise of data){
                     if (exercise["onerm"] && exercise["onerm"] > 0){
@@ -125,7 +127,9 @@ export class AddProgramComponent {
                         this.maxCount = this.maxCount + 1;
                     }
                 }
-            })
+            }).finally(() => {
+                this.isLoadingMaxes = false;
+            });
         }
     }
     

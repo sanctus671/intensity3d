@@ -162,6 +162,7 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(ViewProgramComponent, {
       width: '700px',
       maxWidth: '95vw',
+      restoreFocus: false,
       data: { program: { ...program, id: programId } }
     });
     

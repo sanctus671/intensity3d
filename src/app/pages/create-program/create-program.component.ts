@@ -145,6 +145,14 @@ export class CreateProgramComponent implements OnInit {
         // Load draft program if exists
         this.loadDraftProgram();
         
+        // Check for layout query param
+        const layoutParam = this.route.snapshot.queryParams['layout'];
+        if (layoutParam === 'grid') {
+            this.displayMode.set('grid');
+        } else if (layoutParam === 'stacked') {
+            this.displayMode.set('stacked');
+        }
+        
         // Check if customizing an existing program (from query params)
         const customizeId = this.route.snapshot.queryParams['customize'];
         if (customizeId) {

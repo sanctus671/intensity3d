@@ -55,6 +55,10 @@
   // Profile Header Section
   .profile-header {
     margin-bottom: 24px;
+
+    &.profile-header--own{
+        margin-top:30px;
+    }
     
     &__content {
       display: flex;
@@ -86,6 +90,7 @@
         margin-top:10px;
         max-width:300px;
         text-align:center;
+        white-space: pre-line;
       }
     }
     

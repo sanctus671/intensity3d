@@ -6,7 +6,6 @@ import { MatCalendarCellClassFunction } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,7 +47,6 @@ import { WorkoutPoolComponent } from '../../dialogs/workout-pool/workout-pool.co
     CommonModule,
     DragDropModule,
     MatDatepickerModule,
-    MatNativeDateModule,
     MatListModule,
     MatIconModule,
     MatButtonModule,
@@ -169,6 +167,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
                 }
                 else{
                     this.workoutDates = [];
+                    this.workouts[this.selectedDateString] = []; // Clear existing data to force fresh load
                     this.getDiaryData(); 
                     this.getWorkout();
                 }
@@ -201,6 +200,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
         });          
         
         this.diaryService.addWorkoutFromPool(workout.workoutid, formattedDate, workout.id).then((data) => {
+            this.workouts[this.selectedDateString] = []; // Clear existing data to force fresh load
             this.getWorkout();
         }).catch(() => {  
             this.snackBar.open('Failed to add workout', '', {
@@ -221,6 +221,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
         dialogRef.afterClosed().subscribe(data => {
             if (data){
                 this.workoutDates = [];
+                this.workouts[this.selectedDateString] = []; // Clear existing data to force fresh load
                 this.getDiaryData(); 
                 this.getWorkout();
             }
@@ -339,6 +340,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
                         duration: 5000
                     });  
                     
+                    //this.workouts[this.selectedDateString] = []; // Clear existing data to force fresh load
                     this.getWorkout();
                                        
                 }).catch(() => {
@@ -378,6 +380,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
                     });  
                     
                     if (copyToDate === this.selectedDateString){
+                        //this.workouts[this.selectedDateString] = []; // Clear existing data to force fresh load
                         this.getWorkout();
                     }
                                        
@@ -547,6 +550,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
             
             if (data){
                 this.workoutDates = [];
+                this.workouts[this.selectedDateString] = []; // Clear existing data to force fresh load
                 this.getDiaryData();                 
                 this.getWorkout();
             }

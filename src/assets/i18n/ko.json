@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}}이(가) {{date}}에 일기에 성공적으로 추가되었습니다.",
     "User's Diary": "사용자의 일기",
     "Start": "시작",
-    "Stop": "멈춤"
+    "Stop": "멈춤",
+    "Are you sure you want to logout?": "정말 로그아웃하시겠습니까?"
 }

@@ -269,6 +269,56 @@ export class StorageService {
     });
   }
 
+  public async clearAllUserData(): Promise<void> {
+    return this.enqueueQuery(async () => {
+      // Clear in-memory storage
+      this.storage.clear();
+
+      // Clear all intensity-related localStorage keys
+      try {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('intensity__')) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+      } catch (e) {
+        console.error('Error clearing localStorage:', e);
+      }
+
+      // Clear SQL database tables
+      if (this.db) {
+        try {
+          this.db.run('DELETE FROM responses;');
+          this.db.run('DELETE FROM requests;');
+          await this.saveDatabaseToIndexedDB();
+        } catch (e) {
+          console.error('Error clearing database tables:', e);
+        }
+      }
+
+      // Clear IndexedDB entirely
+      try {
+        await this.clearIndexedDB();
+      } catch (e) {
+        console.error('Error clearing IndexedDB:', e);
+      }
+
+      console.log('All user data cleared');
+    });
+  }
+
+  private clearIndexedDB(): Promise<void> {
+    return new Promise((resolve) => {
+      const request = indexedDB.deleteDatabase('IntensityDB');
+      request.onsuccess = () => resolve();
+      request.onerror = () => resolve();
+      request.onblocked = () => resolve();
+    });
+  }
+
   public getCacheStats(): { responseCount: number; requestCount: number } {
     if (!this.db) return { responseCount: 0, requestCount: 0 };
 

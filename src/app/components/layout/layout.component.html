@@ -101,7 +101,7 @@
       <!-- Menu Items -->
       <div class="account-menu__items">
         @if (!account().premium) {
-          <button mat-menu-item class="account-menu__premium" (click)="openUpgrade()">
+          <button mat-menu-item class="account-menu__premium" [routerLink]="['/premium']">
             <mat-icon class="premium-icon" fontSet="material-symbols-outlined">crown</mat-icon>
             <span>{{ 'Upgrade to premium' | translate }}</span>
           </button>

@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} başarıyla {{date}} tarihinde günlüğünüze eklendi.",
     "User's Diary": "Kullanıcının Günlüğü",
     "Start": "Başlat",
-    "Stop": "Dur"
+    "Stop": "Dur",
+    "Are you sure you want to logout?": "Çıkış yapmak istediğinizden emin misiniz?"
 }

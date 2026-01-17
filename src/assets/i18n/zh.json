@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} 已成功于 {{date}} 添加到你的日记中。",
     "User's Diary": "用户日记",
     "Start": "开始",
-    "Stop": "停止"
+    "Stop": "停止",
+    "Are you sure you want to logout?": "您确定要退出登录吗？"
 }

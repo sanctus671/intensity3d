@@ -25,9 +25,12 @@
                                     <span matListItemLine>{{ set.notes }}</span>
                                 }
                                 @if (set.video) {
-                                    <a mat-flat-button matSuffix color="primary" [href]="set.video" target="_blank" (click)="viewVideo($event)">
-                                        {{ 'View Video' | translate }}
-                                    </a>
+                                    <div matListItemMeta>
+
+                                        <a mat-flat-button color="primary" [href]="set.video" target="_blank" (click)="viewVideo($event)">
+                                            {{ 'View Video' | translate }}
+                                        </a>
+                                    </div>
                                 }
                             </a>
                         }

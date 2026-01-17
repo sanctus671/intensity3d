@@ -8,7 +8,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountService } from '../../services/account/account.service';
 
@@ -28,8 +27,7 @@ import { AccountService } from '../../services/account/account.service';
     MatSelectModule,
     MatDatepickerModule,
     TranslateModule
-  ],
-  providers: [provideNativeDateAdapter()]
+  ]
 })
 export class CopyToDateComponent {
     

@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} har lagts till i din dagbok den {{date}}.",
     "User's Diary": "Användarens dagbok",
     "Start": "Starta",
-    "Stop": "Stoppa"
+    "Stop": "Stoppa",
+    "Are you sure you want to logout?": "Är du säker på att du vill logga ut?"
 }

@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} को {{date}} को आपकी डायरी में सफलतापूर्वक जोड़ दिया गया है।",
     "User's Diary": "उपयोगकर्ता की डायरी",
     "Start": "शुरू करें",
-    "Stop": "रोकें"
+    "Stop": "रोकें",
+    "Are you sure you want to logout?": "क्या आप वाकई लॉग आउट करना चाहते हैं?"
 }

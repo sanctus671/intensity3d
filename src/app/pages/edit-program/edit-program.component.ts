@@ -140,6 +140,14 @@ export class EditProgramComponent implements OnInit {
         
         this.calculateTabs();
         
+        // Check for layout query param
+        const layoutParam = this.route.snapshot.queryParams['layout'];
+        if (layoutParam === 'grid') {
+            this.displayMode.set('grid');
+        } else if (layoutParam === 'stacked') {
+            this.displayMode.set('stacked');
+        }
+        
         // Load program if id is in route
         const programId = this.route.snapshot.params['id'];
         if (programId) {

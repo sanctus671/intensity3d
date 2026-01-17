@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} {{date}} அன்று உங்கள் நாட்குறிப்பில் வெற்றிகரமாக சேர்க்கப்பட்டது.",
     "User's Diary": "பயனர் நாட்குறிப்பு",
     "Start": "தொடங்கு",
-    "Stop": "நிறுத்து"
+    "Stop": "நிறுத்து",
+    "Are you sure you want to logout?": "நீங்கள் உறுதியாக வெளியேற விரும்புகிறீர்களா?"
 }

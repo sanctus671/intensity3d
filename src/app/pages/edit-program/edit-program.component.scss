@@ -5,7 +5,7 @@
     z-index:2;
 }
 
-@media only screen and (max-width:1100px){
+@media only screen and (max-width:950px){
     .edit-program-extra-actions{
         display:none;
     }
@@ -342,7 +342,6 @@ mat-list-item.workout-list__exercise{
 
 /* Display Mode Toggle */
 .display-mode-toggle {
-    margin-right: 16px;
     
     .mat-button-toggle {
         --mat-button-toggle-state-layer-size: 36px;

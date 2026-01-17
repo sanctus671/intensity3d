@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "เพิ่ม {{programName}} ลงในไดอารี่ของคุณในวันที่ {{date}} สำเร็จแล้ว",
     "User's Diary": "ไดอารี่ของผู้ใช้",
     "Start": "เริ่ม",
-    "Stop": "หยุด"
+    "Stop": "หยุด",
+    "Are you sure you want to logout?": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?"
 }

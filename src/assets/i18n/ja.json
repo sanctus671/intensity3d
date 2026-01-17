@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} は {{date}} に日記へ追加されました。",
     "User's Diary": "ユーザーの日記",
     "Start": "開始",
-    "Stop": "停止"
+    "Stop": "停止",
+    "Are you sure you want to logout?": "ログアウトしてもよろしいですか？"
 }

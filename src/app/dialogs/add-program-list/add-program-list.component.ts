@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
 import { ProgramService } from '../../services/program/program.service';
 import { AddProgramComponent } from '../../dialogs/add-program/add-program.component';
@@ -34,6 +35,7 @@ import moment from 'moment';
     MatIconModule,
     MatTabsModule,
     MatListModule,
+    MatProgressSpinnerModule,
     TranslateModule,
     SlicePipe,
     ExerciseSearchPipe

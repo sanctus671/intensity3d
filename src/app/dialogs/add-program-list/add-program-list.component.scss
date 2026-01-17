@@ -14,6 +14,27 @@
         width:100%;
     }
     
+    .add-program-list__loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 0;
+        
+        mat-spinner {
+            margin: 0 auto;
+        }
+    }
+    
+    .add-program-list__empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--mat-app-text-color, rgba(0, 0, 0, 0.6));
+        
+        .dark-theme & {
+            color: var(--mat-app-text-color, rgba(255, 255, 255, 0.6));
+        }
+    }
+    
     .add-program-list__nav{
         a{
             cursor:pointer;

@@ -959,5 +959,6 @@
     "{{programName}} has successfully been added to your diary on {{date}}.": "{{programName}} успешно добавлена в ваш дневник на {{date}}.",
     "User's Diary": "Дневник пользователя",
     "Start": "Старт",
-    "Stop": "Стоп"
+    "Stop": "Стоп",
+    "Are you sure you want to logout?": "Вы уверены, что хотите выйти?"
 }

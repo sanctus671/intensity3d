@@ -1,5 +1,6 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal, effect, inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { DateAdapter } from '@angular/material/core';
 import { StorageService } from '../storage/storage.service';
 import moment from 'moment';
 import 'moment/locale/es';
@@ -22,26 +23,48 @@ import 'moment/locale/da';
 import 'moment/locale/sv';
 
 export const SUPPORTED_LANGUAGES = [
+/*     { code: 'en', name: 'English' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'it', name: 'Italian' },
+    { code: 'pt', name: 'Portuguese' },
+    { code: 'ru', name: 'Russian' },
+    { code: 'ja', name: 'Japanese' },
+    { code: 'ko', name: 'Korean' },
+    { code: 'zh', name: 'Chinese' },
+    { code: 'ar', name: 'Arabic' },
+    { code: 'hi', name: 'Hindi' },
+    { code: 'ta', name: 'Tamil' },
+    { code: 'th', name: 'Thai' },
+    { code: 'tr', name: 'Turkish' },
+    { code: 'nl', name: 'Dutch' },
+    { code: 'no', name: 'Norwegian' },
+    { code: 'da', name: 'Danish' },
+    { code: 'sv', name: 'Swedish' } */
+
   { code: 'en', name: 'English' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'it', name: 'Italian' },
-  { code: 'pt', name: 'Portuguese' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ko', name: 'Korean' },
-  { code: 'zh', name: 'Chinese' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'th', name: 'Thai' },
-  { code: 'tr', name: 'Turkish' },
-  { code: 'nl', name: 'Dutch' },
-  { code: 'no', name: 'Norwegian' },
-  { code: 'da', name: 'Danish' },
-  { code: 'sv', name: 'Swedish' }
+  { code: 'de', name: 'Deutsch' },
+  { code: 'es', name: 'Español' },
+  { code: 'fr', name: 'Français' },
+  { code: 'pt', name: 'Português' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'no', name: 'Norsk' },
+  { code: 'nl', name: 'Nederlands' },
+  { code: 'ru', name: 'Русский' },
+  { code: 'sv', name: 'Svenska' },
+  { code: 'da', name: 'Dansk' },
+  { code: 'ko', name: '한국어' },
+  { code: 'ja', name: '日本語' },
+  { code: 'zh', name: '中文' },
+  { code: 'th', name: 'ไทย' },
+  { code: 'tr', name: 'Türkçe' },
+  { code: 'ar', name: 'العربية' },
+  { code: 'hi', name: 'हिन्दी' },
+  { code: 'ta', name: 'தமிழ்' }
 ];
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +72,8 @@ export const SUPPORTED_LANGUAGES = [
 export class TranslationService {
   public currentLanguage = signal<string>('en');
   public supportedLanguages = SUPPORTED_LANGUAGES;
+
+  private dateAdapter = inject(DateAdapter<Date>);
 
   constructor(
     private translate: TranslateService,
@@ -67,6 +92,8 @@ export class TranslationService {
       // Sync Moment.js locale (some languages have different locale codes)
       const momentLocale = this.getMomentLocale(lang);
       moment.locale(momentLocale);
+      // Sync Material DateAdapter locale for mat-calendar and datepickers
+      this.dateAdapter.setLocale(this.getDateAdapterLocale(lang));
     });
   }
 
@@ -119,6 +146,17 @@ export class TranslationService {
     const localeMap: Record<string, string> = {
       'zh': 'zh-cn',
       'no': 'nb'
+    };
+    return localeMap[lang] || lang;
+  }
+
+  private getDateAdapterLocale(lang: string): string {
+    // Map app language codes to browser locale codes for NativeDateAdapter
+    const localeMap: Record<string, string> = {
+      'en': 'en-US',
+      'zh': 'zh-CN',
+      'no': 'nb-NO',
+      'pt': 'pt-BR'
     };
     return localeMap[lang] || lang;
   }

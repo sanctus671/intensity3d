@@ -57,6 +57,15 @@
             margin-top:10px;
         }
 
+        &.add_program__maxes{
+            
+            mat-spinner{
+                margin-left:10px;
+                --mat-progress-spinner-active-indicator-color: white;
+            }
+
+        }
+
  
 
         div.mat-expansion-panel-content {

@@ -21,6 +21,9 @@
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     {{ maxCount }}/{{ exercises.length }} {{ 'Max' | translate }}@if (exercises.length !== 1) {<span>es</span>}&nbsp;{{ 'Entered' | translate }}
+                    @if (isLoadingMaxes) {
+                        <mat-spinner diameter="16"></mat-spinner>
+                    }
                 </mat-panel-title>
             </mat-expansion-panel-header>
             

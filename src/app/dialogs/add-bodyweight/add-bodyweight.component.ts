@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccountService } from '../../services/account/account.service';
 import moment from 'moment';
@@ -27,8 +26,7 @@ import moment from 'moment';
     MatIconModule,
     MatDatepickerModule,
     TranslateModule
-  ],
-  providers: [provideNativeDateAdapter()]
+  ]
 })
 export class AddBodyweightComponent {
     

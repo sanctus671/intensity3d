@@ -292,8 +292,6 @@ export class AuthenticationService {
     return new Promise((resolve, reject) => {
       this.storage.get('intensity__session').then((session) => {
         if (session) {
-          this.storage.remove('intensity__session').then(() => {});
-
           const data = {
             key: environment.apiKey,
             session: session,
@@ -302,20 +300,22 @@ export class AuthenticationService {
           };
 
           this.http.post(environment.apiUrl, data).subscribe({
-            next: (res: any) => {
-              if (res['success'] === true) {
-                this.setAuthStatus(false);
-                resolve(true);
-              } else {
-                resolve(true);
-              }
+            next: async (res: any) => {
+              await this.storage.clearAllUserData();
+              this.setAuthStatus(false);
+              resolve(true);
             },
-            error: (e) => {
+            error: async (e) => {
+              await this.storage.clearAllUserData();
+              this.setAuthStatus(false);
               resolve(true);
             }
           });
         } else {
-          resolve(true);
+          this.storage.clearAllUserData().then(() => {
+            this.setAuthStatus(false);
+            resolve(true);
+          });
         }
       });
     });
@@ -325,8 +325,6 @@ export class AuthenticationService {
     return new Promise((resolve, reject) => {
       this.storage.get('intensity__session').then((session) => {
         if (session) {
-          this.storage.remove('intensity__session').then(() => {});
-
           const data = {
             key: environment.apiKey,
             session: session,
@@ -335,20 +333,22 @@ export class AuthenticationService {
           };
 
           this.http.post(environment.apiUrl, data).subscribe({
-            next: (res: any) => {
-              if (res['success'] === true) {
-                this.setAuthStatus(false);
-                resolve(true);
-              } else {
-                resolve(true);
-              }
+            next: async (res: any) => {
+              await this.storage.clearAllUserData();
+              this.setAuthStatus(false);
+              resolve(true);
             },
-            error: (e) => {
+            error: async (e) => {
+              await this.storage.clearAllUserData();
+              this.setAuthStatus(false);
               resolve(true);
             }
           });
         } else {
-          resolve(true);
+          this.storage.clearAllUserData().then(() => {
+            this.setAuthStatus(false);
+            resolve(true);
+          });
         }
       });
     });

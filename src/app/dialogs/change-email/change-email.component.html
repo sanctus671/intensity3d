@@ -1,20 +1,18 @@
 <div class="dialog-title">
-    <h2 mat-dialog-title>{{ 'Change Password' | translate }}</h2>
+    <h2 mat-dialog-title>{{ 'Change Email' | translate }}</h2>
     <mat-icon (click)="dismiss()" [attr.aria-label]="'Close dialog' | translate">close</mat-icon>
 </div>
 
-<mat-dialog-content class="change-password">
-   
-
+<mat-dialog-content class="change-email">
     <mat-form-field>
-        <mat-label>{{ 'New Password' | translate }}</mat-label>
-        <input matInput type="password" [(ngModel)]="user.new_password">
+        <mat-label>{{ 'New Email' | translate }}</mat-label>
+        <input matInput type="email" [(ngModel)]="user.new_email">
     </mat-form-field> 
-    
+<!--     
     <mat-form-field>
-        <mat-label>{{ 'Confirm Password' | translate }}</mat-label>
-        <input matInput type="password" [(ngModel)]="user.confirm_password">
-    </mat-form-field>     
+        <mat-label>{{ 'Confirm Email' | translate }}</mat-label>
+        <input matInput type="email" [(ngModel)]="user.confirm_email">
+    </mat-form-field>     --> 
 </mat-dialog-content>
 
 <mat-dialog-actions>

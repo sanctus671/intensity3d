@@ -100,8 +100,15 @@ export class EditProfileComponent {
     }
     
     public save(): void {
-        delete this.profile.dp;
-        this.dialogRef.close({profile: this.profile, dp: this.uploadedDp});
+        // Only return the fields that were actually edited to avoid spreading
+        // numeric indices from the API response into the account object
+        const updatedProfile = {
+            userid: this.profile.userid,
+            display: this.profile.display,
+            gender: this.profile.gender,
+            about: this.profile.about
+        };
+        this.dialogRef.close({profile: updatedProfile, dp: this.uploadedDp});
     }    
     
     public dismiss(): void { 

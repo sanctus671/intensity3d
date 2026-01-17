@@ -20,6 +20,7 @@ import { ThemeService, Theme } from '../../services/theme/theme.service';
 import { TranslationService, SUPPORTED_LANGUAGES } from '../../services/translation/translation.service';
 
 import { ChangePasswordComponent } from '../../dialogs/change-password/change-password.component';
+import { ChangeEmailComponent } from '../../dialogs/change-email/change-email.component';
 import { GoalSettingsComponent } from '../../dialogs/goal-settings/goal-settings.component';
 import { ChangeUnitsComponent } from '../../dialogs/change-units/change-units.component';
 import { ChangeDistanceUnitsComponent } from '../../dialogs/change-distance-units/change-distance-units.component';
@@ -297,7 +298,7 @@ export class SettingsComponent implements OnInit {
             data: {}
         });  
         dialogRef.afterClosed().subscribe(data => {
-            if (data && data.current_password && data.new_password && data.confirm_password) {
+            if (data.new_password && data.confirm_password) {
                 if (data.new_password !== data.confirm_password) {
                     this.snackBar.open(this.translationService.instant('Passwords do not match'), '', {
                         duration: 5000
@@ -306,12 +307,44 @@ export class SettingsComponent implements OnInit {
                 }
                 
                 const currentAccount = this.account();
-                this.authenticationService.changePassword(data.current_password, data.new_password, currentAccount.id).then(() => {
+                this.authenticationService.changePassword(data.new_password, currentAccount.id).then(() => {
                     this.snackBar.open(this.translationService.instant('Password changed'), '', {
                         duration: 5000
                     });                     
                 }).catch(() => {
                     this.snackBar.open(this.translationService.instant('Error changing password'), '', {
+                        duration: 5000
+                    });                    
+                });
+            }   
+        });         
+    }
+    
+    public changeEmail(): void {
+        const currentAccount = this.account();
+        const dialogRef = this.dialog.open(ChangeEmailComponent, {
+            width: '400px',
+            data: { email: currentAccount.email }
+        });  
+        dialogRef.afterClosed().subscribe(data => {
+            if (data?.new_email && data?.confirm_email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(data.new_email)) {
+                    this.snackBar.open(this.translationService.instant('Please enter a valid email address'), '', {
+                        duration: 5000
+                    });                     
+                    return;
+                }
+                
+      
+                
+                const currentAccount = this.account();
+                this.authenticationService.changeEmail(data.new_email, currentAccount.id).then(() => {
+                    this.snackBar.open(this.translationService.instant('Email changed'), '', {
+                        duration: 5000
+                    });                     
+                }).catch(() => {
+                    this.snackBar.open(this.translationService.instant('Error changing email'), '', {
                         duration: 5000
                     });                    
                 });

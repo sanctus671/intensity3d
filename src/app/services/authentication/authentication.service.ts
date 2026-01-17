@@ -224,7 +224,7 @@ export class AuthenticationService {
     });
   }
 
-  public changePassword(oldPassword: string, newPassword: string, userId: number): Promise<boolean> {
+  public changePassword(newPassword: string, userId: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.storage.get('intensity__session').then((session) => {
         if (session) {
@@ -234,8 +234,39 @@ export class AuthenticationService {
             controller: 'edit',
             action: 'updateuser',
             id: userId,
-            oldpassword: oldPassword,
             password: newPassword
+          };
+
+          this.http.post(environment.apiUrl, data).subscribe({
+            next: (res: any) => {
+              if (res['success'] === true) {
+                resolve(true);
+              } else {
+                reject(res);
+              }
+            },
+            error: (e) => {
+              reject(e);
+            }
+          });
+        } else {
+          reject('No session found');
+        }
+      });
+    });
+  }
+
+  public changeEmail(newEmail: string, userId: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.get('intensity__session').then((session) => {
+        if (session) {
+          const data = {
+            key: environment.apiKey,
+            session: session,
+            controller: 'edit',
+            action: 'updateuser',
+            id: userId,
+            username: newEmail
           };
 
           this.http.post(environment.apiUrl, data).subscribe({

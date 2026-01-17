@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, inject, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ElementRef, ViewChild, signal } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject, ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { ActivatedRoute } from '@angular/router';
@@ -89,9 +89,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
     public quickAddExercises: Array<any> = [];
     
     public workoutPool: Array<any> = [];
-    public activePrograms: Array<any> = [];
-    
-    public isCalendarVisible = signal(false);    
+    public activePrograms: Array<any> = [];    
 
     constructor() {   
         // Register Swiper web component
@@ -479,7 +477,7 @@ export class DiaryComponent implements OnInit, AfterViewInit {
     public editSet(set: any, exercise: any, index: any): void {
         let dialogRef = this.dialog.open(EditSetComponent, {
             width: '400px',
-            data: {set:set, exercise:exercise}
+            data: {set:set}
         });
         dialogRef.afterClosed().subscribe(data => {
             if (data && data.delete){
@@ -784,19 +782,6 @@ export class DiaryComponent implements OnInit, AfterViewInit {
             // Clear loading flag now that full data is loaded
             for (let exercise of this.workouts[selectedDate]) {
                 exercise.loadingFullData = false;
-                
-                // Update record properties for each set from the full data
-                if (exercise.sets && Array.isArray(exercise.sets)) {
-                    const fullExercise = data.find((e: any) => e.exerciseid === exercise.exerciseid);
-                    if (fullExercise && fullExercise.sets && Array.isArray(fullExercise.sets)) {
-                        for (let i = 0; i < exercise.sets.length; i++) {
-                            const fullSet = fullExercise.sets.find((s: any) => s.id === exercise.sets[i].id);
-                            if (fullSet) {
-                                exercise.sets[i].is_overall_record = fullSet.is_overall_record;
-                            }
-                        }
-                    }
-                }
             }
             
             this.loading = false;

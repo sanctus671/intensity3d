@@ -375,6 +375,14 @@ export class BodyweightComponent implements OnInit {
         { duration: 3000 }
       );
     }
+    else if (result && result.removed){
+        await this.loadBodyweights();
+        this.snackBar.open(
+          this.translate.instant('Import removed'),
+          this.translate.instant('Close'),
+          { duration: 3000 }
+        );        
+    }
   }
 
   public showMore(): void {

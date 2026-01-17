@@ -81,7 +81,11 @@
   --mat-sys-primary: #d44735;
   --mat-sys-on-primary: #ffffff;
 
-  --empty-color: #313131;
+  --empty-color: #161616;
+
+
+
+  
 }
 
 // Global styles
@@ -152,4 +156,17 @@ body.dark-theme {
   .mat-mdc-option {
     min-height: 48px;
   }
+}
+
+// Stripe Link modal styling
+// Note: Angular CDK uses the native Popover API which renders dialogs in the browser's "top layer".
+// The top layer is separate from normal DOM stacking, so z-index alone doesn't help.
+// The PurchasePremiumComponent uses a MutationObserver to promote Stripe's modal to the top layer.
+// These CSS rules serve as a fallback for older browsers without Popover API support.
+[data-react-aria-top-layer] {
+  z-index: 2147483647 !important;
+}
+
+iframe[name^="__privateStripeFrame"] {
+  z-index: 2147483647 !important;
 }

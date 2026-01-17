@@ -30,7 +30,6 @@
       margin: 0 0 16px;
       font-size: 24px;
       font-weight: 500;
-      color: var(--mat-app-on-background, #000);
 
       .dark-theme & {
         color: var(--mat-app-on-background, #fff);
@@ -39,11 +38,7 @@
 
     p {
       margin: 0 0 24px;
-      color: var(--mat-app-on-background-variant, rgba(0, 0, 0, 0.7));
 
-      .dark-theme & {
-        color: var(--mat-app-on-background-variant, rgba(255, 255, 255, 0.7));
-      }
     }
 
     h4 {
@@ -53,11 +48,7 @@
       margin: 16px 0 8px;
       font-size: 18px;
       font-weight: 500;
-      color: var(--mat-app-on-background, #000);
 
-      .dark-theme & {
-        color: var(--mat-app-on-background, #fff);
-      }
 
       mat-icon {
         font-size: 20px;
@@ -78,15 +69,11 @@
     align-items: center;
     gap: 16px;
     padding: 32px;
-    border: 2px dashed var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+    border: 2px dashed var(--mat-sys-primary, rgba(0, 0, 0, 0.12));
     border-radius: 8px;
-    background-color: var(--mat-app-surface, #fafafa);
     margin-bottom: 24px;
 
-    .dark-theme & {
-      border-color: var(--mat-divider-color, rgba(255, 255, 255, 0.12));
-      background-color: var(--mat-app-surface, #1e1e1e);
-    }
+  
 
     button {
       mat-icon {
@@ -138,11 +125,8 @@
     ul {
       margin: 0;
       padding-left: 24px;
-      color: var(--mat-app-on-background, #000);
 
-      .dark-theme & {
-        color: var(--mat-app-on-background, #fff);
-      }
+ 
 
       li {
         margin-bottom: 4px;
@@ -225,11 +209,7 @@
     margin: 24px 0;
 
     mat-card {
-      background-color: var(--mat-app-surface, #fff);
-
-      .dark-theme & {
-        background-color: var(--mat-app-surface, #1e1e1e);
-      }
+  
 
       mat-card-content {
         padding: 16px;
@@ -278,6 +258,7 @@
 
       mat-icon,
       mat-spinner {
+        display:inline-block;
         margin-right: 8px;
       }
     }
@@ -304,50 +285,36 @@
   }
 }
 
+
 // Stepper customization
 ::ng-deep .import-data {
-  mat-stepper {
-    background-color: transparent;
-  }
-
-  .mat-stepper-horizontal {
-    background-color: transparent;
-  }
-
-  .mat-step-header {
-    .mat-step-icon {
-      background-color: var(--mat-app-surface-variant, rgba(0, 0, 0, 0.12));
-      color: var(--mat-app-on-surface-variant, rgba(0, 0, 0, 0.6));
-
-      .dark-theme & {
-        background-color: var(--mat-app-surface-variant, rgba(255, 255, 255, 0.12));
-        color: var(--mat-app-on-surface-variant, rgba(255, 255, 255, 0.6));
+    mat-stepper {
+      background-color: transparent;
+    }
+  
+    .mat-stepper-horizontal {
+      background-color: transparent;
+    }
+  
+    .mat-step-header {
+    
+  
+      .mat-step-icon-selected,
+      .mat-step-icon-state-done {
+        background-color: var(--mat-primary-color, #D44735);
+        color: white;
+      }
+  
+  
+      .mat-step-label-selected {
+        color: var(--mat-primary-color, #D44735);
       }
     }
-
-    .mat-step-icon-selected,
-    .mat-step-icon-state-done {
-      background-color: var(--mat-primary-color, #D44735);
-      color: white;
-    }
-
-    .mat-step-label {
-      color: var(--mat-app-on-background, #000);
-
-      .dark-theme & {
-        color: var(--mat-app-on-background, #fff);
-      }
-    }
-
-    .mat-step-label-selected {
-      color: var(--mat-primary-color, #D44735);
+  
+    .mat-horizontal-stepper-header-container {
+      margin-bottom: 24px;
     }
   }
-
-  .mat-horizontal-stepper-header-container {
-    margin-bottom: 24px;
-  }
-}
 
 // Dialog actions
 mat-dialog-actions {

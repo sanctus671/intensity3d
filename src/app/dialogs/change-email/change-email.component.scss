@@ -1,0 +1,19 @@
+
+
+.dialog-title{
+    position:relative;
+    padding-right:40px;
+    mat-icon{
+        cursor:pointer;
+        position:absolute;
+        top:20px;
+        right:20px;
+    }
+}
+
+
+.change-email{
+    mat-form-field{
+        width:100%;
+    }
+}

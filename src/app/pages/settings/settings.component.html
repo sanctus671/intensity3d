@@ -140,7 +140,15 @@
         
         
         <mat-list>            
-            <h3 matSubheader>{{ "Account Settings" | translate }}</h3>             
+            <h3 matSubheader>{{ "Account Settings" | translate }}</h3>   
+            <mat-list-item (click)="changeEmail()">
+                <mat-icon matListItemIcon fontSet="material-icons-outlined">mail</mat-icon>
+                <div matListItemTitle>{{ "Change Email" | translate }}</div>
+                <div matListItemMeta>
+
+                    <mat-icon class="settings__chevron">chevron_right</mat-icon>
+                </div>
+            </mat-list-item>          
             <mat-list-item (click)="changePassword()">
                 <mat-icon matListItemIcon fontSet="material-icons-outlined">lock</mat-icon>
                 <div matListItemTitle>{{ "Change Password" | translate }}</div>

@@ -214,10 +214,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   getSelectedMonth(): string {
     const date = this.selectedDate();
-
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
-    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    return moment(date).format('MMMM YYYY');
   }
 
   getTodayFormatted(): string {

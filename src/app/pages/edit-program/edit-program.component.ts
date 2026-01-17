@@ -502,6 +502,22 @@ export class EditProgramComponent implements OnInit {
     }
     
     public copyWorkout(workout: Workout): void {
+        // In grid mode, duplicate the entire workout to the same day
+        if (this.displayMode() === 'grid') {
+            const copy = this.deepCopy(workout);
+            copy.workoutid = null;
+            copy.added = true;
+            // Clear exercise IDs for the copied workout
+            copy.exercises = copy.exercises.map(ex => ({ ...ex, id: null }));
+            
+            this.program.update(currentProgram => ({
+                ...currentProgram,
+                workouts: [...currentProgram.workouts, copy]
+            }));
+            return;
+        }
+        
+        // In stacked mode, open dialog to select target days
         const dialogRef = this.dialog.open(CopyProgramWorkoutComponent, {
             width: '300px',
             data: { workout: workout, program: this.program() }

@@ -1,6 +1,25 @@
 import { Injectable, signal, effect } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../storage/storage.service';
+import moment from 'moment';
+import 'moment/locale/es';
+import 'moment/locale/fr';
+import 'moment/locale/de';
+import 'moment/locale/it';
+import 'moment/locale/pt';
+import 'moment/locale/ru';
+import 'moment/locale/ja';
+import 'moment/locale/ko';
+import 'moment/locale/zh-cn';
+import 'moment/locale/ar';
+import 'moment/locale/hi';
+import 'moment/locale/ta';
+import 'moment/locale/th';
+import 'moment/locale/tr';
+import 'moment/locale/nl';
+import 'moment/locale/nb';
+import 'moment/locale/da';
+import 'moment/locale/sv';
 
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -45,6 +64,9 @@ export class TranslationService {
       // Keep backwards/other-code compatibility (AccountService uses intensity__locale)
       this.storage.set('intensity__locale', lang);
       this.translate.use(lang);
+      // Sync Moment.js locale (some languages have different locale codes)
+      const momentLocale = this.getMomentLocale(lang);
+      moment.locale(momentLocale);
     });
   }
 
@@ -90,5 +112,14 @@ export class TranslationService {
 
   public get(key: string, params?: any) {
     return this.translate.get(key, params);
+  }
+
+  private getMomentLocale(lang: string): string {
+    // Map app language codes to Moment.js locale codes where they differ
+    const localeMap: Record<string, string> = {
+      'zh': 'zh-cn',
+      'no': 'nb'
+    };
+    return localeMap[lang] || lang;
   }
 }

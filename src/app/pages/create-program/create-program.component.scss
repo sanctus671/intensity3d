@@ -5,7 +5,7 @@
     z-index:2;
 }
 
-@media only screen and (max-width:999px){
+@media only screen and (max-width:1100px){
     .create-program-extra-actions{
         display:none;
     }
@@ -790,4 +790,15 @@ mat-list-item.workout-list__exercise{
             background-color: var(--surface-color-dark, #2d2d2d);
         }
     }
+
+    .grid__exercise-actions{
+        background-color: var(--surface-color-dark, #2d2d2d);
+    }
+}
+
+.dark-theme{
+    .create-program__grid-container, .create-program .create-program__tabs, .create-program .create-program__program-workouts{
+        --surface-color: black;
+    }
+
 }

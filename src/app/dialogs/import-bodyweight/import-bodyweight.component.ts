@@ -21,6 +21,7 @@ import { BodyweightService } from '../../services/bodyweight/bodyweight.service'
 import { AccountService } from '../../services/account/account.service';
 import { ThemeService } from '../../services/theme/theme.service';
 import { ConfirmationComponent } from '../confirmation/confirmation.component';
+import { DisplayInformationComponent } from '../display-information/display-information.component';
 import { environment } from '../../../environments/environment';
 
 interface ImportField {
@@ -115,7 +116,14 @@ export class ImportBodyweightComponent implements OnInit {
 
     const file = input.files[0];
     if (!file.name.endsWith('.csv')) {
-      alert(this.translate.instant('Please select a CSV file'));
+      this.dialog.open(DisplayInformationComponent, {
+        width: '400px',
+        maxWidth: '95vw',
+        data: {
+          title: this.translate.instant('Invalid File'),
+          content: this.translate.instant('Please select a CSV file')
+        }
+      });
       return;
     }
 
@@ -151,7 +159,14 @@ export class ImportBodyweightComponent implements OnInit {
       this.currentStep.set(1);
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert(this.translate.instant('There was an error uploading your file.'));
+      this.dialog.open(DisplayInformationComponent, {
+        width: '400px',
+        maxWidth: '95vw',
+        data: {
+          title: this.translate.instant('Upload Error'),
+          content: this.translate.instant('There was an error uploading your file.')
+        }
+      });
       this.selectedFile.set(null);
     } finally {
       this.isUploading.set(false);
@@ -210,7 +225,14 @@ export class ImportBodyweightComponent implements OnInit {
   public async startImport(): Promise<void> {
     const selectedFields = this.selectedFields();
     if (selectedFields.indexOf('created') < 0 || selectedFields.indexOf('weight') < 0) {
-      alert(this.translate.instant('You must assign a field to the date and weight columns.'));
+      this.dialog.open(DisplayInformationComponent, {
+        width: '400px',
+        maxWidth: '95vw',
+        data: {
+          title: this.translate.instant('Missing Fields'),
+          content: this.translate.instant('You must assign a field to the date and weight columns.')
+        }
+      });
       return;
     }
 
@@ -253,14 +275,30 @@ export class ImportBodyweightComponent implements OnInit {
         JSON.stringify(this.importedFields())
       );
       
-      alert(this.translate.instant('Your records have been imported into your bodyweight log.'));
+      const successDialogRef = this.dialog.open(DisplayInformationComponent, {
+        width: '400px',
+        maxWidth: '95vw',
+        data: {
+          title: this.translate.instant('Import Successful'),
+          content: this.translate.instant('Your records have been imported into your bodyweight log.')
+        }
+      });
       
-      await this.loadPreviousImports();
-      this.resetForm();
-      this.dialogRef.close({ imported: true });
+      successDialogRef.afterClosed().subscribe(async () => {
+        await this.loadPreviousImports();
+        this.resetForm();
+        this.dialogRef.close({ removed: true });
+      });
     } catch (error) {
       console.error('Error importing data:', error);
-      alert(this.translate.instant('There was an error importing this data. Please try again.'));
+      this.dialog.open(DisplayInformationComponent, {
+        width: '400px',
+        maxWidth: '95vw',
+        data: {
+          title: this.translate.instant('Import Error'),
+          content: this.translate.instant('There was an error importing this data. Please try again.')
+        }
+      });
     } finally {
       this.isImporting.set(false);
     }
@@ -298,6 +336,7 @@ export class ImportBodyweightComponent implements OnInit {
         this.previousImports.set([...imports]);
         
         await this.bodyweightService.removeImport(addId);
+        this.dialogRef.close({ imported: true });
       } catch (error) {
         console.error('Error removing import:', error);
         this.snackBar.open(
@@ -326,7 +365,14 @@ export class ImportBodyweightComponent implements OnInit {
       window.open(environment.apiUrl.replace('index.php', '') + exportUrl, '_blank');
     } catch (error) {
       console.error('Error exporting data:', error);
-      alert(this.translate.instant('There was an error exporting your data.'));
+      this.dialog.open(DisplayInformationComponent, {
+        width: '400px',
+        maxWidth: '95vw',
+        data: {
+          title: this.translate.instant('Export Error'),
+          content: this.translate.instant('There was an error exporting your data.')
+        }
+      });
     } finally {
       this.exportLoading.set(false);
     }

@@ -349,6 +349,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         if (data.dp) {
           this.profile.update(p => ({ ...p, dp: data.dp }));
         }
+        console.log(data);
         
         try {
           await this.accountService.updateProfile(data.profile);
@@ -359,6 +360,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
             ...data.profile,
             ...(data.dp ? { dp: data.dp } : {})
           };
+          console.log(updatedAccount);
           this.account.set(updatedAccount);
           this.accountService.setAccountObservable(updatedAccount);
           

@@ -64,9 +64,8 @@
     align-items: center;
     gap: 16px;
     padding: 32px;
-    border: 2px dashed var(--mat-divider-color, rgba(0, 0, 0, 0.12));
+    border: 2px dashed var(--mat-sys-primary, rgba(0, 0, 0, 0.12));
     border-radius: 8px;
-    background-color: var(--mat-divider-color, rgba(0, 0, 0, 0.12));
     margin-bottom: 24px;
 
     .dark-theme & {
@@ -246,6 +245,7 @@
 
       mat-icon,
       mat-spinner {
+        display:inline-block;
         margin-right: 8px;
       }
     }

@@ -88,9 +88,17 @@ export class PurchasePremiumComponent implements OnInit {
     }
     
     ngOnInit(): void {
-        // Component initialization
+        // Disable CDK's native Popover API so Stripe Link modal appears above this dialog.
+        // The popover attribute puts dialogs in the browser's "top layer" which blocks external overlays.
+        setTimeout(() => this.disablePopoverForDialog(), 0);
     }
     
+    private disablePopoverForDialog(): void {
+        document.querySelectorAll('.cdk-overlay-popover').forEach(el => {
+            el.removeAttribute('popover');
+        });
+    }
+      
     private async loadAccount(): Promise<void> {
         try {
             const account = await this.accountService.getAccountLocal();
